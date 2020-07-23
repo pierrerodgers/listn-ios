@@ -10,10 +10,14 @@ import SwiftUI
 
 struct LoginView: View {
     @ObservedObject var viewModel : LoginViewModel
+    @State var username : String = ""
+    @State var password : String = ""
     
     var body: some View {
         VStack {
-            Button(action: {self.viewModel.logIn(username: "test", password: "test")}, label: {Text("Log In")})
+            TextField("Username", text: $username)
+            SecureField("Password", text: $password)
+            Button(action: {self.viewModel.logIn(username: self.username, password: self.password)}, label: {Text("Log In")})
             if viewModel.hasError {
                 Text("Error \(viewModel.error!)")
             }
