@@ -22,8 +22,10 @@ class LoginViewModel: ObservableObject {
     func logIn(username:String, password:String) {
         loginService.logIn(username: username, password: password, completion: {error in
             guard error == nil else {
-                self.error = error!.localizedDescription
-                self.hasError = true
+                DispatchQueue.main.async {
+                    self.error = error!.localizedDescription
+                    self.hasError = true
+                }
                 return
             }
             
@@ -34,8 +36,10 @@ class LoginViewModel: ObservableObject {
     func signUp(username:String, password:String) {
         loginService.signUp(username: username, password: password, completion: {error in
             guard error == nil else {
-                self.error = error!.localizedDescription
-                self.hasError = true
+                DispatchQueue.main.async {
+                    self.error = error!.localizedDescription
+                    self.hasError = true
+                }
                 return
             }
             self.isLoggedIn = true
