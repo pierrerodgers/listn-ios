@@ -17,6 +17,7 @@ class LoginViewModel: ObservableObject {
     
     init(loginService:LoginService) {
         self.loginService = loginService
+        isLoggedIn = loginService.isLoggedIn
     }
     
     func logIn(username:String, password:String) {
@@ -28,8 +29,10 @@ class LoginViewModel: ObservableObject {
                 }
                 return
             }
+            DispatchQueue.main.async {
+                self.isLoggedIn = true
+            }
             
-            self.isLoggedIn = true
         })
     }
     
@@ -42,7 +45,9 @@ class LoginViewModel: ObservableObject {
                 }
                 return
             }
-            self.isLoggedIn = true
+            DispatchQueue.main.async {
+                self.isLoggedIn = true
+            }
         })
     }
     

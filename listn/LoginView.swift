@@ -14,16 +14,24 @@ struct LoginView: View {
     @State var password : String = ""
     
     var body: some View {
-        VStack {
-            TextField("Username", text: $username)
-            SecureField("Password", text: $password)
-            Button(action: {self.viewModel.logIn(username: self.username, password: self.password)}, label: {Text("Log In")})
-            if viewModel.hasError {
-                Text("Error \(viewModel.error!)")
-            }
+        if viewModel.isLoggedIn {
+            return AnyView(Text("Logged in!"))
+        }
+        else {
+            return AnyView(VStack {
+                TextField("Username", text: $username)
+                SecureField("Password", text: $password)
+                Button(action: {self.viewModel.logIn(username: self.username, password: self.password)}, label: {Text("Log In")})
+                if viewModel.hasError {
+                    Text("Error \(viewModel.error!)")
+                }
+            })
         }
         
+        
+        
     }
+    
 }
 /*
 struct LoginView_Previews: PreviewProvider {
