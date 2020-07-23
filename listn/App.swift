@@ -10,40 +10,41 @@ import Foundation
 import RealmSwift
 
 protocol LoginService {
-    func signUp(username:String, password:String)
+    func signUp(username:String, password:String, completion:@escaping (Error?) -> Void)
     
-    func logIn(username:String, password:String)
-    
-    isLoggedIn : Bool
-    
-    error : String?
+    func logIn(username:String, password:String, completion:@escaping (Error?) -> Void)
     
 }
 
 class MongoLoginService : LoginService {
+    
     // We assume that app is intitialised
-    var app : RealmApp
+    private var app : RealmApp
     
     
     init(app:RealmApp) {
         self.app = app
     }
     
-    func signUp(username: String, password: String) {
+    func signUp(username: String, password: String, completion: @escaping (Error?) -> Void) {
         app.usernamePasswordProviderClient().registerEmail(username, password:password, completion: { error in
             guard error == nil else {
                 print("Signup failed")
-                self.error = error
+                completion(error)
                 return
             }
             print("Signup successful")
-            self.logIn(username: username, password: password)
+            self.logIn(username: username, password: password, completion: completion)
         })
     }
     
-    func logIn(username: String, password: String) {
-        app.login(withcredential:AppCredentials(username: username, password:password)) { [weak self] in
-            self!.isLoggedIn = true
-        }
+    func logIn(username: String, password: String, completion:@escaping (Error?) -> Void) {
+        print(username)
+        print(password)
+        let credentials = AppCredentials(username: username, password: password)
+        print(credentials)
+        app.login(withCredential:AppCredentials(username: username, password: password), completion: {user, error in
+            completion(error)
+        })
     }
 }
