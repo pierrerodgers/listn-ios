@@ -14,6 +14,8 @@ protocol LoginService {
     
     func logIn(username:String, password:String, completion:@escaping (Error?) -> Void)
     
+    var isLoggedIn : Bool { get }
+    
 }
 
 class MongoLoginService : LoginService {
@@ -21,9 +23,14 @@ class MongoLoginService : LoginService {
     // We assume that app is intitialised
     private var app : RealmApp
     
+    var isLoggedIn: Bool = true
+    
     
     init(app:RealmApp) {
         self.app = app
+        if (app.currentUser() != nil) {
+            isLoggedIn = true
+        }
     }
     
     func signUp(username: String, password: String, completion: @escaping (Error?) -> Void) {
