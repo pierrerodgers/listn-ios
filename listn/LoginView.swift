@@ -9,13 +9,25 @@
 import SwiftUI
 
 struct LoginView: View {
+    @ObservedObject var viewModel : LoginViewModel
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack {
+            Button(action: {self.viewModel.logIn(username: "test", password: "test")}, label: {Text("Log In")})
+            if viewModel.hasError {
+                Text("Error \(viewModel.error!)")
+            }
+        }
+        
     }
 }
-
+/*
 struct LoginView_Previews: PreviewProvider {
+    
+    /*let loginService = MongoLoginService(app: app)
+    let viewModel = LoginViewModel(loginService: loginService)*/
     static var previews: some View {
-        LoginView()
+        //LoginView(viewModel: viewModel)
     }
 }
+*/
