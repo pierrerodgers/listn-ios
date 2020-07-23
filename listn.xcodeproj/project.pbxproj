@@ -14,6 +14,7 @@
 		C12F6F0424C827670083BF92 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C12F6F0324C827670083BF92 /* Preview Assets.xcassets */; };
 		C12F6F0724C827670083BF92 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C12F6F0524C827670083BF92 /* LaunchScreen.storyboard */; };
 		C12F6F1224C827670083BF92 /* listnUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12F6F1124C827670083BF92 /* listnUITests.swift */; };
+		C12F6F1D24C9298D0083BF92 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12F6F1C24C9298D0083BF92 /* LoginView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +39,7 @@
 		C12F6F0D24C827670083BF92 /* listnUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = listnUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C12F6F1124C827670083BF92 /* listnUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = listnUITests.swift; sourceTree = "<group>"; };
 		C12F6F1324C827670083BF92 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C12F6F1C24C9298D0083BF92 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +84,7 @@
 				C12F6EFA24C827600083BF92 /* AppDelegate.swift */,
 				C12F6EFC24C827600083BF92 /* SceneDelegate.swift */,
 				C12F6EFE24C827600083BF92 /* ContentView.swift */,
+				C12F6F1C24C9298D0083BF92 /* LoginView.swift */,
 				C12F6F0024C827670083BF92 /* Assets.xcassets */,
 				C12F6F0524C827670083BF92 /* LaunchScreen.storyboard */,
 				C12F6F0824C827670083BF92 /* Info.plist */,
@@ -210,6 +213,7 @@
 			files = (
 				C12F6EFB24C827600083BF92 /* AppDelegate.swift in Sources */,
 				C12F6EFD24C827600083BF92 /* SceneDelegate.swift in Sources */,
+				C12F6F1D24C9298D0083BF92 /* LoginView.swift in Sources */,
 				C12F6EFF24C827600083BF92 /* ContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
