@@ -9,10 +9,10 @@
 import Foundation
 import RealmSwift
 
-class album: Object {
+class Album: Object, Identifiable {
     @objc dynamic var _id: ObjectId? = nil
     @objc dynamic var _partitionKey: String? = nil
-    @objc dynamic var artist: artist?
+    @objc dynamic var artist: Artist?
     @objc dynamic var artwork: String? = nil
     let genres = RealmSwift.List<String>()
     @objc dynamic var name: String? = nil
@@ -30,7 +30,7 @@ class album_streamingUrls: EmbeddedObject {
     @objc dynamic var spotify: String? = nil
 }
 
-class artist: Object {
+class Artist: Object {
     @objc dynamic var _id: ObjectId? = nil
     @objc dynamic var _partitionKey: String? = nil
     @objc dynamic var image: String? = nil
@@ -47,7 +47,7 @@ class artist_streamingUrls: EmbeddedObject {
 }
 
 
-class reviewer: Object {
+class Reviewer: Object {
     @objc dynamic var _id: ObjectId? = nil
     @objc dynamic var _partitionKey: String? = nil
     @objc dynamic var link: String? = nil
@@ -57,14 +57,14 @@ class reviewer: Object {
     }
 }
 
-class review: Object {
+class Review: Object {
     @objc dynamic var _id: ObjectId? = nil
     @objc dynamic var _partitionKey: String? = nil
-    @objc dynamic var album: album?
-    @objc dynamic var artist: artist?
+    @objc dynamic var Album: Album?
+    @objc dynamic var Artist: Artist?
     @objc dynamic var date: Date? = nil
     @objc dynamic var link: String? = nil
-    @objc dynamic var reviewer: reviewer?
+    @objc dynamic var reviewer: Reviewer?
     @objc dynamic var score: String? = nil
     override static func primaryKey() -> String? {
         return "_id"
