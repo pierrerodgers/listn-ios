@@ -20,7 +20,7 @@ class FeedModel: ObservableObject {
     
     var app : AppData
     
-    @Published var reviews : Array<Review>
+    @Published var reviews : Array<review>
     
     
     
