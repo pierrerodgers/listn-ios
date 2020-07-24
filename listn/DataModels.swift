@@ -57,11 +57,12 @@ class Reviewer: Object {
     }
 }
 
-class Review: Object {
-    @objc dynamic var _id: ObjectId? = nil
+class Review: Object, Identifiable {
+    //@objc dynamic var _id: ObjectId? = nil
+    var _id: ObjectId? = nil
     @objc dynamic var _partitionKey: String? = nil
-    @objc dynamic var Album: Album?
-    @objc dynamic var Artist: Artist?
+    @objc dynamic var album: Album?
+    @objc dynamic var artist: Artist?
     @objc dynamic var date: Date? = nil
     @objc dynamic var link: String? = nil
     @objc dynamic var reviewer: Reviewer?
@@ -71,3 +72,6 @@ class Review: Object {
     }
 }
 
+class User:Object {
+    @objc dynamic var _id: ObjectId? = nil
+}
