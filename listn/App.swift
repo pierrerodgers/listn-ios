@@ -18,6 +18,26 @@ protocol LoginService {
     
 }
 
+protocol AppData : ArtistData, AlbumData, UserData {
+    func getLatestReviews() -> Array<Review>
+}
+
+protocol ArtistData {
+    func getAlbums(artist: Artist) -> Array<Album>
+    
+    func getReviews(artist:Artist) -> Array<Review>
+    
+}
+
+protocol AlbumData {
+    func getReviews(album: Album) -> Array<Review>
+}
+
+protocol UserData {
+    func getReviews(user: User) -> Array<Review>
+    
+}
+
 class MongoLoginService : LoginService {
     
     // We assume that app is intitialised
