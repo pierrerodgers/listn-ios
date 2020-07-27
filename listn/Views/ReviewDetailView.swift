@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct ReviewDetailView: View {
-    @State var review : review
+    @State var review : Review
     
     var body: some View {
         Text(review.album!.name ?? "Album")
