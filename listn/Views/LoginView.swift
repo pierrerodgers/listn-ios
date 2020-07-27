@@ -32,6 +32,10 @@ struct LoginView: View {
                     if viewModel.hasError {
                         Text("Error \(viewModel.error!)")
                     }
+                    Button(action: {self.viewModel.signUp(username: self.username, password: self.password)}, label: {Text("Sign up")})
+                    if viewModel.hasError {
+                        Text("Error \(viewModel.error!)")
+                    }
                 }
             )
         }
