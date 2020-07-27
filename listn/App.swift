@@ -16,6 +16,8 @@ protocol LoginService {
     
     var isLoggedIn : Bool { get }
     
+    func logOut(completion: @escaping (Error?) -> Void)
+    
 }
 
 protocol AppData : ArtistData, AlbumData, UserData {
@@ -43,13 +45,16 @@ class MongoLoginService : LoginService {
     // We assume that app is intitialised
     private var app : RealmApp
     
-    var isLoggedIn: Bool = true
+    var isLoggedIn: Bool
     
     
     init(app:RealmApp) {
         self.app = app
         if (app.currentUser() != nil) {
             isLoggedIn = true
+        }
+        else {
+            isLoggedIn = false
         }
     }
     
@@ -66,12 +71,14 @@ class MongoLoginService : LoginService {
     }
     
     func logIn(username: String, password: String, completion:@escaping (Error?) -> Void) {
-        print(username)
-        print(password)
         let credentials = AppCredentials(username: username, password: password)
         print(credentials)
         app.login(withCredential:AppCredentials(username: username, password: password), completion: {user, error in
             completion(error)
         })
+    }
+    
+    func logOut(completion: @escaping (Error?) -> Void) {
+        app.logOut(completion: completion)
     }
 }
