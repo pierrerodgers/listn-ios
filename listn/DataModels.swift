@@ -58,8 +58,7 @@ class Reviewer: Object {
 }
 
 class Review: Object, Identifiable {
-    //@objc dynamic var _id: ObjectId? = nil
-    var _id: ObjectId? = nil
+    @objc dynamic var _id: ObjectId? = nil
     @objc dynamic var _partitionKey: String? = nil
     @objc dynamic var album: Album?
     @objc dynamic var artist: Artist?
@@ -72,6 +71,12 @@ class Review: Object, Identifiable {
     }
 }
 
-class User:Object {
-    @objc dynamic var _id: ObjectId? = nil
+class User: Object {
+    @objc dynamic var _id: ObjectId = ObjectId.generate()
+    @objc dynamic var _partitionKey: String? = nil
+    @objc dynamic var name: String = ""
+    @objc dynamic var user_id: String = ""
+    override static func primaryKey() -> String? {
+        return "_id"
+    }
 }
