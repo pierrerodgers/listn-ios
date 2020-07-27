@@ -15,7 +15,13 @@ struct LoginView: View {
     
     var body: some View {
         if viewModel.isLoggedIn {
-            return AnyView(Text("Logged in!"))
+            return AnyView(
+                HStack{
+                    Text("Logged in!")
+                    Button(action: {self.viewModel.logOut()}, label: {Text("Log out")})
+                }
+            
+            )
         }
         else {
             return AnyView(
