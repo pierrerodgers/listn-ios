@@ -34,16 +34,6 @@ class LoginViewModel: ObservableObject {
                 self.isLoggedIn = true
             }
             
-            Realm.asyncOpen(configuration: app.currentUser()!.configuration(partitionValue: ((app.currentUser()?.customData!["id"])!)!), callback: { maybeRealm, error in
-                guard error == nil else {
-                    print(error ?? "Error!")
-                    return
-                }
-                let realm = maybeRealm!
-                let albums = realm.objects(Album.self)
-                print(albums)
-            })
-            
             
         })
     }
