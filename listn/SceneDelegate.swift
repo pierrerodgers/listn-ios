@@ -11,9 +11,6 @@ import SwiftUI
 import RealmSwift
 
 
-let config = AppConfiguration(baseURL: "https://realm.mongodb.com", transport: nil, localAppName: nil, localAppVersion: nil)
-let app = RealmApp("listn-bsliv", configuration: config)
-
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
@@ -25,9 +22,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
 
         // Create the SwiftUI view that provides the window contents.
-        let loginService = MongoLoginService(app:app)
+        /*let loginService = MongoLoginService(app:app)
         let loginModel = LoginViewModel(loginService: loginService)
-        let contentView = LoginView(viewModel: loginModel)
+        let contentView = LoginView(viewModel: loginModel)*/
+        
+        
+        /*
+        let realm = try! Realm(configuration: app.currentUser()!.configuration(partitionValue:(app.currentUser()?.identity)!))*/
+        let app = ListnApp()
+        let contentView = AddReviewView(app:app)
+        
 
         // Use a UIHostingController as window root view controller.
         if let windowScene = scene as? UIWindowScene {
