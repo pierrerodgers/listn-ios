@@ -9,6 +9,7 @@
 import Foundation
 import RealmSwift
 
+
 class Album: Object, Identifiable {
     @objc dynamic var _id: ObjectId? = nil
     @objc dynamic var _partitionKey: String? = nil
