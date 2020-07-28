@@ -31,9 +31,10 @@ class ListnApp {
         // Initialise login service and fill variables if logged in
         loginService = MongoLoginService(app: realmApp)
         if loginService.isLoggedIn {
-            realm = try! Realm(configuration: app.currentUser()!.configuration(partitionValue:(app.currentUser()?.identity)!))
-            Network.shared.token = app.currentUser()!.accessToken!
+            realm = try! Realm(configuration: realmApp.currentUser()!.configuration(partitionValue:(realmApp.currentUser()?.identity)!))
+            Network.shared.token = realmApp.currentUser()!.accessToken!
             user = realm?.objects(User.self)[0]
+            appData = ListnAppData()
         }
         
     }
@@ -47,49 +48,38 @@ class ListnApp {
 }
 
 class ListnAppData : AppData {
+    func getAlbums(artistId: String, completion: @escaping (Error?, Array<ListnAlbum>?) -> Void) {
+        print("FETCHING DATA")
+        Network.shared.apollo.fetch(query: AlbumQuery(query: AlbumQueryInput(artist:ArtistQueryInput(_id: artistId)))) { result in
+            switch result {
+            case .success(let graphQlResult):
+                let albums = graphQlResult.data?.albums.compactMap({albumResult in albumResult!})
+                let toReturn = albums?.compactMap({album in ApolloAlbum(apolloResult: album)})
+                let _ = completion(nil, toReturn!)
+                //let albums = graphQlResult.data?.albums.map( return result! )
+                //completion(nil, graphQlResult.data?.albums)
+            case .failure(let error) :
+                print(error)
+                let _ = completion(error, nil)
+            }
+        }
+    }
+    
+    func getReviews(artistId: String, completion: @escaping (Error?, Array<ListnReview>?) -> Any) {
+        let _ = completion(nil, nil)
+    }
+    
+    func getReviews(albumId: String, completion: @escaping (Error?, Array<ListnReview>?) -> Any) {
+        let _ = completion(nil, nil)
+    }
+    
+    func getReviews(userId: String, completion: @escaping (Error?, Array<ListnReview>?) -> Any) {
+        let _ = completion(nil, nil)
+    }
+    
     // Assumes that token is already added to Network class!
-    
-    func getLatestReviews() -> Array<Review> {
-        return []
-    }
-    
-    func getAlbums(artist: Artist) -> Array<Album> {
-        /*Network.shared.token = (app.currentUser()?.accessToken!)!
-        print(Network.shared.token)
-        Network.shared.apollo.fetch(query: AlbumQuery(query:AlbumQueryInput(name:"Punisher"))) { result in
-            switch result {
-            case .success(let graphQlResult):
-                print("success! Result:\(graphQlResult.data?.album?.artist?.name)")
-            case .failure(let error) :
-                print(error)
-            }
-            
-            
-        }*/
-        /*
-        Network.shared.apollo.fetch(query: AlbumQuery(query: AlbumQueryInput(artist:ArtistQueryInput(_id: artist._id!.stringValue)))) { result in
-            switch result {
-            case .success(let graphQlResult):
-                return graphQlResult.data?.albums
-            case .failure(let error) :
-                print(error)
-                return []
-            }
-        }*/
-        
-        return []
-    }
-    
-    func getReviews(artist: Artist) -> Array<Review> {
-        return []
-    }
-    
-    func getReviews(album: Album) -> Array<Review> {
-        return []
-    }
-    
-    func getReviews(user: User) -> Array<Review> {
-        return []
+    func getLatestReviews(completion: @escaping (Error?, Array<ListnReview>?) -> Any) {
+        let _ = completion(nil, [])
     }
     
     
@@ -107,22 +97,22 @@ protocol LoginService {
 }
 
 protocol AppData : ArtistData, AlbumData, UserData {
-    func getLatestReviews() -> Array<Review>
+    func getLatestReviews(completion: @escaping (Error?, Array<ListnReview>?) -> Any)
 }
 
 protocol ArtistData {
-    func getAlbums(artist: Artist) -> Array<Album>
+    func getAlbums(artistId: String, completion: @escaping (Error?, Array<ListnAlbum>?) -> Void)
     
-    func getReviews(artist:Artist) -> Array<Review>
+    func getReviews(artistId:String, completion: @escaping (Error?, Array<ListnReview>?) -> Any)
     
 }
 
 protocol AlbumData {
-    func getReviews(album: Album) -> Array<Review>
+    func getReviews(albumId: String, completion: @escaping (Error?, Array<ListnReview>?) -> Any)
 }
 
 protocol UserData {
-    func getReviews(user: User) -> Array<Review>
+    func getReviews(userId: String, completion: @escaping (Error?, Array<ListnReview>?) -> Any)
     
 }
 
