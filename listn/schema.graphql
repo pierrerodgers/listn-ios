@@ -1,0 +1,13 @@
+query Album($query:AlbumQueryInput) {
+    albums (query:$query){
+        _id
+        name
+        artwork
+        genres
+        releaseDate
+        artist {
+            name
+            _id
+        }
+    }
+}
