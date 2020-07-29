@@ -8,10 +8,11 @@
 
 import Foundation
 import Apollo
+import RealmSwift
 
 class Network {
     static let shared = Network()
-    var token : String = ""
+    var app : RealmApp?
     private(set) lazy var apollo: ApolloClient = {
         let httpNetworkTransport = HTTPNetworkTransport(url: URL(string: "https://realm.mongodb.com/api/client/v2.0/app/listn-bsliv/graphql")!)
         httpNetworkTransport.delegate = self
@@ -21,6 +22,7 @@ class Network {
 
 extension Network : HTTPNetworkTransportPreflightDelegate {
     func networkTransport(_ networkTransport: HTTPNetworkTransport, willSend request: inout URLRequest) {
+        let token = app!.currentUser()!.accessToken!
         request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
     }
     
