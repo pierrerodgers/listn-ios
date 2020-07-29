@@ -1,13 +1,66 @@
 query Album($query:AlbumQueryInput) {
     albums (query:$query){
+        ...AlbumDetail
+    }
+}
+
+query LatestReviews {
+    reviews(
+        sortBy: DATE_DESC
+        limit: 20
+    ) {
+        ...ReviewDetail
+        
+    }
+}
+
+fragment ArtistDetail on Artist {
+    name
+    _id
+    image
+    streamingUrls {
+        appleMusic
+        spotify
+    }
+}
+
+fragment AlbumDetail on Album {
+    artist {
+        ...ArtistDetail
+    }
+    _id
+    name
+    artwork
+    genres
+    releaseDate
+    recordLabel
+    streamingUrls {
+        appleMusic
+        spotify
+    }
+}
+
+fragment ReviewDetail on Review {
+    album {
+        ...AlbumDetail
+    }
+    artist {
+        ...ArtistDetail
+    }
+    reviewer {
         _id
+        link
         name
-        artwork
-        genres
-        releaseDate
-        artist {
-            name
-            _id
-        }
+    }
+    _id
+    link
+    date
+    score
+
+}
+
+query Reviews($query:ReviewQueryInput) {
+    reviews (query: $query) {
+        ...ReviewDetail
     }
 }
