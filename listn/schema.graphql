@@ -4,6 +4,12 @@ query Album($query:AlbumQueryInput) {
     }
 }
 
+query Artist($query:ArtistQueryInput) {
+    artists (query:$query) {
+    ...ArtistDetail
+    }
+}
+
 query LatestReviews {
     reviews(
         sortBy: DATE_DESC
@@ -64,3 +70,16 @@ query Reviews($query:ReviewQueryInput) {
         ...ReviewDetail
     }
 }
+
+query AlbumSearch($input:String) {
+    AlbumSearch(input:{query:$input}) {
+        albums
+    }
+}
+
+query ArtistSearch($input:String) {
+    ArtistSearch(input:{query:$input}) {
+        artists
+    }
+}
+
