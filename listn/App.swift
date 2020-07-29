@@ -50,7 +50,8 @@ class ListnApp {
     
 }
 
-class ListnAppData : AppData {
+class ListnAppData : AppData, SearchData {
+    
     func getAlbums(artistId: String, completion: @escaping (Error?, Array<ListnAlbum>?) -> Void) {
         print("FETCHING DATA")
         Network.shared.apollo.fetch(query: AlbumQuery(query: AlbumQueryInput(artist:ArtistQueryInput(_id: artistId)))) { result in
@@ -58,69 +59,130 @@ class ListnAppData : AppData {
             case .success(let graphQlResult):
                 let albums = graphQlResult.data?.albums.compactMap({albumResult in albumResult!})
                 let toReturn = albums?.compactMap({album in ApolloAlbum(apolloResult: album.fragments.albumDetail)})
-                let _ = completion(nil, toReturn!)
+                completion(nil, toReturn!)
                 //let albums = graphQlResult.data?.albums.map( return result! )
                 //completion(nil, graphQlResult.data?.albums)
             case .failure(let error) :
                 print(error)
-                let _ = completion(error, nil)
+                completion(error, nil)
             }
         }
     }
     
-    func getReviews(artistId: String, completion: @escaping (Error?, Array<ListnReview>?) -> Any) {
+    func getReviews(artistId: String, completion: @escaping (Error?, Array<ListnReview>?) -> ()) {
         Network.shared.apollo.fetch(query: ReviewsQuery(query: ReviewQueryInput(artist:ArtistQueryInput(_id: artistId)))) { result in
             switch result {
             case .success(let graphQlResult):
                 let reviews = graphQlResult.data?.reviews.compactMap({review in review!})
                 let toReturn = reviews?.compactMap({review in ApolloReview(apolloResult: review.fragments.reviewDetail)})
-                let _ = completion(nil, toReturn!)
+                completion(nil, toReturn!)
                 //let albums = graphQlResult.data?.albums.map( return result! )
                 //completion(nil, graphQlResult.data?.albums)
             case .failure(let error) :
                 print(error)
-                let _ = completion(error, nil)
+                completion(error, nil)
             }
         }
     }
     
-    func getReviews(albumId: String, completion: @escaping (Error?, Array<ListnReview>?) -> Any) {
+    func getReviews(albumId: String, completion: @escaping (Error?, Array<ListnReview>?) -> ()) {
         Network.shared.apollo.fetch(query: ReviewsQuery(query: ReviewQueryInput(album:AlbumQueryInput(_id: albumId)))) { result in
             switch result {
             case .success(let graphQlResult):
                 let reviews = graphQlResult.data?.reviews.compactMap({review in review!})
                 let toReturn = reviews?.compactMap({review in ApolloReview(apolloResult: review.fragments.reviewDetail)})
-                let _ = completion(nil, toReturn!)
+                completion(nil, toReturn!)
                 //let albums = graphQlResult.data?.albums.map( return result! )
                 //completion(nil, graphQlResult.data?.albums)
             case .failure(let error) :
                 print(error)
-                let _ = completion(error, nil)
+                completion(error, nil)
             }
         }
     }
     
-    func getReviews(userId: String, completion: @escaping (Error?, Array<ListnReview>?) -> Any) {
-        let _ = completion(nil, nil)
+    func getReviews(userId: String, completion: @escaping (Error?, Array<ListnReview>?) -> ()) {
+         completion(nil, nil)
     }
     
     // Assumes that token is already added to Network class!
-    func getLatestReviews(completion: @escaping (Error?, Array<ListnReview>?) -> Any) {
+    func getLatestReviews(completion: @escaping (Error?, Array<ListnReview>?) -> ()) {
         Network.shared.apollo.fetch(query: LatestReviewsQuery()) { result in
             switch result {
             case .success(let graphQlResult):
                 let reviews = graphQlResult.data?.reviews.compactMap({review in review!})
                 let toReturn = reviews?.compactMap({review in ApolloReview(apolloResult: review.fragments.reviewDetail)})
-                let _ = completion(nil, toReturn!)
+                completion(nil, toReturn!)
                 //let albums = graphQlResult.data?.albums.map( return result! )
                 //completion(nil, graphQlResult.data?.albums)
             case .failure(let error) :
                 print(error)
-                let _ = completion(error, nil)
+                completion(error, nil)
             }
         }
     }
     
+    func searchAlbums(query: String, completion: @escaping (Error?, Array<String>?) -> ()) {
+        Network.shared.apollo.fetch(query: AlbumSearchQuery(input: query)) { result in
+            switch result {
+            case .success(let graphQlResult):
+                let ids = graphQlResult.data?.albumSearch?.albums?.compactMap({albumId in albumId!})
+                completion(nil, ids!)
+            case .failure(let error) :
+                print(error)
+                completion(error,nil)
+            }
+        }
+    }
+    
+    func getAlbums(albumIds: [String], completion: @escaping (Error?, Array<ListnAlbum>?) -> ()) {
+        Network.shared.apollo.fetch(query:AlbumQuery(query: AlbumQueryInput(_idIn:albumIds))) { result in
+            switch result {
+            case .success(let graphQlResult):
+                let albums = graphQlResult.data?.albums.compactMap({albumResult in albumResult!})
+                let toReturn = albums?.compactMap({album in ApolloAlbum(apolloResult: album.fragments.albumDetail)})
+                completion(nil, toReturn!)
+                //let albums = graphQlResult.data?.albums.map( return result! )
+                //completion(nil, graphQlResult.data?.albums)
+            case .failure(let error) :
+                print(error)
+                completion(error, nil)
+            }
+        }
+    }
+    
+    func searchArtists(query: String, completion: @escaping (Error?, Array<String>?) -> ()) {
+        Network.shared.apollo.fetch(query: ArtistSearchQuery(input: query)) { result in
+            switch result {
+            case .success(let graphQlResult):
+                let ids = graphQlResult.data?.artistSearch?.artists?.compactMap({artistId in artistId!})
+                completion(nil, ids!)
+            case .failure(let error) :
+                print(error)
+                completion(error,nil)
+            }
+        }
+    }
+    
+    func searchReviewers(query: String, completion: @escaping (Error?, Array<String>?) -> ()) {
+        completion(nil, nil)
+    }
+    
+    func getArtists(artistIds: [String], completion: @escaping (Error?, Array<ListnArtist>?) -> ()) {
+        Network.shared.apollo.fetch(query:ArtistQuery(query: ArtistQueryInput(_idIn:artistIds))) { result in
+            switch result {
+            case .success(let graphQlResult):
+                let artists = graphQlResult.data?.artists.compactMap({artistResult in artistResult!})
+                let toReturn = artists?.compactMap({artist in ApolloArtist(apolloResult: artist.fragments.artistDetail)})
+                completion(nil, toReturn!)
+                //let albums = graphQlResult.data?.albums.map( return result! )
+                //completion(nil, graphQlResult.data?.albums)
+            case .failure(let error) :
+                print(error)
+                completion(error, nil)
+            }
+        }
+    }
     
 }
 
@@ -135,24 +197,34 @@ protocol LoginService {
     
 }
 
-protocol AppData : ArtistData, AlbumData, UserData {
-    func getLatestReviews(completion: @escaping (Error?, Array<ListnReview>?) -> Any)
+protocol AppData : ArtistData, AlbumData, UserData, SearchData {
+    func getLatestReviews(completion: @escaping (Error?, Array<ListnReview>?) -> ())
 }
 
 protocol ArtistData {
     func getAlbums(artistId: String, completion: @escaping (Error?, Array<ListnAlbum>?) -> Void)
     
-    func getReviews(artistId:String, completion: @escaping (Error?, Array<ListnReview>?) -> Any)
+    func getReviews(artistId:String, completion: @escaping (Error?, Array<ListnReview>?) -> ())
+    
+    func getArtists(artistIds: [String], completion: @escaping (Error?, Array<ListnArtist>?) -> ())
     
 }
 
 protocol AlbumData {
-    func getReviews(albumId: String, completion: @escaping (Error?, Array<ListnReview>?) -> Any)
+    func getReviews(albumId: String, completion: @escaping (Error?, Array<ListnReview>?) -> ())
+    
+    func getAlbums(albumIds: [String], completion: @escaping (Error?, Array<ListnAlbum>?) -> ())
 }
 
 protocol UserData {
-    func getReviews(userId: String, completion: @escaping (Error?, Array<ListnReview>?) -> Any)
+    func getReviews(userId: String, completion: @escaping (Error?, Array<ListnReview>?) -> ())
     
+}
+
+protocol SearchData {
+    func searchAlbums(query:String, completion: @escaping (Error?, Array<String>?) -> ())
+    func searchArtists(query:String, completion: @escaping (Error?, Array<String>?) -> ())
+    func searchReviewers(query:String, completion: @escaping (Error?, Array<String>?) -> ())
 }
 
 class MongoLoginService : LoginService {
@@ -180,7 +252,7 @@ class MongoLoginService : LoginService {
         app.usernamePasswordProviderClient().registerEmail(username, password:password, completion: { error in
             guard error == nil else {
                 print("Signup failed")
-                completion(error)
+               completion(error)
                 return
             }
             print("Signup successful")
@@ -192,7 +264,7 @@ class MongoLoginService : LoginService {
         let credentials = AppCredentials(username: username, password: password)
         print(credentials)
         app.login(withCredential:AppCredentials(username: username, password: password), completion: {user, error in
-            completion(error)
+           completion(error)
         })
     }
     
