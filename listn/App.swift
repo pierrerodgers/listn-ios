@@ -14,7 +14,11 @@ class ListnApp {
     var realmApp : RealmApp!
     var loginService : LoginService!
     var user : User?
-    var realm : Realm?
+    var realm : Realm? {
+        get {
+            try! Realm(configuration: realmApp.currentUser()!.configuration(partitionValue:(realmApp.currentUser()?.identity)!))
+        }
+    }
     var appData : AppData?
     
     var isLoggedIn : Bool {
@@ -31,9 +35,8 @@ class ListnApp {
         // Initialise login service and fill variables if logged in
         loginService = MongoLoginService(app: realmApp)
         if loginService.isLoggedIn {
-            realm = try! Realm(configuration: realmApp.currentUser()!.configuration(partitionValue:(realmApp.currentUser()?.identity)!))
-            Network.shared.token = realmApp.currentUser()!.accessToken!
-            user = realm?.objects(User.self)[0]
+            realmApp.currentUser()?.refreshCustomData({(error) in })
+            Network.shared.app = realmApp
             appData = ListnAppData()
         }
         
@@ -54,7 +57,7 @@ class ListnAppData : AppData {
             switch result {
             case .success(let graphQlResult):
                 let albums = graphQlResult.data?.albums.compactMap({albumResult in albumResult!})
-                let toReturn = albums?.compactMap({album in ApolloAlbum(apolloResult: album)})
+                let toReturn = albums?.compactMap({album in ApolloAlbum(apolloResult: album.fragments.albumDetail)})
                 let _ = completion(nil, toReturn!)
                 //let albums = graphQlResult.data?.albums.map( return result! )
                 //completion(nil, graphQlResult.data?.albums)
@@ -66,11 +69,35 @@ class ListnAppData : AppData {
     }
     
     func getReviews(artistId: String, completion: @escaping (Error?, Array<ListnReview>?) -> Any) {
-        let _ = completion(nil, nil)
+        Network.shared.apollo.fetch(query: ReviewsQuery(query: ReviewQueryInput(artist:ArtistQueryInput(_id: artistId)))) { result in
+            switch result {
+            case .success(let graphQlResult):
+                let reviews = graphQlResult.data?.reviews.compactMap({review in review!})
+                let toReturn = reviews?.compactMap({review in ApolloReview(apolloResult: review.fragments.reviewDetail)})
+                let _ = completion(nil, toReturn!)
+                //let albums = graphQlResult.data?.albums.map( return result! )
+                //completion(nil, graphQlResult.data?.albums)
+            case .failure(let error) :
+                print(error)
+                let _ = completion(error, nil)
+            }
+        }
     }
     
     func getReviews(albumId: String, completion: @escaping (Error?, Array<ListnReview>?) -> Any) {
-        let _ = completion(nil, nil)
+        Network.shared.apollo.fetch(query: ReviewsQuery(query: ReviewQueryInput(album:AlbumQueryInput(_id: albumId)))) { result in
+            switch result {
+            case .success(let graphQlResult):
+                let reviews = graphQlResult.data?.reviews.compactMap({review in review!})
+                let toReturn = reviews?.compactMap({review in ApolloReview(apolloResult: review.fragments.reviewDetail)})
+                let _ = completion(nil, toReturn!)
+                //let albums = graphQlResult.data?.albums.map( return result! )
+                //completion(nil, graphQlResult.data?.albums)
+            case .failure(let error) :
+                print(error)
+                let _ = completion(error, nil)
+            }
+        }
     }
     
     func getReviews(userId: String, completion: @escaping (Error?, Array<ListnReview>?) -> Any) {
@@ -79,7 +106,19 @@ class ListnAppData : AppData {
     
     // Assumes that token is already added to Network class!
     func getLatestReviews(completion: @escaping (Error?, Array<ListnReview>?) -> Any) {
-        let _ = completion(nil, [])
+        Network.shared.apollo.fetch(query: LatestReviewsQuery()) { result in
+            switch result {
+            case .success(let graphQlResult):
+                let reviews = graphQlResult.data?.reviews.compactMap({review in review!})
+                let toReturn = reviews?.compactMap({review in ApolloReview(apolloResult: review.fragments.reviewDetail)})
+                let _ = completion(nil, toReturn!)
+                //let albums = graphQlResult.data?.albums.map( return result! )
+                //completion(nil, graphQlResult.data?.albums)
+            case .failure(let error) :
+                print(error)
+                let _ = completion(error, nil)
+            }
+        }
     }
     
     
