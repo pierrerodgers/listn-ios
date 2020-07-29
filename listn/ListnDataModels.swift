@@ -48,7 +48,8 @@ protocol ListnReviewer {
 
 struct ApolloAlbum : ListnAlbum {
     
-    init(apolloResult: AlbumQuery.Data.Album) {
+    
+    init(apolloResult: AlbumDetail) {
         // Initialise all strings
         _id = apolloResult._id!
         name = apolloResult.name!
@@ -61,10 +62,10 @@ struct ApolloAlbum : ListnAlbum {
         releaseDate = dateFormatter.date(from: apolloResult.releaseDate ?? "")
         
         // Initialise Artist
-        artist = ApolloArtist(apolloResult: apolloResult.artist!)
+        artist = ApolloArtist(apolloResult: apolloResult.artist!.fragments.artistDetail)
         
         // Initialise streamingUrls
-        streamingUrls = StreamingUrls(spotify: apolloResult.streamingUrls!.spotify!, appleMusic: apolloResult.streamingUrls!.appleMusic!)
+        streamingUrls = StreamingUrls(spotify: apolloResult.streamingUrls?.spotify ?? "", appleMusic: apolloResult.streamingUrls?.appleMusic ?? "")
     }
     
     var streamingUrls: ListnStreamingUrls
@@ -92,13 +93,62 @@ struct ApolloArtist : ListnArtist {
     
     var streamingUrls: ListnStreamingUrls
     
-    init(apolloResult: AlbumQuery.Data.Album.Artist) {
+    init(apolloResult: ArtistDetail) {
         _id = apolloResult._id!
         name = apolloResult.name!
         image = apolloResult.image ?? ""
-        streamingUrls = StreamingUrls(spotify: apolloResult.streamingUrls!.spotify!, appleMusic: apolloResult.streamingUrls!.appleMusic!)
+        streamingUrls = StreamingUrls(spotify: apolloResult.streamingUrls?.spotify ?? "", appleMusic: apolloResult.streamingUrls?.appleMusic ?? "")
     }
+    
 }
+
+struct ApolloReview : ListnReview {
+    init(apolloResult: ReviewDetail) {
+        _id = apolloResult._id!
+        score = apolloResult.score!
+        link = apolloResult.link!
+        
+        // Initialise date
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        date = dateFormatter.date(from: apolloResult.date ?? "") ?? Date()
+        
+        album = ApolloAlbum(apolloResult: apolloResult.album!.fragments.albumDetail)
+        
+        reviewer = ApolloReviewer(apolloResult: apolloResult.reviewer!)
+        
+    }
+    
+    var _id: String
+    
+    var reviewer: ListnReviewer
+    
+    var album: ListnAlbum
+    
+    var link: String
+    
+    var score: String
+    
+    var date: Date
+}
+
+struct ApolloReviewer : ListnReviewer {
+    init(apolloResult: ReviewDetail.Reviewer) {
+        _id = apolloResult._id!
+        name = apolloResult.name!
+        link = apolloResult.link!
+    }
+    
+    var _id: String = ""
+    
+    var name: String = ""
+    
+    var link: String = ""
+    
+    
+    
+}
+
 
 struct StreamingUrls : ListnStreamingUrls {
     var spotify: String
