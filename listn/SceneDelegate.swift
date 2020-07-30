@@ -22,15 +22,32 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
 
         // Create the SwiftUI view that provides the window contents.
-        /*let loginService = MongoLoginService(app:app)
+        /*let app = ListnApp()
+        let loginService = MongoLoginService(app:app.realmApp)
         let loginModel = LoginViewModel(loginService: loginService)
         let contentView = LoginView(viewModel: loginModel)*/
         
         
         /*
         let realm = try! Realm(configuration: app.currentUser()!.configuration(partitionValue:(app.currentUser()?.identity)!))*/
-        let app = ListnApp()
-        let contentView = AddReviewView(app:app)
+        let app = ListnApp() { isLoggedIn, app in
+            DispatchQueue.main.sync {
+                let window = UIWindow(windowScene: scene as! UIWindowScene)
+                let viewModel = TestSearchViewModel(appData: app.appData!)
+                let view = TestSearchView(model: viewModel)
+                window.rootViewController = UIHostingController(rootView:view)
+                self.window = window
+                window.makeKeyAndVisible()
+            }
+            
+            
+        }
+        /*let feedModel = FeedModel(app: app.appData!)
+        let contentView = FeedView(model: feedModel)*/
+        /*
+        let searchModel = TestSearchViewModel(appData: app.appData!)
+        let contentView = TestSearchView(model: searchModel)*/
+        let contentView = ContentView()
         
 
         // Use a UIHostingController as window root view controller.
