@@ -27,7 +27,7 @@ class ListnApp {
         }
     }
     
-    init() {
+    init( completion: @escaping (Bool, ListnApp) -> Void) {
         // Initialise Realm App
         let config = AppConfiguration(baseURL: "https://realm.mongodb.com", transport: nil, localAppName: nil, localAppVersion: nil)
         realmApp = RealmApp(id:"listn-bsliv", configuration: config)
@@ -35,9 +35,20 @@ class ListnApp {
         // Initialise login service and fill variables if logged in
         loginService = MongoLoginService(app: realmApp)
         if loginService.isLoggedIn {
-            realmApp.currentUser()?.refreshCustomData({(error) in })
+            realmApp.currentUser()?.refreshCustomData({(error) in
+                guard error == nil else {
+                    self.loginService.logOut(completion: {error in
+                        completion(false, self)
+                    })
+                    return
+                }
+                completion(true, self)
+            })
             Network.shared.app = realmApp
             appData = ListnAppData()
+        }
+        else {
+            completion(false, self)
         }
         
     }
