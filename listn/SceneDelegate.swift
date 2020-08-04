@@ -30,14 +30,29 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         /*
         let realm = try! Realm(configuration: app.currentUser()!.configuration(partitionValue:(app.currentUser()?.identity)!))*/
-        let app = ListnApp() { isLoggedIn, app in
-            DispatchQueue.main.sync {
-                let window = UIWindow(windowScene: scene as! UIWindowScene)
-                let viewModel = TestSearchViewModel(appData: app.appData!)
-                let view = TestSearchView(model: viewModel)
-                window.rootViewController = UIHostingController(rootView:view)
-                self.window = window
-                window.makeKeyAndVisible()
+        let _ = ListnApp() { isLoggedIn, app in
+            if (isLoggedIn == false ) {
+                DispatchQueue.main.async {
+                    let window = UIWindow(windowScene: scene as! UIWindowScene)
+                    let viewModel = LoginViewModel(loginService: app.loginService)
+                    let view = LoginView(viewModel: viewModel)
+                    window.rootViewController = UIHostingController(rootView:view)
+                    self.window = window
+                    window.makeKeyAndVisible()
+                }
+                
+            }
+            else {
+                DispatchQueue.main.async {
+                    let window = UIWindow(windowScene: scene as! UIWindowScene)
+                    /*let viewModel = TestSearchViewModel(appData: app.appData!)
+                    let view = TestSearchView(model: viewModel)*/
+                    let viewModel = FeedModel(app: app)
+                    let view = FeedView(model: viewModel)
+                    window.rootViewController = UIHostingController(rootView:view)
+                    self.window = window
+                    window.makeKeyAndVisible()
+                }
             }
             
             
