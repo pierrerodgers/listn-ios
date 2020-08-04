@@ -14,11 +14,7 @@ class ListnApp {
     var realmApp : RealmApp!
     var loginService : LoginService!
     var user : User?
-    var realm : Realm? {
-        get {
-            try! Realm(configuration: realmApp.currentUser()!.configuration(partitionValue:(realmApp.currentUser()?.identity)!))
-        }
-    }
+    var realm : Realm?
     var appData : AppData?
     
     var isLoggedIn : Bool {
@@ -46,6 +42,18 @@ class ListnApp {
             })
             Network.shared.app = realmApp
             appData = ListnAppData()
+            /*Realm.asyncOpen(configuration:realmApp.currentUser()!.configuration(partitionValue:(realmApp.currentUser()?.identity)!)) {(maybeRealm, error) in
+                guard error == nil else {
+                    fatalError("Failed to open realm: \(error!)")
+                }
+                guard let realm = maybeRealm else {
+                    fatalError("realm is nil!")
+                }
+                self.realm = maybeRealm
+                let reviews = maybeRealm!.objects(UserFeed.self)
+                print(reviews)
+            }*/
+            self.realm = try! Realm(configuration: realmApp.currentUser()!.configuration(partitionValue:(realmApp.currentUser()?.identity)!))
         }
         else {
             completion(false, self)
@@ -54,6 +62,17 @@ class ListnApp {
     }
     
     
+    func getUserFeed( completion: @escaping (Array<String>) -> Void ) {
+        let feeds = realm!.objects(UserFeed.self)
+        guard feeds.count != 0 else {
+            completion([])
+            return
+        }
+        let userFeed = feeds[0]
+        let feed = userFeed.reviews
+        let reviewIds = Array(feed).compactMap({review in return review.id!})
+        completion(reviewIds)
+    }
     
     
     
@@ -62,6 +81,22 @@ class ListnApp {
 }
 
 class ListnAppData : AppData, SearchData {
+    func getReviewsForIDs(IDs: [String], completion: @escaping (Error?, Array<ListnReview>?) -> ()) {
+        Network.shared.apollo.fetch(query: ReviewsQuery(query: ReviewQueryInput(_idIn:IDs))) { result in
+            switch result {
+            case .success(let graphQlResult):
+                let reviews = graphQlResult.data?.reviews.compactMap({review in review!})
+                let toReturn = reviews?.compactMap({review in ApolloReview(apolloResult: review.fragments.reviewDetail)})
+                completion(nil, toReturn!)
+                //let albums = graphQlResult.data?.albums.map( return result! )
+                //completion(nil, graphQlResult.data?.albums)
+            case .failure(let error) :
+                print(error)
+                completion(error, nil)
+            }
+        }
+    }
+    
     
     func getAlbums(artistId: String, completion: @escaping (Error?, Array<ListnAlbum>?) -> Void) {
         print("FETCHING DATA")
@@ -197,46 +232,7 @@ class ListnAppData : AppData, SearchData {
     
 }
 
-protocol LoginService {
-    func signUp(username:String, password:String, completion:@escaping (Error?) -> Void)
-    
-    func logIn(username:String, password:String, completion:@escaping (Error?) -> Void)
-    
-    var isLoggedIn : Bool { get }
-    
-    func logOut(completion: @escaping (Error?) -> Void)
-    
-}
 
-protocol AppData : ArtistData, AlbumData, UserData, SearchData {
-    func getLatestReviews(completion: @escaping (Error?, Array<ListnReview>?) -> ())
-}
-
-protocol ArtistData {
-    func getAlbums(artistId: String, completion: @escaping (Error?, Array<ListnAlbum>?) -> Void)
-    
-    func getReviews(artistId:String, completion: @escaping (Error?, Array<ListnReview>?) -> ())
-    
-    func getArtists(artistIds: [String], completion: @escaping (Error?, Array<ListnArtist>?) -> ())
-    
-}
-
-protocol AlbumData {
-    func getReviews(albumId: String, completion: @escaping (Error?, Array<ListnReview>?) -> ())
-    
-    func getAlbums(albumIds: [String], completion: @escaping (Error?, Array<ListnAlbum>?) -> ())
-}
-
-protocol UserData {
-    func getReviews(userId: String, completion: @escaping (Error?, Array<ListnReview>?) -> ())
-    
-}
-
-protocol SearchData {
-    func searchAlbums(query:String, completion: @escaping (Error?, Array<String>?) -> ())
-    func searchArtists(query:String, completion: @escaping (Error?, Array<String>?) -> ())
-    func searchReviewers(query:String, completion: @escaping (Error?, Array<String>?) -> ())
-}
 
 class MongoLoginService : LoginService {
     
