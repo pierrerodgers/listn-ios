@@ -18,18 +18,48 @@ class FeedModel: ObservableObject {
         It should only handle UI logic
      */
     
-    var app : AppData
+    var app : ListnApp
     
-    @Published var reviews : Array<Review>
+    @Published var reviews : Array<ListnReview>
+    var reviewIds : [String]
     
+    private var currentIndex = 0
+    private var isLoading = false
     
-    
-    init(app: AppData) {
+    init(app: ListnApp) {
         self.app = app
-        reviews = app.getLatestReviews()
+        self.reviews = []
+        self.reviewIds = []
+        
+        app.getUserFeed() { [weak self] reviewIds in
+            self!.reviewIds = reviewIds
+            self!.getNextPage()
+        }
+        
+        
     }
     
-    
+    func getNextPage() {
+        if isLoading == false {
+            isLoading = true
+            print("GETTING NEXT PAGE, currentIndex:\(currentIndex)")
+            let max = reviewIds.count - 1
+            let start = currentIndex
+            let end = min(currentIndex+40, max)
+            if max != currentIndex {
+                app.appData?.getReviewsForIDs(IDs: Array(reviewIds[start...end])) { (error, reviews) in
+                    guard error == nil else {
+                        self.isLoading = false
+                        return
+                    }
+                    self.reviews.append(contentsOf: reviews!)
+                    self.currentIndex += 40
+                    self.isLoading = false
+                }
+            }
+        }
+        
+    }
     
     
 }

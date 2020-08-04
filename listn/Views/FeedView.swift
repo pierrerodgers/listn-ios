@@ -12,8 +12,24 @@ struct FeedView: View {
     @ObservedObject var model : FeedModel
     
     var body: some View {
-        List(model.reviews, id:\.reviewer) { review in
-            Text(review.album!.name ?? "Album")
+        NavigationView {
+            List(model.reviews.enumerated().map({$0}), id: \.element._id) { index, review in
+                NavigationLink(destination: ArtistDetailView(model: ArtistDetailViewModel(artist: review.album.artist, app: self.model.app)) ) {
+                    VStack(alignment: .leading) {
+                        Text(review.album.name)
+                        Text(review.album.artist.name)
+                        Text(review.reviewer.name)
+                        Text(review.score)
+                    }.onAppear() {
+                        if index == self.model.reviews.count - 10 {
+                            self.model.getNextPage()
+                        }
+                    }
+                }
+                
+                
+            }
+
         }
     }
 }
