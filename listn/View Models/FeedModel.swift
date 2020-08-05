@@ -43,10 +43,11 @@ class FeedModel: ObservableObject {
         if isLoading == false {
             isLoading = true
             print("GETTING NEXT PAGE, currentIndex:\(currentIndex)")
-            let max = reviewIds.count - 1
+            let maximum = max(reviewIds.count - 1,0)
             let start = currentIndex
-            let end = min(currentIndex+40, max)
-            if max != currentIndex {
+            let end = min(currentIndex+40, maximum)
+            print("end: \(end), start =\(start)")
+            if maximum != currentIndex {
                 app.getReviewsForIDs(IDs: Array(reviewIds[start...end])) { (error, reviews) in
                     guard error == nil else {
                         self.isLoading = false
