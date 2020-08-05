@@ -14,7 +14,7 @@ struct FeedView: View {
     var body: some View {
         NavigationView {
             List(model.reviews.enumerated().map({$0}), id: \.element._id) { index, review in
-                NavigationLink(destination: AlbumDetailView(model: AlbumDetailViewModel(album: review.album, app: self.model.app)) ) {
+                NavigationLink(destination: LazyView(AlbumDetailView(model: AlbumDetailViewModel(album: review.album, app: self.model.app))) ) {
                     VStack(alignment: .leading) {
                         Text(review.album.name)
                         Text(review.album.artist.name)

@@ -12,13 +12,18 @@ import SDWebImageSwiftUI
 struct AlbumDetailView: View {
     @ObservedObject var model : AlbumDetailViewModel
     
+    init(model: AlbumDetailViewModel) {
+        self.model = model
+        model.getReviews()
+    }
+    
     var body: some View {
         ScrollView() {
             VStack {
                 Text(model.album.name)
                 Text(model.album.releaseDate?.toString() ?? "")
                 
-                NavigationLink(destination: ArtistDetailView(model: ArtistDetailViewModel(artist: model.album.artist, app: model.app))) {
+                NavigationLink(destination: LazyView(ArtistDetailView(model: ArtistDetailViewModel(artist: self.model.album.artist, app: self.model.app)))) {
                     Text(self.model.album.artist.name).padding(.vertical)
                 }
                 
@@ -33,9 +38,9 @@ struct AlbumDetailView: View {
                     
                 }
             }
-        }.onAppear() {
+        }/*.onAppear() {
             self.model.getReviews()
-        }
+        }*/
     }
 }
 /*

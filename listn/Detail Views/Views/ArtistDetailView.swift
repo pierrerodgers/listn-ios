@@ -12,7 +12,11 @@ import SDWebImageSwiftUI
 struct ArtistDetailView: View {
     @ObservedObject var model : ArtistDetailViewModel
     
-    
+    init(model: ArtistDetailViewModel) {
+        self.model = model
+        self.model.getReviews()
+        self.model.getAlbums()
+    }
     
     var body: some View {
         ScrollView() {
@@ -25,7 +29,7 @@ struct ArtistDetailView: View {
                     
                     HStack {
                         ForEach(model.albums, id:\._id) { album in
-                            NavigationLink(destination: AlbumDetailView(model: AlbumDetailViewModel(album: album, app: self.model.app))) {
+                            NavigationLink(destination: LazyView(AlbumDetailView(model: AlbumDetailViewModel(album: album, app: self.model.app)))) {
                                 VStack{
                                     WebImage(url:URL(string:album.artwork ?? "")).resizable().placeholder(content: {Rectangle()}).frame(width:200, height:200, alignment: .center)
                                     Text(album.name)
@@ -47,9 +51,6 @@ struct ArtistDetailView: View {
                     
                 }
             }
-        }.onAppear() {
-            self.model.getReviews()
-            self.model.getAlbums()
         }
     }
 }
