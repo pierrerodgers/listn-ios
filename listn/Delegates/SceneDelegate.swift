@@ -31,12 +31,23 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         /*
         let realm = try! Realm(configuration: app.currentUser()!.configuration(partitionValue:(app.currentUser()?.identity)!))*/
         let _ = ListnApp() { isLoggedIn, app in
-            DispatchQueue.main.async {
-                let window = UIWindow(windowScene: scene as! UIWindowScene)
-                let view = AppView(app:app)
-                window.rootViewController = UIHostingController(rootView:view)
-                self.window = window
-                window.makeKeyAndVisible()
+            if isLoggedIn {
+                DispatchQueue.main.async {
+                    let window = UIWindow(windowScene: scene as! UIWindowScene)
+                    let view = AppView(app:app)
+                    window.rootViewController = UIHostingController(rootView:view)
+                    self.window = window
+                    window.makeKeyAndVisible()
+                }
+            }
+            else {
+                DispatchQueue.main.async {
+                    let window = UIWindow(windowScene: scene as! UIWindowScene)
+                    let view = LoginView(viewModel: LoginViewModel(loginService: app.loginService))
+                    window.rootViewController = UIHostingController(rootView:view)
+                    self.window = window
+                    window.makeKeyAndVisible()
+                }
             }
             
             
