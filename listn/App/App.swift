@@ -40,21 +40,18 @@ class ListnApp : ListnAppData {
                     })
                     return
                 }
-                completion(true, self)
+                
+                Network.shared.app = self.realmApp
+                Realm.asyncOpen(configuration: self.realmApp.currentUser()!.configuration(partitionValue:(self.realmApp.currentUser()?.identity)!), callbackQueue: DispatchQueue.main) { realm, error in
+                    guard realm != nil else {
+                        completion(false, self)
+                        return
+                    }
+                    self.realm = realm!
+                    completion(true, self)
+                }
+                
             })
-            Network.shared.app = realmApp
-            /*Realm.asyncOpen(configuration:realmApp.currentUser()!.configuration(partitionValue:(realmApp.currentUser()?.identity)!)) {(maybeRealm, error) in
-                guard error == nil else {
-                    fatalError("Failed to open realm: \(error!)")
-                }
-                guard let realm = maybeRealm else {
-                    fatalError("realm is nil!")
-                }
-                self.realm = maybeRealm
-                let reviews = maybeRealm!.objects(UserFeed.self)
-                print(reviews)
-            }*/
-            self.realm = try! Realm(configuration: realmApp.currentUser()!.configuration(partitionValue:(realmApp.currentUser()?.identity)!))
         }
         else {
             completion(false, self)
