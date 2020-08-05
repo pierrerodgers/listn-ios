@@ -11,7 +11,8 @@ import Combine
 class ArtistDetailViewModel : ObservableObject {
     
     @Published var artist: ListnArtist
-    @Published var reviews : Array<ListnReview>
+    @Published var reviews : Array<ListnReview> = []
+    @Published var albums : Array<ListnAlbum> = []
     
     var app : ListnApp
     
@@ -19,7 +20,7 @@ class ArtistDetailViewModel : ObservableObject {
         print("Initialising for artist: \(artist.name)")
         self.artist = artist
         self.app = app
-        reviews = []
+        
     }
     
     func getReviews() {
@@ -28,6 +29,17 @@ class ArtistDetailViewModel : ObservableObject {
                 return
             }
             self.reviews = reviews!
+        }
+    }
+    
+    func getAlbums() {
+        app.appData?.getAlbums(artistId: artist._id) { error, albums in
+            guard error == nil else {
+                print(error)
+                return
+            }
+            self.albums = albums!
+            
         }
     }
 
