@@ -15,16 +15,18 @@ class AlbumDetailViewModel: ObservableObject {
     var app : ListnApp
     
     init(album: ListnAlbum, app: ListnApp) {
+        print("initialising for album \(album.name)")
         self.app = app
         self.album = album
         reviews = []
     }
     
     func getReviews() {
-        app.appData?.getReviews(albumId: album._id) { error, reviews in
+        app.getReviews(albumId: album._id) { error, reviews in
             guard error == nil else {
                 return
             }
+            print("Review for album \(self.album.name) fetched")
             self.reviews = reviews!
         }
     }

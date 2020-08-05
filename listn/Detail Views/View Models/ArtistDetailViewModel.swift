@@ -24,20 +24,22 @@ class ArtistDetailViewModel : ObservableObject {
     }
     
     func getReviews() {
-        app.appData?.getReviews(artistId: artist._id) { error, reviews in
+        app.getReviews(artistId: artist._id) { error, reviews in
             guard error == nil else {
                 return
             }
+            print("Reviews for artist \(self.artist.name) fetched")
             self.reviews = reviews!
         }
     }
     
     func getAlbums() {
-        app.appData?.getAlbums(artistId: artist._id) { error, albums in
+        app.getAlbums(artistId: artist._id) { error, albums in
             guard error == nil else {
-                print(error)
+                print(error.debugDescription)
                 return
             }
+            print("Albums for artist \(self.artist.name) fetched")
             self.albums = albums!
             
         }

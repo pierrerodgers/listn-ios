@@ -47,7 +47,7 @@ class FeedModel: ObservableObject {
             let start = currentIndex
             let end = min(currentIndex+40, max)
             if max != currentIndex {
-                app.appData?.getReviewsForIDs(IDs: Array(reviewIds[start...end])) { (error, reviews) in
+                app.getReviewsForIDs(IDs: Array(reviewIds[start...end])) { (error, reviews) in
                     guard error == nil else {
                         self.isLoading = false
                         return
