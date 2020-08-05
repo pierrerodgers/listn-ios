@@ -9,13 +9,12 @@
 import Foundation
 import RealmSwift
 
-class ListnApp {
+class ListnApp : ListnAppData {
     
     var realmApp : RealmApp!
     var loginService : LoginService!
     var user : User?
     var realm : Realm?
-    var appData : AppData?
     
     var isLoggedIn : Bool {
         get {
@@ -24,6 +23,9 @@ class ListnApp {
     }
     
     init( completion: @escaping (Bool, ListnApp) -> Void) {
+        // Init AppData
+        super.init()
+        
         // Initialise Realm App
         let config = AppConfiguration(baseURL: "https://realm.mongodb.com", transport: nil, localAppName: nil, localAppVersion: nil)
         realmApp = RealmApp(id:"listn-bsliv", configuration: config)
@@ -41,7 +43,6 @@ class ListnApp {
                 completion(true, self)
             })
             Network.shared.app = realmApp
-            appData = ListnAppData()
             /*Realm.asyncOpen(configuration:realmApp.currentUser()!.configuration(partitionValue:(realmApp.currentUser()?.identity)!)) {(maybeRealm, error) in
                 guard error == nil else {
                     fatalError("Failed to open realm: \(error!)")
