@@ -40,7 +40,6 @@ class ListnApp : ListnAppData {
                     })
                     return
                 }
-                
                 Network.shared.app = self.realmApp
                 Realm.asyncOpen(configuration: self.realmApp.currentUser()!.configuration(partitionValue:(self.realmApp.currentUser()?.identity)!), callbackQueue: DispatchQueue.main) { realm, error in
                     guard realm != nil else {
@@ -48,6 +47,9 @@ class ListnApp : ListnAppData {
                         return
                     }
                     self.realm = realm!
+                    let users = realm!.objects(User.self)
+                    let user = users[0]
+                    self.user = user
                     completion(true, self)
                 }
                 
@@ -73,7 +75,18 @@ class ListnApp : ListnAppData {
     }
     
     
-    
+    func postReview(review:ListnUserReview) {
+        let userReview = UserReview(listnUserReview: review, partitionKey: realmApp.currentUser()!.identity!, user: user!)
+        
+        do {
+            try realm!.write {
+                realm!.add(userReview)
+            }
+        }
+        catch {
+            print(error)
+        }
+    }
     
     
 }
@@ -84,7 +97,7 @@ class ListnAppData : AppData, SearchData {
             switch result {
             case .success(let graphQlResult):
                 let reviews = graphQlResult.data?.reviews.compactMap({review in review!})
-                let toReturn = reviews?.compactMap({review in ApolloReview(apolloResult: review.fragments.reviewDetail)})
+                let toReturn = reviews?.compactMap({review in ListnReview(apolloResult: review.fragments.reviewDetail)})
                 completion(nil, toReturn!)
                 //let albums = graphQlResult.data?.albums.map( return result! )
                 //completion(nil, graphQlResult.data?.albums)
@@ -102,7 +115,7 @@ class ListnAppData : AppData, SearchData {
             switch result {
             case .success(let graphQlResult):
                 let albums = graphQlResult.data?.albums.compactMap({albumResult in albumResult!})
-                let toReturn = albums?.compactMap({album in ApolloAlbum(apolloResult: album.fragments.albumDetail)})
+                let toReturn = albums?.compactMap({album in ListnAlbum(apolloResult: album.fragments.albumDetail)})
                 completion(nil, toReturn!)
                 //let albums = graphQlResult.data?.albums.map( return result! )
                 //completion(nil, graphQlResult.data?.albums)
@@ -118,7 +131,7 @@ class ListnAppData : AppData, SearchData {
             switch result {
             case .success(let graphQlResult):
                 let reviews = graphQlResult.data?.reviews.compactMap({review in review!})
-                let toReturn = reviews?.compactMap({review in ApolloReview(apolloResult: review.fragments.reviewDetail)})
+                let toReturn = reviews?.compactMap({review in ListnReview(apolloResult: review.fragments.reviewDetail)})
                 completion(nil, toReturn!)
                 //let albums = graphQlResult.data?.albums.map( return result! )
                 //completion(nil, graphQlResult.data?.albums)
@@ -134,7 +147,7 @@ class ListnAppData : AppData, SearchData {
             switch result {
             case .success(let graphQlResult):
                 let reviews = graphQlResult.data?.reviews.compactMap({review in review!})
-                let toReturn = reviews?.compactMap({review in ApolloReview(apolloResult: review.fragments.reviewDetail)})
+                let toReturn = reviews?.compactMap({review in ListnReview(apolloResult: review.fragments.reviewDetail)})
                 completion(nil, toReturn!)
                 //let albums = graphQlResult.data?.albums.map( return result! )
                 //completion(nil, graphQlResult.data?.albums)
@@ -155,7 +168,7 @@ class ListnAppData : AppData, SearchData {
             switch result {
             case .success(let graphQlResult):
                 let reviews = graphQlResult.data?.reviews.compactMap({review in review!})
-                let toReturn = reviews?.compactMap({review in ApolloReview(apolloResult: review.fragments.reviewDetail)})
+                let toReturn = reviews?.compactMap({review in ListnReview(apolloResult: review.fragments.reviewDetail)})
                 completion(nil, toReturn!)
                 //let albums = graphQlResult.data?.albums.map( return result! )
                 //completion(nil, graphQlResult.data?.albums)
@@ -184,7 +197,7 @@ class ListnAppData : AppData, SearchData {
             switch result {
             case .success(let graphQlResult):
                 let albums = graphQlResult.data?.albums.compactMap({albumResult in albumResult!})
-                let toReturn = albums?.compactMap({album in ApolloAlbum(apolloResult: album.fragments.albumDetail)})
+                let toReturn = albums?.compactMap({album in ListnAlbum(apolloResult: album.fragments.albumDetail)})
                 completion(nil, toReturn!)
                 //let albums = graphQlResult.data?.albums.map( return result! )
                 //completion(nil, graphQlResult.data?.albums)
@@ -217,7 +230,7 @@ class ListnAppData : AppData, SearchData {
             switch result {
             case .success(let graphQlResult):
                 let artists = graphQlResult.data?.artists.compactMap({artistResult in artistResult!})
-                let toReturn = artists?.compactMap({artist in ApolloArtist(apolloResult: artist.fragments.artistDetail)})
+                let toReturn = artists?.compactMap({artist in ListnArtist(apolloResult: artist.fragments.artistDetail)})
                 completion(nil, toReturn!)
                 //let albums = graphQlResult.data?.albums.map( return result! )
                 //completion(nil, graphQlResult.data?.albums)
