@@ -54,9 +54,7 @@ fragment ReviewDetail on Review {
         ...ArtistDetail
     }
     reviewer {
-        _id
-        link
-        name
+        ...ReviewerDetail
     }
     _id
     link
@@ -65,9 +63,21 @@ fragment ReviewDetail on Review {
 
 }
 
+fragment ReviewerDetail on Reviewer {
+    _id
+    link
+    name
+}
+
 query Reviews($query:ReviewQueryInput) {
     reviews (query: $query) {
         ...ReviewDetail
+    }
+}
+
+query Reviewers($query:ReviewerQueryInput) {
+    reviewers(query:$query) {
+        ...ReviewerDetail
     }
 }
 
@@ -80,6 +90,14 @@ query AlbumSearch($input:String) {
 query ArtistSearch($input:String) {
     ArtistSearch(input:{query:$input}) {
         artists
+    }
+}
+
+query Search($input:String) {
+    Search(input:{query:$input}) {
+        artists
+        albums
+        reviewers
     }
 }
 

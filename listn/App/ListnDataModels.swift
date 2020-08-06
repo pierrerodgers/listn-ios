@@ -71,7 +71,7 @@ struct ListnReview {
         
         album = ListnAlbum(apolloResult: apolloResult.album!.fragments.albumDetail)
         
-        reviewer = ListnReviewer(apolloResult: apolloResult.reviewer!)
+        reviewer = ListnReviewer(apolloResult: apolloResult.reviewer!.fragments.reviewerDetail)
         
     }
     var _id : String?
@@ -83,7 +83,7 @@ struct ListnReview {
 }
 
 struct ListnReviewer {
-    init(apolloResult: ReviewDetail.Reviewer) {
+    init(apolloResult: ReviewerDetail) {
         _id = apolloResult._id!
         name = apolloResult.name!
         link = apolloResult.link!
