@@ -92,6 +92,43 @@ class ListnApp : ListnAppData {
 }
 
 class ListnAppData : AppData, SearchData {
+    func search(query: String, completion: @escaping (Error?, SearchResults?) -> ()) {
+        Network.shared.apollo.fetch(query: SearchQuery(input: query)) { result in
+            switch result {
+            case .success(let graphQlResult):
+                let albumIds = graphQlResult.data?.search?.albums?.compactMap({albumId in albumId!})
+                let artistIds = graphQlResult.data?.search?.artists?.compactMap({artistId in artistId!})
+                let reviewerIds = graphQlResult.data?.search?.reviewers?.compactMap({reviewerId in reviewerId!})
+                self.getAlbums(albumIds: albumIds!) { error, results in
+                    guard error == nil else {
+                        completion(error, nil)
+                        return
+                    }
+                    let albums = results!
+                    self.getArtists(artistIds: artistIds!) {  error, results in
+                        guard error == nil else {
+                            completion(error, nil)
+                            return
+                        }
+                        let artists = results!
+                        self.getReviewers(reviewerIds: reviewerIds!){ error, results in
+                             guard error == nil else {
+                                completion(error, nil)
+                                return
+                             }
+                             let reviewers = results!
+                            completion(nil, SearchResults(albums: albums, artists: artists, reviewers: reviewers))
+                        }
+                    }
+                }
+                //completion(nil, SearchResults(albums: albumIds!, artists: artistIds!, reviewers: reviewerIds!))
+            case .failure(let error) :
+                print(error)
+                completion(error,nil)
+            }
+        }
+    }
+    
     func getReviewsForIDs(IDs: [String], completion: @escaping (Error?, Array<ListnReview>?) -> ()) {
         Network.shared.apollo.fetch(query: ReviewsQuery(query: ReviewQueryInput(_idIn:IDs))) { result in
             switch result {
@@ -198,6 +235,22 @@ class ListnAppData : AppData, SearchData {
             case .success(let graphQlResult):
                 let albums = graphQlResult.data?.albums.compactMap({albumResult in albumResult!})
                 let toReturn = albums?.compactMap({album in ListnAlbum(apolloResult: album.fragments.albumDetail)})
+                completion(nil, toReturn!)
+                //let albums = graphQlResult.data?.albums.map( return result! )
+                //completion(nil, graphQlResult.data?.albums)
+            case .failure(let error) :
+                print(error)
+                completion(error, nil)
+            }
+        }
+    }
+    
+    func getReviewers(reviewerIds:[String], completion: @escaping (Error?, Array<ListnReviewer>?) -> ()) {
+        Network.shared.apollo.fetch(query:ReviewersQuery(query: ReviewerQueryInput(_idIn:reviewerIds))) { result in
+            switch result {
+            case .success(let graphQlResult):
+                let reviewers = graphQlResult.data?.reviewers.compactMap({reviewerResult in reviewerResult!})
+                let toReturn = reviewers?.compactMap({reviewer in ListnReviewer(apolloResult: reviewer.fragments.reviewerDetail)})
                 completion(nil, toReturn!)
                 //let albums = graphQlResult.data?.albums.map( return result! )
                 //completion(nil, graphQlResult.data?.albums)

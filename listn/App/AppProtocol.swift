@@ -46,7 +46,14 @@ protocol UserData {
 }
 
 protocol SearchData {
+    func search(query:String, completion: @escaping (Error?, SearchResults?) -> ())
     func searchAlbums(query:String, completion: @escaping (Error?, Array<String>?) -> ())
     func searchArtists(query:String, completion: @escaping (Error?, Array<String>?) -> ())
     func searchReviewers(query:String, completion: @escaping (Error?, Array<String>?) -> ())
+}
+
+struct SearchResults {
+    var albums : Array<ListnAlbum>
+    var artists : Array<ListnArtist>
+    var reviewers : Array<ListnReviewer>
 }
