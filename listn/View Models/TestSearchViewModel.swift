@@ -13,10 +13,10 @@ class TestSearchViewModel: ObservableObject {
     @Published var artistResults : Array<ListnArtist> = []
     @Published var reviewerResults: Array<ListnReviewer> = []
     
-    var appData : AppData
+    var app : ListnApp
     
-    init(appData: AppData) {
-        self.appData = appData
+    init(app: ListnApp) {
+        self.app = app
     }
     
     func search(search:String) {
@@ -26,12 +26,12 @@ class TestSearchViewModel: ObservableObject {
     
     func searchAlbums(search:String) {
         print(search)
-        appData.searchAlbums(query: search) { (error, results) in
+        app.searchAlbums(query: search) { (error, results) in
             guard error == nil else {
                 print(error.debugDescription)
                 return
             }
-            self.appData.getAlbums(albumIds:results!, completion:{ (error, results) in
+            self.app.getAlbums(albumIds:results!, completion:{ (error, results) in
                 guard error == nil else {
                     print (error.debugDescription)
                     return
@@ -42,12 +42,12 @@ class TestSearchViewModel: ObservableObject {
     }
     
     func searchArtists(search:String) {
-        appData.searchArtists(query: search) { (error, results) in
+        app.searchArtists(query: search) { (error, results) in
             guard error == nil else {
                 print(error.debugDescription)
                 return
             }
-            self.appData.getArtists(artistIds:results!, completion:{ (error, results) in
+            self.app.getArtists(artistIds:results!, completion:{ (error, results) in
                 guard error == nil else {
                     print (error.debugDescription)
                     return

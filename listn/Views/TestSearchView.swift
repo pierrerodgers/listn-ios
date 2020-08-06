@@ -13,29 +13,37 @@ struct TestSearchView: View {
     @State var query : String = ""
     
     var body: some View {
-        VStack {
-            TextField("Search", text: $query)
-            Button(action: {
-                print("Searching with query \(self.query)")
-                self.model.search(search: self.query)
-            }, label: {
-                Text("Search!")
-            })
-            Text("Albums")
-            List(model.albumResults, id:\._id) { album in
-                VStack {
-                    Text(album.name)
-                    Text(album.artist.name)
+        NavigationView {
+            VStack {
+                TextField("Search", text: $query)
+                Button(action: {
+                    print("Searching with query \(self.query)")
+                    self.model.search(search: self.query)
+                }, label: {
+                    Text("Search!")
+                })
+                Text("Albums")
+                List(model.albumResults, id:\._id) { album in
+                    NavigationLink(destination: LazyView(AlbumDetailView(model: AlbumDetailViewModel(album: album, app: self.model.app)))) {
+                        VStack {
+                            Text(album.name)
+                            Text(album.artist.name)
+                        }
+                    }
                 }
-            }
-            Text("Artists")
-            List(model.artistResults, id:\._id) { artist in
-                VStack {
-                    Text(artist.name)
+                Text("Artists")
+                List(model.artistResults, id:\._id) { artist in
+                    NavigationLink(destination: LazyView(ArtistDetailView(model: ArtistDetailViewModel(artist: artist, app: self.model.app)))) {
+                        VStack {
+                            Text(artist.name)
+                        }
+                    }
+                    
                 }
+                    
             }
-                
         }
+        
         
     }
 }
