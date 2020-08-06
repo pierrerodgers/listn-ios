@@ -9,45 +9,7 @@
 import Foundation
 
 
-protocol ListnAlbum {
-    var _id : String { get }
-    var name : String { get }
-    var artwork : String? { get }
-    var releaseDate : Date? { get }
-    var genres : [String]? { get }
-    var streamingUrls : ListnStreamingUrls { get }
-    var artist : ListnArtist { get }
-}
-
-protocol ListnArtist {
-    var _id : String { get }
-    var name : String { get }
-    var image : String { get }
-    var streamingUrls : ListnStreamingUrls { get }
-}
-
-protocol ListnStreamingUrls {
-    var appleMusic : String { get }
-    var spotify : String { get }
-}
-
-protocol ListnReview {
-    var _id : String { get }
-    var reviewer : ListnReviewer { get }
-    var album : ListnAlbum { get }
-    var link : String { get }
-    var score : String { get }
-    var date : Date { get }
-}
-
-protocol ListnReviewer {
-    var _id : String { get }
-    var name : String { get }
-    var link : String { get }
-}
-
-struct ApolloAlbum : ListnAlbum {
-    
+struct ListnAlbum {
     
     init(apolloResult: AlbumDetail) {
         // Initialise all strings
@@ -62,47 +24,41 @@ struct ApolloAlbum : ListnAlbum {
         releaseDate = dateFormatter.date(from: apolloResult.releaseDate ?? "")
         
         // Initialise Artist
-        artist = ApolloArtist(apolloResult: apolloResult.artist!.fragments.artistDetail)
+        artist = ListnArtist(apolloResult: apolloResult.artist!.fragments.artistDetail)
         
         // Initialise streamingUrls
-        streamingUrls = StreamingUrls(spotify: apolloResult.streamingUrls?.spotify ?? "", appleMusic: apolloResult.streamingUrls?.appleMusic ?? "")
+        streamingUrls = ListnStreamingUrls(appleMusic: apolloResult.streamingUrls?.appleMusic ?? "", spotify: apolloResult.streamingUrls?.spotify ?? "")
     }
     
-    var streamingUrls: ListnStreamingUrls
-    
-    var artist: ListnArtist
-    
-    var _id: String
-    
-    var name: String
-    
-    var artwork: String?
-    
-    var releaseDate: Date?
-    
-    var genres: [String]?
-    
+    var _id : String
+    var name : String
+    var artwork : String?
+    var releaseDate : Date?
+    var genres : [String]?
+    var streamingUrls : ListnStreamingUrls
+    var artist : ListnArtist
 }
 
-struct ApolloArtist : ListnArtist {
-    var _id: String
-    
-    var name: String
-    
-    var image: String
-    
-    var streamingUrls: ListnStreamingUrls
-    
+struct ListnArtist {
     init(apolloResult: ArtistDetail) {
         _id = apolloResult._id!
         name = apolloResult.name!
         image = apolloResult.image ?? ""
-        streamingUrls = StreamingUrls(spotify: apolloResult.streamingUrls?.spotify ?? "", appleMusic: apolloResult.streamingUrls?.appleMusic ?? "")
+        streamingUrls = ListnStreamingUrls(appleMusic: apolloResult.streamingUrls?.appleMusic ?? "", spotify: apolloResult.streamingUrls?.spotify ?? "")
     }
     
+    var _id : String
+    var name : String
+    var image : String
+    var streamingUrls : ListnStreamingUrls
 }
 
-struct ApolloReview : ListnReview {
+struct ListnStreamingUrls {
+    var appleMusic : String
+    var spotify : String
+}
+
+struct ListnReview {
     init(apolloResult: ReviewDetail) {
         _id = apolloResult._id!
         score = apolloResult.score!
@@ -113,45 +69,34 @@ struct ApolloReview : ListnReview {
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         date = dateFormatter.date(from: apolloResult.date ?? "") ?? Date()
         
-        album = ApolloAlbum(apolloResult: apolloResult.album!.fragments.albumDetail)
+        album = ListnAlbum(apolloResult: apolloResult.album!.fragments.albumDetail)
         
-        reviewer = ApolloReviewer(apolloResult: apolloResult.reviewer!)
+        reviewer = ListnReviewer(apolloResult: apolloResult.reviewer!)
         
     }
-    
-    var _id: String
-    
-    var reviewer: ListnReviewer
-    
-    var album: ListnAlbum
-    
-    var link: String
-    
-    var score: String
-    
-    var date: Date
+    var _id : String?
+    var reviewer : ListnReviewer
+    var album : ListnAlbum
+    var link : String
+    var score : String
+    var date : Date
 }
 
-struct ApolloReviewer : ListnReviewer {
+struct ListnReviewer {
     init(apolloResult: ReviewDetail.Reviewer) {
         _id = apolloResult._id!
         name = apolloResult.name!
         link = apolloResult.link!
     }
     
-    var _id: String = ""
-    
-    var name: String = ""
-    
-    var link: String = ""
-    
-    
-    
+    var _id : String
+    var name : String
+    var link : String
 }
 
-
-struct StreamingUrls : ListnStreamingUrls {
-    var spotify: String
-    var appleMusic: String
-    
+struct ListnUserReview {
+    var album : ListnAlbum
+    var score : String
+    var date : Date
+    var text : String?
 }
