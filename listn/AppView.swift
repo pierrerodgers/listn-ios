@@ -14,7 +14,7 @@ struct AppView: View {
     var body: some View {
         UIKitTabView {
             FeedView(model: FeedModel(app: app)).tab(title: "Feed")
-            TestSearchView(model: TestSearchViewModel(app: app)).tab(title:"Search")
+            SearchView(model: SearchViewModel(app: app)).tab(title:"Search")
         }
     }
 }
