@@ -15,6 +15,11 @@ class Album: Object {
     override static func primaryKey() -> String? {
         return "_id"
     }
+    
+    convenience init(listnAlbum: ListnAlbum) {
+        self.init()
+        _id = try! ObjectId(string:listnAlbum._id)
+    }
 }
 
 
@@ -101,15 +106,23 @@ class User: Object {
 
 
 class UserReview: Object {
-    @objc dynamic var _id: ObjectId? = nil
+    @objc dynamic var _id: ObjectId? = ObjectId.generate()
     @objc dynamic var _partitionKey: String? = nil
-    @objc dynamic var album: Album?
-    @objc dynamic var artist: Artist?
+    @objc dynamic var album_id : ObjectId? = nil
     @objc dynamic var score: String? = nil
     @objc dynamic var text: String? = nil
-    @objc dynamic var user: User?
+    @objc dynamic var user_id: ObjectId? = nil
     override static func primaryKey() -> String? {
         return "_id"
+    }
+    
+    convenience init(listnUserReview:ListnUserReview, partitionKey:String, user: User) {
+        self.init()
+        self._partitionKey = partitionKey
+        self.album_id = try! ObjectId(string:listnUserReview.album._id)
+        self.score = listnUserReview.score
+        self.text = listnUserReview.text ?? ""
+        self.user_id = user._id
     }
 }
 
