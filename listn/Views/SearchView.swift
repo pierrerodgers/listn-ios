@@ -50,7 +50,9 @@ struct SearchView: View {
                 }
                 if selectedType == .reviewers {
                     List(model.reviewerResults, id:\._id) { reviewer in
-                        Text(reviewer.name)
+                        NavigationLink(destination:LazyView(ReviewerDetailView(model: ReviewerDetailViewModel(app: self.model.app, reviewer: reviewer)))) {
+                            Text(reviewer.name)
+                        }
                     }
                 }
             }.navigationBarTitle("").navigationBarHidden(true)
