@@ -63,15 +63,40 @@ fragment ReviewDetail on Review {
 
 }
 
+fragment UserReviewDetail on UserReview {
+    album {
+        ...AlbumDetail
+    }
+    user {
+        ...UserDetail
+    }
+    _id
+    date
+    score
+    text
+}
+
 fragment ReviewerDetail on Reviewer {
     _id
     link
     name
 }
 
-query Reviews($query:ReviewQueryInput) {
-    reviews (query: $query) {
+fragment UserDetail on User {
+    _id
+    name
+    username
+}
+
+query Reviews($query:ReviewQueryInput, $limit:Int = 100) {
+    reviews (query: $query, limit:$limit) {
         ...ReviewDetail
+    }
+}
+
+query UserReviews($query:UserReviewQueryInput, $limit:Int = 20) {
+    userReviews(query: $query, limit:$limit) {
+        ...UserReviewDetail
     }
 }
 
