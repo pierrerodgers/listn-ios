@@ -111,7 +111,7 @@ class UserReview: Object {
     @objc dynamic var album_id : ObjectId? = nil
     @objc dynamic var score: String? = nil
     @objc dynamic var text: String? = nil
-    @objc dynamic var user_id: ObjectId? = nil
+    @objc dynamic var user: User? = nil
     override static func primaryKey() -> String? {
         return "_id"
     }
@@ -122,7 +122,7 @@ class UserReview: Object {
         self.album_id = try! ObjectId(string:listnUserReview.album._id)
         self.score = listnUserReview.score
         self.text = listnUserReview.text ?? ""
-        self.user_id = user._id
+        self.user = user
     }
 }
 
@@ -159,9 +159,9 @@ class UserFollow: Object {
 
 
 class ReviewerFollow: Object {
-    @objc dynamic var _id: ObjectId? = nil
+    @objc dynamic var _id: ObjectId? = ObjectId.generate()
     @objc dynamic var _partitionKey: String? = nil
-    @objc dynamic var reviewer_followed: Reviewer?
+    @objc dynamic var reviewerFollowed_id : ObjectId? = nil
     @objc dynamic var user: User?
     override static func primaryKey() -> String? {
         return "_id"
