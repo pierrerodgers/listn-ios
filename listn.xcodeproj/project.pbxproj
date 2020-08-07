@@ -18,7 +18,6 @@
 		C10BE69A24DA867400C70DBA /* UIKitTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10BE69924DA867400C70DBA /* UIKitTabView.swift */; };
 		C10BE69C24DA86FB00C70DBA /* AppView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10BE69B24DA86FB00C70DBA /* AppView.swift */; };
 		C10BE69E24DA8B4E00C70DBA /* AddReviewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10BE69D24DA8B4E00C70DBA /* AddReviewViewModel.swift */; };
-		C11DD06224D10D0C00AB6C8E /* temp in Resources */ = {isa = PBXBuildFile; fileRef = C11DD06124D10D0C00AB6C8E /* temp */; };
 		C11DD06424D155B600AB6C8E /* TestSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C11DD06324D155B600AB6C8E /* TestSearchView.swift */; };
 		C11DD06624D155CF00AB6C8E /* TestSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C11DD06524D155CF00AB6C8E /* TestSearchViewModel.swift */; };
 		C12F6EFB24C827600083BF92 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12F6EFA24C827600083BF92 /* AppDelegate.swift */; };
@@ -73,7 +72,6 @@
 		C10BE69924DA867400C70DBA /* UIKitTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIKitTabView.swift; sourceTree = "<group>"; };
 		C10BE69B24DA86FB00C70DBA /* AppView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppView.swift; sourceTree = "<group>"; };
 		C10BE69D24DA8B4E00C70DBA /* AddReviewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddReviewViewModel.swift; sourceTree = "<group>"; };
-		C11DD06124D10D0C00AB6C8E /* temp */ = {isa = PBXFileReference; lastKnownFileType = text; path = temp; sourceTree = "<group>"; };
 		C11DD06324D155B600AB6C8E /* TestSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestSearchView.swift; sourceTree = "<group>"; };
 		C11DD06524D155CF00AB6C8E /* TestSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TestSearchViewModel.swift; path = "listn/View Models/TestSearchViewModel.swift"; sourceTree = SOURCE_ROOT; };
 		C12F6EF724C827600083BF92 /* listn.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = listn.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -247,7 +245,6 @@
 				C12F6F0024C827670083BF92 /* Assets.xcassets */,
 				C12F6F3324CAA0C40083BF92 /* Info.plist */,
 				C12F6F6024CEAABD0083BF92 /* schema.json */,
-				C11DD06124D10D0C00AB6C8E /* temp */,
 				C12F6F3B24CAA0C40083BF92 /* Preview Content */,
 				C12F6F3F24CAA0C50083BF92 /* SceneDelegate.swift */,
 				C12F6F0524C827670083BF92 /* LaunchScreen.storyboard */,
@@ -406,7 +403,6 @@
 				C12F6F0424C827670083BF92 /* Preview Assets.xcassets in Resources */,
 				C12F6F4B24CAA0C50083BF92 /* Preview Content in Resources */,
 				C12F6F6124CEAABD0083BF92 /* schema.json in Resources */,
-				C11DD06224D10D0C00AB6C8E /* temp in Resources */,
 				C12F6F6424CEB83A0083BF92 /* schema.graphql in Resources */,
 				C12F6F0124C827670083BF92 /* Assets.xcassets in Resources */,
 			);
