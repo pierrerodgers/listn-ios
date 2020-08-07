@@ -9,10 +9,19 @@
 import SwiftUI
 
 struct ReviewDetailView: View {
-    @State var review : Review
+    @ObservedObject var model : ReviewDetailViewModel
     
     var body: some View {
-        Text(review.album!.name ?? "Album")
+        VStack{
+            NavigationLink(destination:LazyView(AlbumDetailView(model: AlbumDetailViewModel(album: self.model.review.album, app: self.model.app)))){
+                Text(model.review.album.name)
+            }
+            NavigationLink(destination:LazyView(ArtistDetailView(model: ArtistDetailViewModel(artist: self.model.review.album.artist, app: self.model.app)))){
+                Text(model.review.album.artist.name)
+            }
+            Text(model.review.score)
+            Text(model.review.username)
+        }
     }
 }
 /*
