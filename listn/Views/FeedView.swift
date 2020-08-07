@@ -18,7 +18,7 @@ struct FeedView: View {
                     VStack(alignment: .leading) {
                         Text(review.album.name)
                         Text(review.album.artist.name)
-                        Text(review.reviewer.name)
+                        Text(review.username)
                         Text(review.score)
                     }.onAppear() {
                         if index == self.model.reviews.count - 10 {

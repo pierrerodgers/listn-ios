@@ -45,7 +45,7 @@ struct ArtistDetailView: View {
                 ForEach(model.reviews, id:\._id) { review in
                     VStack {
                         Text(review.score)
-                        Text(review.reviewer.name)
+                        Text(review.username)
                     }
                     
                     
