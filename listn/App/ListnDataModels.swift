@@ -58,7 +58,8 @@ struct ListnStreamingUrls {
     var spotify : String
 }
 
-struct ListnReview {
+struct ListnCriticReview : ListnReview {
+    
     init(apolloResult: ReviewDetail) {
         _id = apolloResult._id!
         score = apolloResult.score!
@@ -76,10 +77,16 @@ struct ListnReview {
     }
     var _id : String?
     var reviewer : ListnReviewer
+    var username : String {
+        get {
+            return reviewer.name
+        }
+    }
     var album : ListnAlbum
     var link : String
     var score : String
     var date : Date
+    var text: String?
 }
 
 struct ListnReviewer {
@@ -94,9 +101,57 @@ struct ListnReviewer {
     var link : String
 }
 
-struct ListnUserReview {
+struct ListnUser {
+    init(apolloResult: UserDetail) {
+        _id = apolloResult._id
+        name = apolloResult.name
+        username = apolloResult.username!
+    }
+    var name : String
+    var _id : String
+    var username : String
+}
+
+struct ListnUserReview : ListnReview {
+    init(apolloResult: UserReviewDetail) {
+        _id = apolloResult._id!
+        score = apolloResult.score!
+        text = apolloResult.text ?? ""
+        
+        // Initialise date
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        date = dateFormatter.date(from: apolloResult.date ?? "") ?? Date()
+        
+        album = ListnAlbum(apolloResult: apolloResult.album!.fragments.albumDetail)
+        user = ListnUser(apolloResult: apolloResult.user!.fragments.userDetail)
+                
+    }
+    
+    init(album:ListnAlbum, score: String, text: String?) {
+        self.album = album
+        self.score = score
+        self.text = text
+        self.date = Date()
+    }
+    var _id : String?
     var album : ListnAlbum
     var score : String
     var date : Date
     var text : String?
+    var user : ListnUser?
+    var username : String {
+        get {
+            return user?.username ?? ""
+        }
+    }
+}
+
+protocol ListnReview {
+    var username :String { get }
+    var score : String { get }
+    var text : String? { get }
+    var date : Date { get }
+    var _id : String? { get }
+    var album : ListnAlbum { get }
 }
