@@ -27,12 +27,16 @@ struct AlbumDetailView: View {
                     Text(self.model.album.artist.name).padding(.vertical)
                 }
                 
+                NavigationLink(destination: LazyView(AddReviewView(model: AddReviewViewModel(album: self.model.album, app: self.model.app)))) {
+                    Text("Add review for this album")
+                }
+                
                 WebImage(url: URL(string:model.album.artwork ?? "")).resizable().placeholder(content: {Rectangle()}).frame(width:300, height:300, alignment: .center)
                 
                 ForEach(model.reviews, id:\._id) { review in
                     VStack(alignment:.leading) {
                         Text(review.score)
-                        Text(review.reviewer.name)
+                        Text(review.username)
                     }
                     
                     
