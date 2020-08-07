@@ -42,6 +42,12 @@
 		C12F6F6A24CEBBF20083BF92 /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12F6F6924CEBBF20083BF92 /* API.swift */; };
 		C12F6F6C24D00CF40083BF92 /* ListnDataModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12F6F6B24D00CF30083BF92 /* ListnDataModels.swift */; };
 		C12F6F6D24D00D2E0083BF92 /* RealmDataModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12F6F3524CAA0C40083BF92 /* RealmDataModels.swift */; };
+		C1FB5B4224DBB2D000B85E7E /* FloatingSegmentedControl in Frameworks */ = {isa = PBXBuildFile; productRef = C1FB5B4124DBB2D000B85E7E /* FloatingSegmentedControl */; };
+		C1FB5B4424DBB2E100B85E7E /* SearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1FB5B4324DBB2E100B85E7E /* SearchViewModel.swift */; };
+		C1FB5B4624DBB63600B85E7E /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1FB5B4524DBB63600B85E7E /* SearchView.swift */; };
+		C1FB5B4924DBBD5100B85E7E /* GenericSegmentedControl in Frameworks */ = {isa = PBXBuildFile; productRef = C1FB5B4824DBBD5100B85E7E /* GenericSegmentedControl */; };
+		C1FB5B4B24DBBFD500B85E7E /* ReviewerDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1FB5B4A24DBBFD500B85E7E /* ReviewerDetailView.swift */; };
+		C1FB5B4D24DBBFE200B85E7E /* ReviewerDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1FB5B4C24DBBFE200B85E7E /* ReviewerDetailViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -100,6 +106,10 @@
 		C12F6F6724CEBB5B0083BF92 /* Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
 		C12F6F6924CEBBF20083BF92 /* API.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
 		C12F6F6B24D00CF30083BF92 /* ListnDataModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListnDataModels.swift; sourceTree = "<group>"; };
+		C1FB5B4324DBB2E100B85E7E /* SearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewModel.swift; sourceTree = "<group>"; };
+		C1FB5B4524DBB63600B85E7E /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
+		C1FB5B4A24DBBFD500B85E7E /* ReviewerDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewerDetailView.swift; sourceTree = "<group>"; };
+		C1FB5B4C24DBBFE200B85E7E /* ReviewerDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewerDetailViewModel.swift; sourceTree = "<group>"; };
 		EE9AF27E623E823CA411007B /* Pods-listn-listnUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-listn-listnUITests.debug.xcconfig"; path = "Target Support Files/Pods-listn-listnUITests/Pods-listn-listnUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		F069E44656766C8A2E5F316B /* Pods_listn_listnUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_listn_listnUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -110,6 +120,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				C10BE68F24D941B000C70DBA /* SDWebImageSwiftUI in Frameworks */,
+				C1FB5B4924DBBD5100B85E7E /* GenericSegmentedControl in Frameworks */,
+				C1FB5B4224DBB2D000B85E7E /* FloatingSegmentedControl in Frameworks */,
 				BD0DC7FDDC0872CB6A0AEB36 /* Pods_listn.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -160,6 +172,7 @@
 				C1018A1224D91F1800B2F2DE /* ArtistDetailView.swift */,
 				C10BE69024D967AF00C70DBA /* AlbumDetailView.swift */,
 				C12F6F3424CAA0C40083BF92 /* ReviewDetailView.swift */,
+				C1FB5B4A24DBBFD500B85E7E /* ReviewerDetailView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -169,6 +182,7 @@
 			children = (
 				C1018A1424D91FA700B2F2DE /* ArtistDetailViewModel.swift */,
 				C10BE69224D967EC00C70DBA /* AlbumDetailViewModel.swift */,
+				C1FB5B4C24DBBFE200B85E7E /* ReviewerDetailViewModel.swift */,
 			);
 			path = "View Models";
 			sourceTree = "<group>";
@@ -265,6 +279,7 @@
 			children = (
 				C10BE69D24DA8B4E00C70DBA /* AddReviewViewModel.swift */,
 				C11DD06524D155CF00AB6C8E /* TestSearchViewModel.swift */,
+				C1FB5B4324DBB2E100B85E7E /* SearchViewModel.swift */,
 				C12F6F3E24CAA0C50083BF92 /* LoginViewModel.swift */,
 				C12F6F3D24CAA0C40083BF92 /* FeedModel.swift */,
 			);
@@ -278,6 +293,7 @@
 				C11DD06324D155B600AB6C8E /* TestSearchView.swift */,
 				C12F6F4024CAA0C50083BF92 /* FeedView.swift */,
 				C12F6F5924CE85450083BF92 /* AddReviewView.swift */,
+				C1FB5B4524DBB63600B85E7E /* SearchView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -311,6 +327,8 @@
 			name = listn;
 			packageProductDependencies = (
 				C10BE68E24D941B000C70DBA /* SDWebImageSwiftUI */,
+				C1FB5B4124DBB2D000B85E7E /* FloatingSegmentedControl */,
+				C1FB5B4824DBBD5100B85E7E /* GenericSegmentedControl */,
 			);
 			productName = listn;
 			productReference = C12F6EF724C827600083BF92 /* listn.app */;
@@ -366,6 +384,8 @@
 			mainGroup = C12F6EEE24C827600083BF92;
 			packageReferences = (
 				C10BE68D24D941B000C70DBA /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
+				C1FB5B4024DBB2D000B85E7E /* XCRemoteSwiftPackageReference "FloatingSegmentedControl" */,
+				C1FB5B4724DBBD5100B85E7E /* XCRemoteSwiftPackageReference "GenericSegmentedControl" */,
 			);
 			productRefGroup = C12F6EF824C827600083BF92 /* Products */;
 			projectDirPath = "";
@@ -512,19 +532,23 @@
 				C12F6EFB24C827600083BF92 /* AppDelegate.swift in Sources */,
 				C12F6F4724CAA0C50083BF92 /* ContentView.swift in Sources */,
 				C12F6F6A24CEBBF20083BF92 /* API.swift in Sources */,
+				C1FB5B4624DBB63600B85E7E /* SearchView.swift in Sources */,
 				C12F6EFD24C827600083BF92 /* SceneDelegate.swift in Sources */,
 				C12F6F1D24C9298D0083BF92 /* LoginView.swift in Sources */,
 				C10BE69E24DA8B4E00C70DBA /* AddReviewViewModel.swift in Sources */,
+				C1FB5B4D24DBBFE200B85E7E /* ReviewerDetailViewModel.swift in Sources */,
 				C10BE68C24D9386F00C70DBA /* AppProtocol.swift in Sources */,
 				C12F6F5024CAA0C50083BF92 /* FeedView.swift in Sources */,
 				C10BE69A24DA867400C70DBA /* UIKitTabView.swift in Sources */,
 				C12F6F6C24D00CF40083BF92 /* ListnDataModels.swift in Sources */,
+				C1FB5B4B24DBBFD500B85E7E /* ReviewerDetailView.swift in Sources */,
 				C1018A1524D91FA700B2F2DE /* ArtistDetailViewModel.swift in Sources */,
 				C12F6F4E24CAA0C50083BF92 /* LoginViewModel.swift in Sources */,
 				C12F6F1F24C92F750083BF92 /* App.swift in Sources */,
 				C12F6F5A24CE85450083BF92 /* AddReviewView.swift in Sources */,
 				C12F6F4424CAA0C50083BF92 /* ReviewDetailView.swift in Sources */,
 				C12F6F6824CEBB5B0083BF92 /* Network.swift in Sources */,
+				C1FB5B4424DBB2E100B85E7E /* SearchViewModel.swift in Sources */,
 				C10BE69124D967AF00C70DBA /* AlbumDetailView.swift in Sources */,
 				C11DD06624D155CF00AB6C8E /* TestSearchViewModel.swift in Sources */,
 				C12F6F4D24CAA0C50083BF92 /* FeedModel.swift in Sources */,
@@ -800,6 +824,22 @@
 				minimumVersion = 1.5.0;
 			};
 		};
+		C1FB5B4024DBB2D000B85E7E /* XCRemoteSwiftPackageReference "FloatingSegmentedControl" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/darioGzlez/FloatingSegmentedControl.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+		C1FB5B4724DBBD5100B85E7E /* XCRemoteSwiftPackageReference "GenericSegmentedControl" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/levitatingpineapple/GenericSegmentedControl";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.3;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -807,6 +847,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C10BE68D24D941B000C70DBA /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
 			productName = SDWebImageSwiftUI;
+		};
+		C1FB5B4124DBB2D000B85E7E /* FloatingSegmentedControl */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C1FB5B4024DBB2D000B85E7E /* XCRemoteSwiftPackageReference "FloatingSegmentedControl" */;
+			productName = FloatingSegmentedControl;
+		};
+		C1FB5B4824DBBD5100B85E7E /* GenericSegmentedControl */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C1FB5B4724DBBD5100B85E7E /* XCRemoteSwiftPackageReference "GenericSegmentedControl" */;
+			productName = GenericSegmentedControl;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
