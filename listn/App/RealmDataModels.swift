@@ -112,6 +112,7 @@ class UserReview: Object {
     @objc dynamic var score: String? = nil
     @objc dynamic var text: String? = nil
     @objc dynamic var user: User? = nil
+    @objc dynamic var date : Date? = nil
     override static func primaryKey() -> String? {
         return "_id"
     }
@@ -123,6 +124,7 @@ class UserReview: Object {
         self.score = listnUserReview.score
         self.text = listnUserReview.text ?? ""
         self.user = user
+        self.date = listnUserReview.date
     }
 }
 
