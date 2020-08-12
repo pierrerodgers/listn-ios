@@ -47,8 +47,7 @@ class ListnApp : ListnAppData {
                         return
                     }
                     self.realm = realm!
-                    let users = realm!.objects(User.self)
-                    let user = users[0]
+                    let user = realm!.objects(User.self).first!
                     self.user = user
                     completion(true, self)
                 }
@@ -74,6 +73,21 @@ class ListnApp : ListnAppData {
         completion(reviewIds)
     }
     
+    func getUserReviews(completion: @escaping (Error?, (Array<ListnUserReview>?)) -> ()) {
+        Network.shared.apollo.fetch(query:UserReviewsQuery(query: UserReviewQueryInput(userId:user!._id.stringValue))) { result in
+            switch result {
+            case .success(let graphQlResult):
+                let reviews = graphQlResult.data?.userReviews.compactMap({review in review!})
+                let toReturn = reviews?.compactMap({review in ListnUserReview(apolloResult: review.fragments.userReviewDetail)})
+                completion(nil, toReturn!)
+                //let albums = graphQlResult.data?.albums.map( return result! )
+                //completion(nil, graphQlResult.data?.albums)
+            case .failure(let error) :
+                print(error)
+                completion(error, nil)
+            }
+        }
+    }
     
     func postReview(review:ListnUserReview) {
         let userReview = UserReview(listnUserReview: review, partitionKey: realmApp.currentUser()!.identity!, user: user!)
@@ -117,6 +131,8 @@ class ListnApp : ListnAppData {
             return nil
         }
     }
+    
+    
     
     
 }
@@ -237,10 +253,6 @@ class ListnAppData : AppData, SearchData {
                 completion(error, nil)
             }
         }
-    }
-    
-    func getReviews(userId: String, completion: @escaping (Error?, Array<ListnReview>?) -> ()) {
-         completion(nil, nil)
     }
     
     func getReviews(reviewerId: String, completion: @escaping (Error?, Array<ListnReview>?) -> ()) {
