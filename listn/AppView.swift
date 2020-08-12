@@ -15,6 +15,7 @@ struct AppView: View {
         UIKitTabView {
             FeedView(model: FeedModel(app: app)).tab(title: "Feed")
             SearchView(model: SearchViewModel(app: app)).tab(title:"Search")
+            ProfileView(model: ProfileViewModel(app: app)).tab(title: "Profile")
         }
     }
 }
