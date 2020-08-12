@@ -19,7 +19,7 @@ protocol LoginService {
     
 }
 
-protocol AppData : ArtistData, AlbumData, UserData, SearchData {
+protocol AppData : ArtistData, AlbumData, SearchData {
     func getLatestReviews(completion: @escaping (Error?, Array<ListnReview>?) -> ())
     
     func getReviewsForIDs(IDs:[String], completion: @escaping (Error?, Array<ListnReview>?) -> ())
