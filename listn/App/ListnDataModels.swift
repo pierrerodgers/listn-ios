@@ -33,6 +33,11 @@ struct ListnAlbum {
     var _id : String
     var name : String
     var artwork : String?
+    var smallArtwork : String? {
+        get {
+            return artwork?.replacingOccurrences(of: "1024x1024", with: "180x180")
+        }
+    }
     var releaseDate : Date?
     var genres : [String]?
     var streamingUrls : ListnStreamingUrls
@@ -83,10 +88,11 @@ struct ListnCriticReview : ListnReview {
         }
     }
     var album : ListnAlbum
-    var link : String
+    var link : String?
     var score : String
     var date : Date
     var text: String?
+    var reviewType: ReviewType = .critic
 }
 
 struct ListnReviewer {
@@ -140,6 +146,8 @@ struct ListnUserReview : ListnReview {
     var date : Date
     var text : String?
     var user : ListnUser?
+    var reviewType: ReviewType = .user
+    var link : String?
     var username : String {
         get {
             return user?.username ?? ""
@@ -154,4 +162,9 @@ protocol ListnReview {
     var date : Date { get }
     var _id : String? { get }
     var album : ListnAlbum { get }
+    var reviewType : ReviewType { get }
+    var link : String? { get }
+}
+enum ReviewType {
+    case user, critic
 }
