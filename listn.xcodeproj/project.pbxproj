@@ -41,6 +41,8 @@
 		C12F6F6A24CEBBF20083BF92 /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12F6F6924CEBBF20083BF92 /* API.swift */; };
 		C12F6F6C24D00CF40083BF92 /* ListnDataModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12F6F6B24D00CF30083BF92 /* ListnDataModels.swift */; };
 		C12F6F6D24D00D2E0083BF92 /* RealmDataModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12F6F3524CAA0C40083BF92 /* RealmDataModels.swift */; };
+		C14DDC7824E4D61300ACFEC7 /* FeedReviewCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C14DDC7724E4D61300ACFEC7 /* FeedReviewCard.swift */; };
+		C14DDC7B24E4DC4F00ACFEC7 /* TextModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C14DDC7A24E4DC4F00ACFEC7 /* TextModifiers.swift */; };
 		C187616624E3F88400459AE0 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C187616524E3F88400459AE0 /* ProfileView.swift */; };
 		C187616824E3F89000459AE0 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C187616724E3F89000459AE0 /* ProfileViewModel.swift */; };
 		C1C0BAB924DD30F70029BEF8 /* ReviewDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1C0BAB824DD30F70029BEF8 /* ReviewDetailViewModel.swift */; };
@@ -107,6 +109,8 @@
 		C12F6F6724CEBB5B0083BF92 /* Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
 		C12F6F6924CEBBF20083BF92 /* API.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
 		C12F6F6B24D00CF30083BF92 /* ListnDataModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListnDataModels.swift; sourceTree = "<group>"; };
+		C14DDC7724E4D61300ACFEC7 /* FeedReviewCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedReviewCard.swift; sourceTree = "<group>"; };
+		C14DDC7A24E4DC4F00ACFEC7 /* TextModifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextModifiers.swift; sourceTree = "<group>"; };
 		C187616524E3F88400459AE0 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		C187616724E3F89000459AE0 /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
 		C1C0BAB824DD30F70029BEF8 /* ReviewDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewDetailViewModel.swift; sourceTree = "<group>"; };
@@ -238,6 +242,8 @@
 		C12F6EF924C827600083BF92 /* listn */ = {
 			isa = PBXGroup;
 			children = (
+				C14DDC7924E4DBF700ACFEC7 /* UI Modifiers */,
+				C14DDC7524E4D5F700ACFEC7 /* Components */,
 				C10BE69824DA852500C70DBA /* Delegates */,
 				C10BE69724DA84C500C70DBA /* App */,
 				C12F6F6924CEBBF20083BF92 /* API.swift */,
@@ -310,6 +316,30 @@
 				C12F6F2424C9A4450083BF92 /* ListView.swift */,
 			);
 			name = "Recovered References";
+			sourceTree = "<group>";
+		};
+		C14DDC7524E4D5F700ACFEC7 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				C14DDC7624E4D5FF00ACFEC7 /* Review Components */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		C14DDC7624E4D5FF00ACFEC7 /* Review Components */ = {
+			isa = PBXGroup;
+			children = (
+				C14DDC7724E4D61300ACFEC7 /* FeedReviewCard.swift */,
+			);
+			path = "Review Components";
+			sourceTree = "<group>";
+		};
+		C14DDC7924E4DBF700ACFEC7 /* UI Modifiers */ = {
+			isa = PBXGroup;
+			children = (
+				C14DDC7A24E4DC4F00ACFEC7 /* TextModifiers.swift */,
+			);
+			path = "UI Modifiers";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -481,7 +511,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nSCRIPT_PATH=\"${PODS_ROOT}/Apollo/scripts\"\ncd \"${SRCROOT}/${TARGET_NAME}\"\n\"${SCRIPT_PATH}\"/run-bundled-codegen.sh codegen:generate --target=swift --includes=./**/*.graphql --localSchemaFile=\"schema.json\" API.swift\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nif [ $ENABLE_PREVIEWS == \"NO\" ]\nthen\n  # your code to execute here\n  SCRIPT_PATH=\"${PODS_ROOT}/Apollo/scripts\"\n  cd \"${SRCROOT}/${TARGET_NAME}\"\n  \"${SCRIPT_PATH}\"/run-bundled-codegen.sh codegen:generate --target=swift --includes=./**/*.graphql --localSchemaFile=\"schema.json\" API.swift\nelse\n  echo \"Skipping the script because of preview mode\"\nfi\n";
 		};
 		C6A89740B360134EAE294431 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -539,11 +569,13 @@
 				C12F6F6A24CEBBF20083BF92 /* API.swift in Sources */,
 				C1FB5B4624DBB63600B85E7E /* SearchView.swift in Sources */,
 				C12F6EFD24C827600083BF92 /* SceneDelegate.swift in Sources */,
+				C14DDC7B24E4DC4F00ACFEC7 /* TextModifiers.swift in Sources */,
 				C12F6F1D24C9298D0083BF92 /* LoginView.swift in Sources */,
 				C10BE69E24DA8B4E00C70DBA /* AddReviewViewModel.swift in Sources */,
 				C187616824E3F89000459AE0 /* ProfileViewModel.swift in Sources */,
 				C1FB5B4D24DBBFE200B85E7E /* ReviewerDetailViewModel.swift in Sources */,
 				C10BE68C24D9386F00C70DBA /* AppProtocol.swift in Sources */,
+				C14DDC7824E4D61300ACFEC7 /* FeedReviewCard.swift in Sources */,
 				C12F6F5024CAA0C50083BF92 /* FeedView.swift in Sources */,
 				C10BE69A24DA867400C70DBA /* UIKitTabView.swift in Sources */,
 				C12F6F6C24D00CF40083BF92 /* ListnDataModels.swift in Sources */,
