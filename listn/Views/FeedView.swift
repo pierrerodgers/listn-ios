@@ -15,12 +15,7 @@ struct FeedView: View {
         NavigationView {
             List(model.reviews.enumerated().map({$0}), id: \.element._id) { index, review in
                 NavigationLink(destination: LazyView(ReviewDetailView(model: ReviewDetailViewModel(review: review, app: self.model.app))) ) {
-                    VStack(alignment: .leading) {
-                        Text(review.album.name)
-                        Text(review.album.artist.name)
-                        Text(review.username)
-                        Text(review.score)
-                    }.onAppear() {
+                    FeedReviewCard(review: review).onAppear() {
                         if index == self.model.reviews.count - 10 {
                             self.model.getNextPage()
                         }
