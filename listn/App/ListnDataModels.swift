@@ -35,7 +35,7 @@ struct ListnAlbum {
     var artwork : String?
     var smallArtwork : String? {
         get {
-            return artwork?.replacingOccurrences(of: "1024x1024", with: "180x180")
+            return artwork?.replacingOccurrences(of: "1024x1024", with: "300x300")
         }
     }
     var releaseDate : Date?
