@@ -12,15 +12,20 @@ struct ReviewDetailView: View {
     @ObservedObject var model : ReviewDetailViewModel
     
     var body: some View {
-        VStack{
-            NavigationLink(destination:LazyView(AlbumDetailView(model: AlbumDetailViewModel(album: self.model.review.album, app: self.model.app)))){
-                Text(model.review.album.name)
-            }
-            NavigationLink(destination:LazyView(ArtistDetailView(model: ArtistDetailViewModel(artist: self.model.review.album.artist, app: self.model.app)))){
-                Text(model.review.album.artist.name)
-            }
-            Text(model.review.score)
-            Text(model.review.username)
+        ScrollView{
+            VStack{
+                ReviewDetailReviewCard(review: model.review).padding(5)
+                ReviewDetailAlbumCard(album: model.review.album, app:model.app).padding(5)
+                /*
+                NavigationLink(destination:LazyView(AlbumDetailView(model: AlbumDetailViewModel(album: self.model.review.album, app: self.model.app)))){
+                    Text(model.review.album.name)
+                }
+                NavigationLink(destination:LazyView(ArtistDetailView(model: ArtistDetailViewModel(artist: self.model.review.album.artist, app: self.model.app)))){
+                    Text(model.review.album.artist.name)
+                }
+                Text(model.review.score)
+                Text(model.review.username)*/
+            }.offset(x: 0, y: -50)
         }
     }
 }
