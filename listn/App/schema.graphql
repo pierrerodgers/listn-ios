@@ -89,7 +89,7 @@ fragment UserDetail on User {
 }
 
 query Reviews($query:ReviewQueryInput, $limit:Int = 100) {
-    reviews (query: $query, limit:$limit) {
+    reviews (query: $query, limit:$limit, sortBy: DATE_DESC) {
         ...ReviewDetail
     }
 }
