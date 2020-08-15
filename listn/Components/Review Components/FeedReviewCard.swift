@@ -66,6 +66,8 @@ extension ListnAlbum {
         self.artwork = "https://media.pitchfork.com/photos/5ef619d08813ffa92664e83d/1:1/w_600/What’s%20Your%20Pleasure?_Jessie%20Ware.jpg"
         self.artist = ListnArtist(forPreview: true)
         self.streamingUrls = ListnStreamingUrls(appleMusic: "", spotify: "")
+        self.releaseDate = Date()
+        self.genres = ["Pop", "Dance"]
     }
 }
 
