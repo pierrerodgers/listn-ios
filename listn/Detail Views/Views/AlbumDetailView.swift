@@ -20,27 +20,17 @@ struct AlbumDetailView: View {
     var body: some View {
         ScrollView() {
             VStack {
-                Text(model.album.name)
-                Text(model.album.releaseDate?.toString() ?? "")
-                
-                NavigationLink(destination: LazyView(ArtistDetailView(model: ArtistDetailViewModel(artist: self.model.album.artist, app: self.model.app)))) {
-                    Text(self.model.album.artist.name).padding(.vertical)
-                }
+                AlbumDetailCard(album: model.album, app:model.app)
                 
                 NavigationLink(destination: LazyView(AddReviewView(model: AddReviewViewModel(album: self.model.album, app: self.model.app)))) {
                     Text("Add review for this album")
                 }
-                
-                WebImage(url: URL(string:model.album.artwork ?? "")).resizable().placeholder(content: {Rectangle()}).frame(width:300, height:300, alignment: .center)
-                
+                ButtonStack(streamingUrls: self.model.album.streamingUrls)
                 ForEach(model.reviews, id:\._id) { review in
-                    VStack(alignment:.leading) {
-                        Text(review.score)
-                        Text(review.username)
-                    }
-                    
-                    
+                    ReviewRow(review: review)
                 }
+                
+                
             }
         }/*.onAppear() {
             self.model.getReviews()
