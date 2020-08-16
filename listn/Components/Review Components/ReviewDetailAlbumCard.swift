@@ -18,13 +18,13 @@ struct ReviewDetailAlbumCard: View {
             WebImage(url: URL(string:album.smallArtwork ?? "")).resizable().placeholder(content: {Rectangle()}).frame(width:180, height: 180)
             VStack (alignment:.leading){
                 NavigationLink(destination:LazyView(AlbumDetailView(model: AlbumDetailViewModel(album: self.album, app: self.app!)))){
-                    Text(album.name).title()
-                    Text(album.artist.name)
+                    VStack(alignment:.leading){
+                        Text(album.name).title()
+                        Text(album.artist.name)
+                    }
                 }.buttonStyle(PlainButtonStyle())
-                
                 Spacer()
                 RaveButton()
-                //Spacer()
             }.padding(.vertical, 5)
             Spacer()
         }
