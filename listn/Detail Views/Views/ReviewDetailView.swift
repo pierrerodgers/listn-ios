@@ -15,25 +15,17 @@ struct ReviewDetailView: View {
         ScrollView{
             VStack(alignment:.leading){
                 ReviewDetailReviewCard(review: model.review).padding(5)
-                ReviewDetailAlbumCard(album: model.review.album, app:model.app).padding(5)
+                ReviewDetailAlbumCard(album: model.review.album, app: model.app)
                 Text("More reviews for \(model.review.album.name)").font(.headline)
                 ForEach(model.moreAlbumReviews.prefix(5), id:\._id) { review in
                     ReviewRow(review:review)
                 }
                 Text("More from @\(self.model.review.username)").font(.headline)
                 ForEach(model.moreReviewerReviews.prefix(5), id:\._id) { review in
-                    FeedReviewCard(review: review)
+                    NavigationLink(destination: LazyView(ReviewDetailView(model: ReviewDetailViewModel(review: review, app: self.model.app)))) {
+                        FeedReviewCard(review: review)
+                    }.buttonStyle(PlainButtonStyle())
                 }
-                
-                /*
-                NavigationLink(destination:LazyView(AlbumDetailView(model: AlbumDetailViewModel(album: self.model.review.album, app: self.model.app)))){
-                    Text(model.review.album.name)
-                }
-                NavigationLink(destination:LazyView(ArtistDetailView(model: ArtistDetailViewModel(artist: self.model.review.album.artist, app: self.model.app)))){
-                    Text(model.review.album.artist.name)
-                }
-                Text(model.review.score)
-                Text(model.review.username)*/
             }.offset(x: 0, y: -50)
         }
     }
