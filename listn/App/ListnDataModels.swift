@@ -39,6 +39,11 @@ struct ListnAlbum {
             return artwork?.replacingOccurrences(of: "1024x1024", with: "300x300")
         }
     }
+    var releaseDateString : String {
+        get {
+            return releaseDate?.toString(format: "dd MMM YYYY") ?? ""
+        }
+    }
     var releaseDate : Date?
     var genres : [String]?
     var streamingUrls : ListnStreamingUrls
