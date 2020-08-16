@@ -19,6 +19,7 @@ class AlbumDetailViewModel: ObservableObject {
         self.app = app
         self.album = album
         reviews = []
+        getReviews()
     }
     
     func getReviews() {
