@@ -12,11 +12,6 @@ import SDWebImageSwiftUI
 struct AlbumDetailView: View {
     @ObservedObject var model : AlbumDetailViewModel
     
-    init(model: AlbumDetailViewModel) {
-        self.model = model
-        model.getReviews()
-    }
-    
     var body: some View {
         ScrollView() {
             VStack {
@@ -32,9 +27,7 @@ struct AlbumDetailView: View {
                 
                 
             }
-        }/*.onAppear() {
-            self.model.getReviews()
-        }*/
+        }
     }
 }
 /*
