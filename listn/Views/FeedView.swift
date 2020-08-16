@@ -16,12 +16,12 @@ struct FeedView: View {
             List {
                 ForEach(model.reviews.enumerated().map({$0}), id: \.element._id) { index, review in
                     NavigationLink(destination: LazyView(ReviewDetailView(model: ReviewDetailViewModel(review: review, app: self.model.app))) ) {
-                        FeedReviewCard(review: review).onAppear() {
+                        FeedReviewCard(review: review).listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0)).onAppear() {
                             if index == self.model.reviews.count - 10 {
                                 self.model.getNextPage()
                             }
                         }
-                    }.listRowInsets(EdgeInsets(top: 0,leading: 0,bottom: 0,trailing: 0))
+                    }.listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                     
                 }
             }.onAppear() {
