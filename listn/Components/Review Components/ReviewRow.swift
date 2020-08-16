@@ -16,12 +16,12 @@ struct ReviewRow: View {
         VStack (alignment:.leading){
             HStack{
                 // Reviewer/User image
-                Circle().frame(width:40, height:40)
-                Text("@\(review.username)").font(.system(size: 24))
+                Circle().frame(width:30, height:30)
+                Text("@\(review.username)")
                 Spacer()
                 
             }
-            Text(review.score).title()
+            Text(review.score).bold().font(.system(size: 20)).padding(.horizontal)
         }
     }
 }
