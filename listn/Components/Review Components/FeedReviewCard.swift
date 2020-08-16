@@ -14,11 +14,11 @@ struct FeedReviewCard: View {
     
     var body: some View {
         HStack{
-            WebImage(url: URL(string:review.album.smallArtwork ?? "")).resizable().placeholder(content: {Rectangle()}).frame(width:180, height: 180)
+            WebImage(url: URL(string:review.album.smallArtwork ?? "")).resizable().placeholder(content: {Rectangle()}).frame(width:130, height: 130)
             //Rectangle().frame(width:200, height:200)
             VStack(alignment:.leading){
-                Text(review.album.name).title()
-                Text(review.album.artist.name)
+                Text(review.album.name)
+                Text(review.album.artist.name).fontWeight(.light)
                 Spacer()
                 Text(review.score).scoreText()
                 HStack{
@@ -28,7 +28,7 @@ struct FeedReviewCard: View {
                 
             }.padding(.trailing).padding(.vertical)
             Spacer()
-        }.frame(width:414, height:200)
+        }.frame(minWidth:0, maxWidth: .infinity, minHeight: 0, maxHeight:130)
     }
 }
 
