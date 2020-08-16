@@ -20,9 +20,25 @@ struct AlbumDetailView: View {
                 NavigationLink(destination: LazyView(AddReviewView(model: AddReviewViewModel(album: self.model.album, app: self.model.app)))) {
                     Text("Add review for this album")
                 }
+                
                 ButtonStack(streamingUrls: self.model.album.streamingUrls)
+                
+                Text("Critic reviews").font(.headline)
                 ForEach(model.reviews, id:\._id) { review in
-                    ReviewRow(review: review)
+                    NavigationLink(destination: LazyView(ReviewDetailView(model:ReviewDetailViewModel(review: review, app: self.model.app)))) {
+                        ReviewRow(review: review)
+                    }.buttonStyle(PlainButtonStyle())
+                }
+                
+                
+                ScrollView (.horizontal){
+                    HStack{
+                        ForEach(model.otherAlbums, id:\._id) { album in
+                            NavigationLink(destination:LazyView(AlbumDetailView(model: AlbumDetailViewModel(album: album, app: self.model.app)))) {
+                                AlbumSmallCard(album: album)
+                            }.buttonStyle(PlainButtonStyle())
+                        }
+                    }.padding(.horizontal)
                 }
                 
                 
