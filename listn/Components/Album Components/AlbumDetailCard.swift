@@ -10,7 +10,7 @@ import SwiftUI
 import SDWebImageSwiftUI
 
 struct AlbumDetailCard: View {
-    @State var album : ListnAlbum
+    var album : ListnAlbum
     var app : ListnApp?
     
     
