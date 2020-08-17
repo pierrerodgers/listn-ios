@@ -24,7 +24,7 @@ struct ReviewDetailAlbumCard: View {
                     }
                 }.buttonStyle(PlainButtonStyle())
                 Spacer()
-                RaveButton()
+                RaveButton(album:self.album)
             }.padding(.vertical, 5)
             Spacer()
         }

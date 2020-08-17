@@ -30,7 +30,7 @@ struct AlbumDetailCard: View {
                         }
                     }
                     Spacer()
-                    RaveButton()
+                    RaveButton(album:self.album)
                 }
                 HStack{
                     Text(album.genres?[0] ?? "")

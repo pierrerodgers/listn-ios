@@ -9,8 +9,18 @@
 import SwiftUI
 
 struct RaveButton: View {
+    @EnvironmentObject var showReviewSheet : ShowReviewSheet
+    
+    var album : ListnAlbum?
+    
     var body: some View {
-        Text("+ rave").title().padding().background(Color(.gray)).cornerRadius(10)
+        Button(action:{
+            self.showReviewSheet.albumReviewing = self.album
+            self.showReviewSheet.isAddingReview = true
+        }) {
+            Text("+ rave").title().padding().background(Color(.gray)).cornerRadius(10)
+        }
+        
     }
 }
 struct FullReviewButton : View {
