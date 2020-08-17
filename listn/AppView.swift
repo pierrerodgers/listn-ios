@@ -24,7 +24,7 @@ struct AppView: View {
             SearchView(model: SearchViewModel(app: app)).tab(title:"Search")
             ProfileView(model: ProfileViewModel(app: app)).tab(title: "Profile")
         }.environmentObject(showReviewSheet).sheet(isPresented: $showReviewSheet.isAddingReview){
-            AddReviewView(model: AddReviewViewModel(album: self.showReviewSheet.albumReviewing!, app: self.app))
+            AddReviewView(model: AddReviewViewModel(album: self.showReviewSheet.albumReviewing, app: self.app))
         }
     }
 }
