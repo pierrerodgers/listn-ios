@@ -23,6 +23,26 @@ struct RaveButton: View {
         
     }
 }
+
+struct NewRaveButton : View {
+    @EnvironmentObject var showReviewSheet : ShowReviewSheet
+    
+    var body: some View {
+        Button(action:{
+            self.showReviewSheet.isAddingReview = true
+        }) {
+            Image(systemName: "rectangle.stack.badge.plus").font(.system(size: 30)).foregroundColor(.white).padding(20).background(Circle().foregroundColor(Color(red: 235/255, green: 87/255, blue: 87/255)))
+            }.buttonStyle(HoverButtonStyle())
+    }
+}
+
+struct HoverButtonStyle: ButtonStyle {
+ 
+    func makeBody(configuration: Self.Configuration) -> some View {
+        configuration.label.scaleEffect(configuration.isPressed ? 0.9 : 1.0)
+    }
+}
+
 struct FullReviewButton : View {
     var link : String
     
