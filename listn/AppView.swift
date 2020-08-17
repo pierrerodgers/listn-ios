@@ -8,14 +8,23 @@
 
 import SwiftUI
 
+class ShowReviewSheet : ObservableObject {
+    @Published var isAddingReview = false
+    @Published var albumReviewing : ListnAlbum?
+}
+
 struct AppView: View {
     var app : ListnApp
+    
+    @ObservedObject var showReviewSheet = ShowReviewSheet()
     
     var body: some View {
         UIKitTabView {
             FeedView(model: FeedModel(app: app)).tab(title: "Feed")
             SearchView(model: SearchViewModel(app: app)).tab(title:"Search")
             ProfileView(model: ProfileViewModel(app: app)).tab(title: "Profile")
+        }.environmentObject(showReviewSheet).sheet(isPresented: $showReviewSheet.isAddingReview){
+            AddReviewView(model: AddReviewViewModel(album: self.showReviewSheet.albumReviewing!, app: self.app))
         }
     }
 }
