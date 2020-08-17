@@ -73,16 +73,6 @@ class FeedModel: ObservableObject {
     }
     
     func getNextPage() {
-        print(Date().toString(format: "HH:mm:ss.SSS"))
-        Network.shared.apollo.fetch(query: TestReviewsQuery(query: ReviewQueryInput(_idIn:reviewIds))) { result in
-            switch result{
-            case .success(_):
-                print("Finished")
-                print(Date().toString(format: "HH:mm:ss.SSS"))
-            case .failure(_):
-                return
-            }
-        }
         
         if isLoading == false {
             isLoading = true
