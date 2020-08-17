@@ -39,7 +39,7 @@ struct NewRaveButton : View {
 struct HoverButtonStyle: ButtonStyle {
  
     func makeBody(configuration: Self.Configuration) -> some View {
-        configuration.label.scaleEffect(configuration.isPressed ? 0.9 : 1.0)
+        configuration.label.scaleEffect(configuration.isPressed ? 0.8 : 1.0).animation(Animation.easeOut(duration: 0.15))
     }
 }
 
