@@ -7,10 +7,12 @@
 //
 
 import SwiftUI
+import ActivityIndicatorView
 
 struct ContentView: View {
+    @State var loading : Bool = true
     var body: some View {
-        Text("Loading")
+        ActivityIndicatorView(isVisible: $loading, type: .arcs).frame(width:100, height:100)
     }
 }
 
