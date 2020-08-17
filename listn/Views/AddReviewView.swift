@@ -23,13 +23,20 @@ struct AddReviewView: View {
         NavigationView {
             ScrollView {
                 VStack(alignment:.leading) {
-                    HStack{
-                        Spacer()
-                        WebImage(url:URL(string: self.model.album.smallArtwork ?? "")).resizable().placeholder(){Rectangle()}.frame(width:300, height:300)
-                        Spacer()
+                    if model.inputValid.missingAlbum {
+                        Button(action:{}) {
+                            Text("Add album")
+                        }
                     }
-                    Text(model.album.name).bold()
-                    Text(model.album.artist.name)
+                    else {
+                        HStack{
+                            Spacer()
+                            WebImage(url:URL(string: self.model.album!.smallArtwork ?? "")).resizable().placeholder(){Rectangle()}.frame(width:300, height:300)
+                            Spacer()
+                        }
+                        Text(model.album!.name).bold()
+                        Text(model.album!.artist.name)
+                    }
                     Divider()
                     Text("Score").font(.headline)
                     Picker(selection: $review.score, label: Text("Score")) {

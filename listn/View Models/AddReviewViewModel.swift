@@ -12,7 +12,7 @@ import SwiftUI
     case missingScore, invalidScore, missingAlbum, valid
 }
 */
-struct ReviewInputValid {
+struct ReviewInputValidState {
     var missingScore = true
     var invalidScore = false
     var missingAlbum = true
@@ -23,18 +23,24 @@ class AddReviewViewModel: ObservableObject {
     
     var app : ListnApp
     
-    @Published var album : ListnAlbum
-    @Published var inputValid : ReviewInputValid
+    @Published var album : ListnAlbum?
+    @Published var inputValid : ReviewInputValidState
     
     
-    init(album:ListnAlbum, app: ListnApp) {
+    init(album:ListnAlbum?, app: ListnApp) {
         self.album = album
         self.app = app
-        self.inputValid = ReviewInputValid()
+        if album == nil {
+            self.inputValid = ReviewInputValidState()
+        }
+        else {
+            self.inputValid = ReviewInputValidState(missingAlbum:false)
+        }
+        
     }
     
     func postReview(review: NewReview) {
-        let review = ListnUserReview(album:album, score:String(review.score), text: review.text)
+        let review = ListnUserReview(album:album!, score:String(review.score), text: review.text)
         
         app.postReview(review: review)
     }
