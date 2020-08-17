@@ -19,39 +19,61 @@ struct ArtistDetailView: View {
     }
     
     var body: some View {
-        ScrollView() {
+        ScrollView(.vertical) {
             VStack {
-                Text(model.artist.name)
+                ZStack {
+                    GeometryReader { geometry in
+                        ZStack {
+                            if geometry.frame(in: .global).minY <= 0 {
+                                WebImage(url: URL(string:self.model.artist.image))
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: geometry.size.width, height: geometry.size.height)
+                                .offset(y: geometry.frame(in: .global).minY/9)
+                                .clipped()
+                            } else {
+                                WebImage(url: URL(string:self.model.artist.image))
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: geometry.size.width, height: geometry.size.height + geometry.frame(in: .global).minY)
+                                    .clipped()
+                                    .offset(y: -geometry.frame(in: .global).minY)
+                            }
+                        }
+                    }.frame(height:200)
+                    VStack(alignment:.leading){
+                        Spacer()
+                        HStack{
+                            Text(model.artist.name).font(.largeTitle).bold().padding(.horizontal)
+                            Spacer()
+                        }
+                        
+                    }
+                }
+                ButtonStack(streamingUrls: model.artist.streamingUrls)
                 
-                WebImage(url: URL(string:model.artist.image)).resizable().placeholder(content: {Rectangle()}).frame(width:300, height:300, alignment: .center)
-                
-                ScrollView(.horizontal) {
-                    
-                    HStack {
-                        ForEach(model.albums, id:\._id) { album in
-                            NavigationLink(destination: LazyView(AlbumDetailView(model: AlbumDetailViewModel(album: album, app: self.model.app)))) {
-                                VStack{
-                                    WebImage(url:URL(string:album.artwork ?? "")).resizable().placeholder(content: {Rectangle()}).frame(width:200, height:200, alignment: .center)
-                                    Text(album.name)
-                                    Text(album.artist.name)
-                                }
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack{
+                        ForEach(model.albums, id:\._id){ album in
+                            NavigationLink(destination:AlbumDetailView(model: AlbumDetailViewModel(album: album, app: self.model.app))) {
+                                AlbumSmallCard(album: album)
                             }.buttonStyle(PlainButtonStyle())
                         }
+                        
                     }
                     
                 }
-                
                 
                 ForEach(model.reviews, id:\._id) { review in
-                    VStack {
-                        Text(review.score)
-                        Text(review.username)
+                    NavigationLink(destination:LazyView(ReviewDetailView(model:ReviewDetailViewModel(review: review, app: self.model.app)))) {
+                        FeedReviewCard(review: review)
                     }
-                    
-                    
+                     
                 }
             }
-        }
+        }.onAppear(){
+            UINavigationBar.appearance().backgroundColor = UIColor(hue: 0, saturation: 0, brightness: 0, alpha: 0)
+        }.navigationBarTitle("").edgesIgnoringSafeArea(.top)
     }
 }
 
