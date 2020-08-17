@@ -7,6 +7,8 @@
 //
 
 import SwiftUI
+import ActivityIndicatorView
+import SwiftUIRefresh
 
 struct FeedView: View {
     @ObservedObject var model : FeedModel
@@ -17,13 +19,20 @@ struct FeedView: View {
                 ForEach(model.reviews.enumerated().map({$0}), id: \.element._id) { index, review in
                     NavigationLink(destination: LazyView(ReviewDetailView(model: ReviewDetailViewModel(review: review, app: self.model.app))) ) {
                         FeedReviewCard(review: review).listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0)).onAppear() {
-                            if index == self.model.reviews.count - 10 {
+                            if index == self.model.reviews.count - 25 {
                                 self.model.getNextPage()
                             }
                         }
                     }.listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-                    
                 }
+                HStack(){
+                    Spacer()
+                    ActivityIndicatorView(isVisible: $model.isLoading, type: .arcs).frame(width:50, height:50)
+                    Spacer()
+                }
+                
+            }.pullToRefresh(isShowing: $model.isRefreshing){
+                self.model.refreshUserFeed()
             }.onAppear() {
                 if #available(iOS 14.0, *) {
                     // iOS 14 doesn't have extra separators below the list by default.
