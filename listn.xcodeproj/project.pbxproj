@@ -47,6 +47,8 @@
 		C187616824E3F89000459AE0 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C187616724E3F89000459AE0 /* ProfileViewModel.swift */; };
 		C1C0BAB924DD30F70029BEF8 /* ReviewDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1C0BAB824DD30F70029BEF8 /* ReviewDetailViewModel.swift */; };
 		C1E1012E24E8DA1E006B61BE /* AlbumSmallCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E1012D24E8DA1E006B61BE /* AlbumSmallCard.swift */; };
+		C1E1013124E8E6FD006B61BE /* ActivityIndicatorView in Frameworks */ = {isa = PBXBuildFile; productRef = C1E1013024E8E6FD006B61BE /* ActivityIndicatorView */; };
+		C1E1013424E91BC6006B61BE /* SwiftUIRefresh in Frameworks */ = {isa = PBXBuildFile; productRef = C1E1013324E91BC6006B61BE /* SwiftUIRefresh */; };
 		C1E21E5024E6209800F7921E /* ReviewDetailReviewCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E21E4F24E6209800F7921E /* ReviewDetailReviewCard.swift */; };
 		C1E21E5224E624EB00F7921E /* ReviewDetailAlbumCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E21E5124E624EB00F7921E /* ReviewDetailAlbumCard.swift */; };
 		C1E21E5424E6251B00F7921E /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E21E5324E6251B00F7921E /* Buttons.swift */; };
@@ -139,6 +141,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1E1013424E91BC6006B61BE /* SwiftUIRefresh in Frameworks */,
+				C1E1013124E8E6FD006B61BE /* ActivityIndicatorView in Frameworks */,
 				C10BE68F24D941B000C70DBA /* SDWebImageSwiftUI in Frameworks */,
 				C1FB5B4924DBBD5100B85E7E /* GenericSegmentedControl in Frameworks */,
 				C1FB5B4224DBB2D000B85E7E /* FloatingSegmentedControl in Frameworks */,
@@ -391,6 +395,8 @@
 				C10BE68E24D941B000C70DBA /* SDWebImageSwiftUI */,
 				C1FB5B4124DBB2D000B85E7E /* FloatingSegmentedControl */,
 				C1FB5B4824DBBD5100B85E7E /* GenericSegmentedControl */,
+				C1E1013024E8E6FD006B61BE /* ActivityIndicatorView */,
+				C1E1013324E91BC6006B61BE /* SwiftUIRefresh */,
 			);
 			productName = listn;
 			productReference = C12F6EF724C827600083BF92 /* listn.app */;
@@ -448,6 +454,8 @@
 				C10BE68D24D941B000C70DBA /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 				C1FB5B4024DBB2D000B85E7E /* XCRemoteSwiftPackageReference "FloatingSegmentedControl" */,
 				C1FB5B4724DBBD5100B85E7E /* XCRemoteSwiftPackageReference "GenericSegmentedControl" */,
+				C1E1012F24E8E6FD006B61BE /* XCRemoteSwiftPackageReference "ActivityIndicatorView" */,
+				C1E1013224E91BC6006B61BE /* XCRemoteSwiftPackageReference "SwiftUIRefresh" */,
 			);
 			productRefGroup = C12F6EF824C827600083BF92 /* Products */;
 			projectDirPath = "";
@@ -896,6 +904,22 @@
 				minimumVersion = 1.5.0;
 			};
 		};
+		C1E1012F24E8E6FD006B61BE /* XCRemoteSwiftPackageReference "ActivityIndicatorView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/exyte/ActivityIndicatorView.git";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 0.0.3;
+			};
+		};
+		C1E1013224E91BC6006B61BE /* XCRemoteSwiftPackageReference "SwiftUIRefresh" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/timbersoftware/SwiftUIRefresh.git";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 0.0.3;
+			};
+		};
 		C1FB5B4024DBB2D000B85E7E /* XCRemoteSwiftPackageReference "FloatingSegmentedControl" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/darioGzlez/FloatingSegmentedControl.git";
@@ -919,6 +943,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C10BE68D24D941B000C70DBA /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
 			productName = SDWebImageSwiftUI;
+		};
+		C1E1013024E8E6FD006B61BE /* ActivityIndicatorView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C1E1012F24E8E6FD006B61BE /* XCRemoteSwiftPackageReference "ActivityIndicatorView" */;
+			productName = ActivityIndicatorView;
+		};
+		C1E1013324E91BC6006B61BE /* SwiftUIRefresh */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C1E1013224E91BC6006B61BE /* XCRemoteSwiftPackageReference "SwiftUIRefresh" */;
+			productName = SwiftUIRefresh;
 		};
 		C1FB5B4124DBB2D000B85E7E /* FloatingSegmentedControl */ = {
 			isa = XCSwiftPackageProductDependency;
