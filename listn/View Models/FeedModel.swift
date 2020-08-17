@@ -21,25 +21,69 @@ class FeedModel: ObservableObject {
     var app : ListnApp
     
     @Published var reviews : Array<ListnReview>
+    @Published var isLoading : Bool
+    @Published var isRefreshing : Bool
+    
     var reviewIds : [String]
     
     private var currentIndex = 0
-    private var isLoading = false
     
     init(app: ListnApp) {
         self.app = app
         self.reviews = []
         self.reviewIds = []
+        self.isLoading = false
+        self.isRefreshing = false
         
         app.getUserFeed() { [weak self] reviewIds in
             self!.reviewIds = reviewIds
             self!.getNextPage()
         }
-        
+    
         
     }
     
+    func refreshUserFeed() {
+        isRefreshing = true
+        app.refreshUserFeed() { reviewIds in
+            self.reviewIds = reviewIds
+            self.currentIndex = 0
+            self.reviews = []
+            self.getFirstPage()
+        }
+    }
+    
+    func getFirstPage() {
+        let maximum = max(reviewIds.count - 1,0)
+        let start = currentIndex
+        let end = min(currentIndex+40, maximum)
+        print("end: \(end), start =\(start)")
+        print(reviewIds[start...end])
+        if maximum != currentIndex {
+            app.getReviewsForIDs(IDs: Array(reviewIds[start...end])) { (error, reviews) in
+                guard error == nil else {
+                    self.isRefreshing = false
+                    return
+                }
+                self.reviews = reviews!
+                self.currentIndex += 40
+                self.isRefreshing = false
+            }
+        }
+    }
+    
     func getNextPage() {
+        print(Date().toString(format: "HH:mm:ss.SSS"))
+        Network.shared.apollo.fetch(query: TestReviewsQuery(query: ReviewQueryInput(_idIn:reviewIds))) { result in
+            switch result{
+            case .success(_):
+                print("Finished")
+                print(Date().toString(format: "HH:mm:ss.SSS"))
+            case .failure(_):
+                return
+            }
+        }
+        
         if isLoading == false {
             isLoading = true
             print("GETTING NEXT PAGE, currentIndex:\(currentIndex)")
@@ -47,6 +91,7 @@ class FeedModel: ObservableObject {
             let start = currentIndex
             let end = min(currentIndex+40, maximum)
             print("end: \(end), start =\(start)")
+            print(reviewIds[start...end])
             if maximum != currentIndex {
                 app.getReviewsForIDs(IDs: Array(reviewIds[start...end])) { (error, reviews) in
                     guard error == nil else {
