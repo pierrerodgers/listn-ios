@@ -49,6 +49,7 @@
 		C1E1012E24E8DA1E006B61BE /* AlbumSmallCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E1012D24E8DA1E006B61BE /* AlbumSmallCard.swift */; };
 		C1E1013124E8E6FD006B61BE /* ActivityIndicatorView in Frameworks */ = {isa = PBXBuildFile; productRef = C1E1013024E8E6FD006B61BE /* ActivityIndicatorView */; };
 		C1E1013424E91BC6006B61BE /* SwiftUIRefresh in Frameworks */ = {isa = PBXBuildFile; productRef = C1E1013324E91BC6006B61BE /* SwiftUIRefresh */; };
+		C1E1013724EA1EB9006B61BE /* IQKeyboardManagerSwift in Frameworks */ = {isa = PBXBuildFile; productRef = C1E1013624EA1EB9006B61BE /* IQKeyboardManagerSwift */; };
 		C1E21E5024E6209800F7921E /* ReviewDetailReviewCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E21E4F24E6209800F7921E /* ReviewDetailReviewCard.swift */; };
 		C1E21E5224E624EB00F7921E /* ReviewDetailAlbumCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E21E5124E624EB00F7921E /* ReviewDetailAlbumCard.swift */; };
 		C1E21E5424E6251B00F7921E /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E21E5324E6251B00F7921E /* Buttons.swift */; };
@@ -141,6 +142,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1E1013724EA1EB9006B61BE /* IQKeyboardManagerSwift in Frameworks */,
 				C1E1013424E91BC6006B61BE /* SwiftUIRefresh in Frameworks */,
 				C1E1013124E8E6FD006B61BE /* ActivityIndicatorView in Frameworks */,
 				C10BE68F24D941B000C70DBA /* SDWebImageSwiftUI in Frameworks */,
@@ -397,6 +399,7 @@
 				C1FB5B4824DBBD5100B85E7E /* GenericSegmentedControl */,
 				C1E1013024E8E6FD006B61BE /* ActivityIndicatorView */,
 				C1E1013324E91BC6006B61BE /* SwiftUIRefresh */,
+				C1E1013624EA1EB9006B61BE /* IQKeyboardManagerSwift */,
 			);
 			productName = listn;
 			productReference = C12F6EF724C827600083BF92 /* listn.app */;
@@ -456,6 +459,7 @@
 				C1FB5B4724DBBD5100B85E7E /* XCRemoteSwiftPackageReference "GenericSegmentedControl" */,
 				C1E1012F24E8E6FD006B61BE /* XCRemoteSwiftPackageReference "ActivityIndicatorView" */,
 				C1E1013224E91BC6006B61BE /* XCRemoteSwiftPackageReference "SwiftUIRefresh" */,
+				C1E1013524EA1EB9006B61BE /* XCRemoteSwiftPackageReference "IQKeyboardManager" */,
 			);
 			productRefGroup = C12F6EF824C827600083BF92 /* Products */;
 			projectDirPath = "";
@@ -920,6 +924,14 @@
 				minimumVersion = 0.0.3;
 			};
 		};
+		C1E1013524EA1EB9006B61BE /* XCRemoteSwiftPackageReference "IQKeyboardManager" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hackiftekhar/IQKeyboardManager.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.5.6;
+			};
+		};
 		C1FB5B4024DBB2D000B85E7E /* XCRemoteSwiftPackageReference "FloatingSegmentedControl" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/darioGzlez/FloatingSegmentedControl.git";
@@ -953,6 +965,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C1E1013224E91BC6006B61BE /* XCRemoteSwiftPackageReference "SwiftUIRefresh" */;
 			productName = SwiftUIRefresh;
+		};
+		C1E1013624EA1EB9006B61BE /* IQKeyboardManagerSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C1E1013524EA1EB9006B61BE /* XCRemoteSwiftPackageReference "IQKeyboardManager" */;
+			productName = IQKeyboardManagerSwift;
 		};
 		C1FB5B4124DBB2D000B85E7E /* FloatingSegmentedControl */ = {
 			isa = XCSwiftPackageProductDependency;
