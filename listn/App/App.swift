@@ -15,6 +15,7 @@ class ListnApp : ListnAppData {
     var loginService : LoginService!
     var user : User?
     var realm : Realm?
+    var feedToken : NotificationToken?
     
     var isLoggedIn : Bool {
         get {
@@ -60,6 +61,14 @@ class ListnApp : ListnAppData {
         
     }
     
+    func refreshUserFeed(completion: @escaping(Array<String>) -> Void) {
+        realmApp.functions.updateUserFeed([AnyBSON(user!._id)!]) { result, error in
+            print("feed updated")
+            DispatchQueue.main.async {
+                self.getUserFeed(completion: completion)
+            }
+        }
+    }
     
     func getUserFeed( completion: @escaping (Array<String>) -> Void ) {
         let feeds = realm!.objects(UserFeed.self)
@@ -68,6 +77,25 @@ class ListnApp : ListnAppData {
             return
         }
         let userFeed = feeds[0]
+        /*feedToken = feeds.observe() { updatedChanges in
+            switch updatedChanges {
+            case .update(let feeds, _, _, _):
+                let userFeed = feeds[0]
+                let feed = userFeed.reviews
+                let reviewIds = Array(feed).compactMap({review in return review.id!})
+                completion(reviewIds)
+                return
+            case .error(_):
+                return
+            case .initial(let feeds):
+                let userFeed = feeds[0]
+                let feed = userFeed.reviews
+                let reviewIds = Array(feed).compactMap({review in return review.id!})
+                completion(reviewIds)
+                return
+            }
+            
+        }*/
         let feed = userFeed.reviews
         let reviewIds = Array(feed).compactMap({review in return review.id!})
         completion(reviewIds)
