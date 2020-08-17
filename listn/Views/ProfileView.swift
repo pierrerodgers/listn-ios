@@ -13,15 +13,21 @@ struct ProfileView: View {
     
     var body: some View {
         NavigationView {
-            List(self.model.userReviews, id:\._id) { review in
-                NavigationLink(destination: LazyView(ReviewDetailView(model: ReviewDetailViewModel(review: review, app: self.model.app)))) {
-                    VStack(alignment:.leading){
-                        Text(review.album.name)
-                        Text(review.album.artist.name)
-                        Text(review.score)
+            ScrollView {
+                VStack {
+                    HStack{
+                        Text("130 Followers")
+                        Text("130 Following")
+                    }
+                    ForEach(self.model.userReviews, id:\._id) { review in
+                        NavigationLink(destination: LazyView(ReviewDetailView(model: ReviewDetailViewModel(review: review, app: self.model.app)))) {
+                            FeedReviewCard(review: review)
+                        }.buttonStyle(PlainButtonStyle())
+                        
+
                     }
                 }
-            }
+            }.frame(maxWidth:.infinity).navigationBarTitle(model.user.name)
         }
     }
 }
