@@ -75,6 +75,16 @@ struct ButtonStack : View {
     }
 }
 
+struct SaveReviewButton : View {
+    var action : () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Text("Save rave")
+        }
+    }
+}
+
 struct Buttons_Previews: PreviewProvider {
     static var previews: some View {
         Group {
