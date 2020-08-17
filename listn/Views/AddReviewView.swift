@@ -20,26 +20,27 @@ struct AddReviewView: View {
     
     
     var body: some View {
-        ScrollView {
-            VStack(alignment:.leading) {
-                Text("Rave about").title()
-                HStack{
-                    Spacer()
-                    WebImage(url:URL(string: self.model.album.smallArtwork ?? "")).resizable().placeholder(){Rectangle()}.frame(width:300, height:300)
-                    Spacer()
-                }
-                Text(model.album.name).bold()
-                Text(model.album.artist.name)
-                Divider()
-                Text("Score").font(.headline)
-                Picker(selection: $review.score, label: Text("Score")) {
-                    ForEach(1...100, id:\.self) { score in
-                        Text(String(score))
+        NavigationView {
+            ScrollView {
+                VStack(alignment:.leading) {
+                    HStack{
+                        Spacer()
+                        WebImage(url:URL(string: self.model.album.smallArtwork ?? "")).resizable().placeholder(){Rectangle()}.frame(width:300, height:300)
+                        Spacer()
                     }
+                    Text(model.album.name).bold()
+                    Text(model.album.artist.name)
+                    Divider()
+                    Text("Score").font(.headline)
+                    Picker(selection: $review.score, label: Text("Score")) {
+                        ForEach(1...100, id:\.self) { score in
+                            Text(String(score))
+                        }
+                    }
+                    TextField("Add details", text: $review.text)
+                    SaveReviewButton(action:{self.model.postReview(review: self.review)})
                 }
-                TextField("Add details", text: $review.text)
-                SaveReviewButton(action:{self.model.postReview(review: self.review)})
-            }
+            }.navigationBarTitle("Rave about")
         }
     }
     
