@@ -10,7 +10,6 @@ import Foundation
 
 
 struct ListnAlbum {
-    
     init(apolloResult: AlbumDetail) {
         // Initialise all strings
         _id = apolloResult._id!
@@ -25,10 +24,30 @@ struct ListnAlbum {
         releaseDate = dateFormatter.date(from: apolloResult.releaseDate ?? "")
         
         // Initialise Artist
-        artist = ListnArtist(apolloResult: apolloResult.artist!.fragments.artistDetail)
+        self.artist = ListnArtist(apolloResult: (apolloResult.artist?.fragments.artistDetail)!)
         
         // Initialise streamingUrls
-        streamingUrls = ListnStreamingUrls(appleMusic: apolloResult.streamingUrls?.appleMusic ?? "https://music.apple.com/us/search?term=\(apolloResult.name!.replacingOccurrences(of: " ", with: "%20"))%20\(apolloResult.artist!.fragments.artistDetail.name!.replacingOccurrences(of: " ", with: "%20"))", spotify: apolloResult.streamingUrls?.spotify ?? "https://play.spotify.com/search/\(apolloResult.name!.replacingOccurrences(of: " ", with: "%20"))%20\(apolloResult.artist!.fragments.artistDetail.name!.replacingOccurrences(of: " ", with: "%20"))")
+        self.streamingUrls = ListnStreamingUrls(appleMusic: apolloResult.streamingUrls?.appleMusic ?? "https://music.apple.com/us/search?term=\(apolloResult.name!.replacingOccurrences(of: " ", with: "%20"))%20\(apolloResult.artist!.fragments.artistDetail.name!.replacingOccurrences(of: " ", with: "%20"))", spotify: apolloResult.streamingUrls?.spotify ?? "https://play.spotify.com/search/\(apolloResult.name!.replacingOccurrences(of: " ", with: "%20"))%20\(apolloResult.artist!.fragments.artistDetail.name!.replacingOccurrences(of: " ", with: "%20"))")
+    }
+    
+    init(apolloResult: ReviewAlbumDetail, artist: ReviewArtistDetail) {
+        // Initialise all strings
+        _id = apolloResult._id!
+        name = apolloResult.name!
+        artwork = apolloResult.artwork ?? ""
+        genres = apolloResult.genres?.compactMap({string in string!}) ?? []
+        
+        // Initialise date
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        releaseDate = dateFormatter.date(from: apolloResult.releaseDate ?? "")
+        
+        // Initialise Artist
+        self.artist = ListnArtist(apolloResult: artist)
+        
+        // Initialise streamingUrls
+        streamingUrls = ListnStreamingUrls(appleMusic: apolloResult.streamingUrls?.appleMusic ?? "https://music.apple.com/us/search?term=\(apolloResult.name!.replacingOccurrences(of: " ", with: "%20"))%20\(artist.name!.replacingOccurrences(of: " ", with: "%20"))", spotify: apolloResult.streamingUrls?.spotify ?? "https://play.spotify.com/search/\(apolloResult.name!.replacingOccurrences(of: " ", with: "%20"))%20\(artist.name!.replacingOccurrences(of: " ", with: "%20"))")
     }
     
     var _id : String
@@ -66,6 +85,13 @@ struct ListnAlbum {
 }
 
 struct ListnArtist {
+    
+    init(apolloResult: ReviewArtistDetail) {
+        _id = apolloResult._id!
+        name = apolloResult.name!
+        image = apolloResult.image ?? ""
+        streamingUrls = ListnStreamingUrls(appleMusic: apolloResult.streamingUrls?.appleMusic ?? "https://music.apple.com/us/search?term=\(apolloResult.name!.replacingOccurrences(of: " ", with: "%20"))", spotify: apolloResult.streamingUrls?.spotify ?? "https://play.spotify.com/search/\(apolloResult.name!.replacingOccurrences(of: " ", with: "%20"))")
+    }
     init(apolloResult: ArtistDetail) {
         _id = apolloResult._id!
         name = apolloResult.name!
@@ -96,11 +122,12 @@ struct ListnCriticReview : ListnReview {
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         date = dateFormatter.date(from: apolloResult.date ?? "") ?? Date()
         
-        album = ListnAlbum(apolloResult: apolloResult.album!.fragments.albumDetail)
+        album = ListnAlbum(apolloResult: apolloResult.albumData!.fragments.reviewAlbumDetail, artist: apolloResult.artistData!.fragments.reviewArtistDetail)
         
-        reviewer = ListnReviewer(apolloResult: apolloResult.reviewer!.fragments.reviewerDetail)
+        reviewer = ListnReviewer(apolloResult: apolloResult.reviewerData!.fragments.reviewReviewerDetail)
         
     }
+    
     var _id : String?
     var reviewer : ListnReviewer
     var username : String {
@@ -117,11 +144,17 @@ struct ListnCriticReview : ListnReview {
 }
 
 struct ListnReviewer {
+    init(apolloResult: ReviewReviewerDetail) {
+        _id = apolloResult._id!
+        name = apolloResult.name!
+        link = apolloResult.link!
+    }
     init(apolloResult: ReviewerDetail) {
         _id = apolloResult._id!
         name = apolloResult.name!
         link = apolloResult.link!
     }
+    
     
     var _id : String
     var name : String

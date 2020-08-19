@@ -29,11 +29,33 @@ fragment ArtistDetail on Artist {
         spotify
     }
 }
+fragment ReviewArtistDetail on ReviewArtistDatum {
+    name
+    _id
+    image
+    streamingUrls {
+        appleMusic
+        spotify
+    }
+}
 
 fragment AlbumDetail on Album {
     artist {
         ...ArtistDetail
     }
+    _id
+    name
+    artwork
+    genres
+    releaseDate
+    recordLabel
+    streamingUrls {
+        appleMusic
+        spotify
+    }
+}
+fragment ReviewAlbumDetail on ReviewAlbumDatum {
+    artist
     _id
     name
     artwork
@@ -62,6 +84,23 @@ fragment ReviewDetail on Review {
     score
 
 }
+fragment ReviewDetail on Review {
+    albumData {
+        ...ReviewAlbumDetail
+    }
+    artistData {
+        ...ReviewArtistDetail
+    }
+    reviewerData {
+        ...ReviewReviewerDetail
+    }
+    _id
+    link
+    date
+    score
+
+}
+
 
 fragment UserReviewDetail on UserReview {
     album {
@@ -77,6 +116,11 @@ fragment UserReviewDetail on UserReview {
 }
 
 fragment ReviewerDetail on Reviewer {
+    _id
+    link
+    name
+}
+fragment ReviewReviewerDetail on ReviewReviewerDatum {
     _id
     link
     name
@@ -106,17 +150,7 @@ query Reviewers($query:ReviewerQueryInput) {
     }
 }
 
-query AlbumSearch($input:String) {
-    AlbumSearch(input:{query:$input}) {
-        albums
-    }
-}
 
-query ArtistSearch($input:String) {
-    ArtistSearch(input:{query:$input}) {
-        artists
-    }
-}
 
 query Search($input:String) {
     Search(input:{query:$input}) {
@@ -125,4 +159,5 @@ query Search($input:String) {
         reviewers
     }
 }
+
 
