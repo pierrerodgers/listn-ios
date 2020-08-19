@@ -20,29 +20,12 @@ class TestSearchViewModel: ObservableObject {
     }
     
     func search(search:String) {
-        searchAlbums(search: search)
-        searchArtists(search: search)
-    }
-    
-    func searchAlbums(search:String) {
-        print(search)
-        app.searchAlbums(query: search) { (error, results) in
-            guard error == nil else {
-                print(error.debugDescription)
-                return
-            }
-            self.app.getAlbums(albumIds:results!, completion:{ (error, results) in
-                guard error == nil else {
-                    print (error.debugDescription)
-                    return
-                }
-                self.albumResults = results!
-            })
-        }
+        /*searchAlbums(search: search)
+        searchArtists(search: search)*/
     }
     
     func searchArtists(search:String) {
-        app.searchArtists(query: search) { (error, results) in
+        /*app.searchArtists(query: search) { (error, results) in
             guard error == nil else {
                 print(error.debugDescription)
                 return
@@ -54,7 +37,7 @@ class TestSearchViewModel: ObservableObject {
                 }
                 self.artistResults = results!
             })
-        }
+        }*/
     }
     
     
