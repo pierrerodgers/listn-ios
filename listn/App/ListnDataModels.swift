@@ -28,7 +28,7 @@ struct ListnAlbum {
         artist = ListnArtist(apolloResult: apolloResult.artist!.fragments.artistDetail)
         
         // Initialise streamingUrls
-        streamingUrls = ListnStreamingUrls(appleMusic: apolloResult.streamingUrls?.appleMusic ?? "", spotify: apolloResult.streamingUrls?.spotify ?? "")
+        streamingUrls = ListnStreamingUrls(appleMusic: apolloResult.streamingUrls?.appleMusic ?? "https://music.apple.com/us/search?term=\(apolloResult.name!.replacingOccurrences(of: " ", with: "%20"))%20\(apolloResult.artist!.fragments.artistDetail.name!.replacingOccurrences(of: " ", with: "%20"))", spotify: apolloResult.streamingUrls?.spotify ?? "https://play.spotify.com/search/\(apolloResult.name!.replacingOccurrences(of: " ", with: "%20"))%20\(apolloResult.artist!.fragments.artistDetail.name!.replacingOccurrences(of: " ", with: "%20"))")
     }
     
     var _id : String
@@ -44,6 +44,21 @@ struct ListnAlbum {
             return releaseDate?.toString(format: "dd MMM YYYY") ?? ""
         }
     }
+    var genre : String {
+        get {
+            if let genres = genres {
+                if genres.count > 0 {
+                    return genres[0]
+                }
+                else {
+                    return ""
+                }
+            }
+            else {
+                return ""
+            }
+        }
+    }
     var releaseDate : Date?
     var genres : [String]?
     var streamingUrls : ListnStreamingUrls
@@ -55,7 +70,7 @@ struct ListnArtist {
         _id = apolloResult._id!
         name = apolloResult.name!
         image = apolloResult.image ?? ""
-        streamingUrls = ListnStreamingUrls(appleMusic: apolloResult.streamingUrls?.appleMusic ?? "", spotify: apolloResult.streamingUrls?.spotify ?? "")
+        streamingUrls = ListnStreamingUrls(appleMusic: apolloResult.streamingUrls?.appleMusic ?? "https://music.apple.com/us/search?term=\(apolloResult.name!.replacingOccurrences(of: " ", with: "%20"))", spotify: apolloResult.streamingUrls?.spotify ?? "https://play.spotify.com/search/\(apolloResult.name!.replacingOccurrences(of: " ", with: "%20"))")
     }
     
     var _id : String
