@@ -28,12 +28,12 @@ struct AlbumDetailCard: View {
                             Text(album.name).title()
                             Text(album.artist.name)
                         }
-                    }
+                    }.buttonStyle(PlainButtonStyle())
                     Spacer()
                     RaveButton(album:self.album)
                 }
                 HStack{
-                    Text(album.genres?[0] ?? "")
+                    Text(album.genre)
                     Text("-")
                     Text(album.releaseDate?.toString(format: "dd MMM YYYY") ?? "")
                 }

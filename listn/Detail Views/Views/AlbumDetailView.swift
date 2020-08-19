@@ -16,11 +16,6 @@ struct AlbumDetailView: View {
         ScrollView() {
             VStack {
                 AlbumDetailCard(album: model.album, app:model.app)
-                
-                NavigationLink(destination: LazyView(AddReviewView(model: AddReviewViewModel(album: self.model.album, app: self.model.app)))) {
-                    Text("Add review for this album")
-                }
-                
                 ButtonStack(streamingUrls: self.model.album.streamingUrls)
                 
                 Text("Critic reviews").font(.headline)
