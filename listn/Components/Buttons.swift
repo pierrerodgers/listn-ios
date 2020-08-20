@@ -48,12 +48,16 @@ struct FullReviewButton : View {
     var link : String
     
     var body: some View {
-        Button(action: {}) {
+        Button(action: {
+            if let url = URL(string: self.link) {
+                UIApplication.shared.open(url)
+            }
+        }) {
             HStack{
                 Image(systemName: "arrow.up.right.square").font(.system(size: 20))
                 Text("See full review").font(.system(size: 20))
-            }
-        }
+                }.padding().background(Color.blue).cornerRadius(5)
+        }.buttonStyle(PlainButtonStyle())
     }
 }
 
@@ -123,6 +127,16 @@ struct SaveReviewButton : View {
         Button(action: action) {
             Text("Save rave")
         }
+    }
+}
+
+struct FollowButton : View {
+    var action: () -> Void
+    
+    var body: some View {
+        Button(action:action) {
+            Text("Follow").padding().background(Color.gray).cornerRadius(5)
+        }.buttonStyle(PlainButtonStyle())
     }
 }
 
