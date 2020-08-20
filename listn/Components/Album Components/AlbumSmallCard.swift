@@ -13,7 +13,7 @@ struct AlbumSmallCard: View {
     var album : ListnAlbum
     
     var body: some View {
-        VStack{
+        VStack(alignment:.leading){
             WebImage(url: URL(string: album.smallArtwork ??  "")).resizable().placeholder(){Rectangle()}.frame(width: 200, height: 200)
             VStack(alignment:.leading) {
                 Text(album.name).bold()

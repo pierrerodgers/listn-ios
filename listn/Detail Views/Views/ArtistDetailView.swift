@@ -40,7 +40,7 @@ struct ArtistDetailView: View {
                                     .offset(y: -geometry.frame(in: .global).minY)
                             }
                         }
-                    }.frame(height:200)
+                    }.frame(height:400)
                     VStack(alignment:.leading){
                         Spacer()
                         HStack{

@@ -26,8 +26,8 @@ struct ProfileView: View {
                         
 
                     }
-                }
-            }.frame(maxWidth:.infinity).navigationBarTitle(model.user.name)
+                }.frame(maxWidth:.infinity)
+            }.frame(minWidth:0, maxWidth:.infinity).navigationBarTitle(model.user.name)
         }
     }
 }

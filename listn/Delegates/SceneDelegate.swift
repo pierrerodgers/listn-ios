@@ -30,6 +30,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         /*
         let realm = try! Realm(configuration: app.currentUser()!.configuration(partitionValue:(app.currentUser()?.identity)!))*/
+        UINavigationBar.appearance().tintColor = UIColor.label
         let _ = ListnApp() { isLoggedIn, app in
             if isLoggedIn {
                 DispatchQueue.main.async {
