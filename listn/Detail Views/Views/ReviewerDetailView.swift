@@ -12,25 +12,18 @@ struct ReviewerDetailView: View {
     @ObservedObject var model : ReviewerDetailViewModel
     
     var body: some View {
-        VStack {
-            Text(model.reviewer.name)
-            Button(action:model.toggleFollow) {
-                if model.isFollowing {
-                    Text("Unfollow")
+        ScrollView {
+            VStack{
+                HStack{
+                    Text("135 followers")
+                    Text("150 following")
                 }
-                else {
-                    Text("Follow")
+                FollowButton(action: model.toggleFollow)
+                ForEach(model.recentReviews, id:\._id) { review in
+                    FeedReviewCard(review: review)
                 }
-            }
-            List(model.recentReviews, id:\._id) { review in
-                VStack {
-                    Text(review.album.name)
-                    Text(review.album.artist.name)
-                    Text(review.score)
-                }
-                
-            }
-        }
+            }.frame(maxWidth:.infinity)
+        }.navigationBarTitle(model.reviewer.name).frame(maxWidth:.infinity)
     }
 }
 /*
