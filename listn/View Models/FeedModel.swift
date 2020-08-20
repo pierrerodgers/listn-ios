@@ -58,9 +58,9 @@ class FeedModel: ObservableObject {
         let start = currentIndex
         let end = min(currentIndex+40, maximum)
         print("end: \(end), start =\(start)")
-        print(reviewIds[start...end])
+        print(reviewIds[start..<end])
         if maximum != currentIndex {
-            app.getReviewsForIDs(IDs: Array(reviewIds[start...end])) { (error, reviews) in
+            app.getReviewsForIDs(IDs: Array(reviewIds[start..<end])) { (error, reviews) in
                 guard error == nil else {
                     self.isRefreshing = false
                     return
@@ -81,9 +81,9 @@ class FeedModel: ObservableObject {
             let start = currentIndex
             let end = min(currentIndex+40, maximum)
             print("end: \(end), start =\(start)")
-            print(reviewIds[start...end])
+            print(reviewIds[start..<end])
             if maximum != currentIndex {
-                app.getReviewsForIDs(IDs: Array(reviewIds[start...end])) { (error, reviews) in
+                app.getReviewsForIDs(IDs: Array(reviewIds[start..<end])) { (error, reviews) in
                     guard error == nil else {
                         self.isLoading = false
                         return

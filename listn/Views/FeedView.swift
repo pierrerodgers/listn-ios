@@ -23,7 +23,7 @@ struct FeedView: View {
                         ForEach(model.reviews.enumerated().map({$0}), id: \.element._id) { index, review in
                             NavigationLink(destination: LazyView(ReviewDetailView(model: ReviewDetailViewModel(review: review, app: self.model.app))) ) {
                                 FeedReviewCard(review: review).listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0)).onAppear() {
-                                    if index == self.model.reviews.count - 25 {
+                                    if index == self.model.reviews.count - 5 {
                                         self.model.getNextPage()
                                     }
                                 }
@@ -48,6 +48,7 @@ struct FeedView: View {
                         // To remove all separators including the actual ones:
                         UITableView.appearance().separatorStyle = .none
                         UITableViewCell.appearance().selectionStyle = .none
+                        
                     }.navigationBarTitle("Rave")
                     HStack(alignment:.bottom) {
                         Spacer()
