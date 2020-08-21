@@ -46,6 +46,7 @@
 		C156558C24EE8A4E00703B55 /* SearchAlbumRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C156558B24EE8A4E00703B55 /* SearchAlbumRow.swift */; };
 		C156558E24EE8C6D00703B55 /* SearchArtistRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C156558D24EE8C6D00703B55 /* SearchArtistRow.swift */; };
 		C156559024EE8D4400703B55 /* SearchReviewerRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C156558F24EE8D4400703B55 /* SearchReviewerRow.swift */; };
+		C156559324EF598B00703B55 /* ApolloCombine in Frameworks */ = {isa = PBXBuildFile; productRef = C156559224EF598B00703B55 /* ApolloCombine */; };
 		C187616624E3F88400459AE0 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C187616524E3F88400459AE0 /* ProfileView.swift */; };
 		C187616824E3F89000459AE0 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C187616724E3F89000459AE0 /* ProfileViewModel.swift */; };
 		C1C0BAB924DD30F70029BEF8 /* ReviewDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1C0BAB824DD30F70029BEF8 /* ReviewDetailViewModel.swift */; };
@@ -149,6 +150,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C1E1013724EA1EB9006B61BE /* IQKeyboardManagerSwift in Frameworks */,
+				C156559324EF598B00703B55 /* ApolloCombine in Frameworks */,
 				C1E1013424E91BC6006B61BE /* SwiftUIRefresh in Frameworks */,
 				C1E1013124E8E6FD006B61BE /* ActivityIndicatorView in Frameworks */,
 				C10BE68F24D941B000C70DBA /* SDWebImageSwiftUI in Frameworks */,
@@ -417,6 +419,7 @@
 				C1E1013024E8E6FD006B61BE /* ActivityIndicatorView */,
 				C1E1013324E91BC6006B61BE /* SwiftUIRefresh */,
 				C1E1013624EA1EB9006B61BE /* IQKeyboardManagerSwift */,
+				C156559224EF598B00703B55 /* ApolloCombine */,
 			);
 			productName = listn;
 			productReference = C12F6EF724C827600083BF92 /* listn.app */;
@@ -477,6 +480,7 @@
 				C1E1012F24E8E6FD006B61BE /* XCRemoteSwiftPackageReference "ActivityIndicatorView" */,
 				C1E1013224E91BC6006B61BE /* XCRemoteSwiftPackageReference "SwiftUIRefresh" */,
 				C1E1013524EA1EB9006B61BE /* XCRemoteSwiftPackageReference "IQKeyboardManager" */,
+				C156559124EF598B00703B55 /* XCRemoteSwiftPackageReference "ApolloCombine" */,
 			);
 			productRefGroup = C12F6EF824C827600083BF92 /* Products */;
 			projectDirPath = "";
@@ -928,6 +932,14 @@
 				minimumVersion = 1.5.0;
 			};
 		};
+		C156559124EF598B00703B55 /* XCRemoteSwiftPackageReference "ApolloCombine" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/joel-perry/ApolloCombine";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 0.1.0;
+			};
+		};
 		C1E1012F24E8E6FD006B61BE /* XCRemoteSwiftPackageReference "ActivityIndicatorView" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/exyte/ActivityIndicatorView.git";
@@ -975,6 +987,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C10BE68D24D941B000C70DBA /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
 			productName = SDWebImageSwiftUI;
+		};
+		C156559224EF598B00703B55 /* ApolloCombine */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C156559124EF598B00703B55 /* XCRemoteSwiftPackageReference "ApolloCombine" */;
+			productName = ApolloCombine;
 		};
 		C1E1013024E8E6FD006B61BE /* ActivityIndicatorView */ = {
 			isa = XCSwiftPackageProductDependency;
