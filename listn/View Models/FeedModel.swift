@@ -26,6 +26,8 @@ class FeedModel: ObservableObject {
     
     var reviewIds : [String]
     
+    private var disposables = Set<AnyCancellable>()
+    
     private var currentIndex = 0
     
     init(app: ListnApp) {
@@ -48,50 +50,64 @@ class FeedModel: ObservableObject {
         app.refreshUserFeed() { reviewIds in
             self.reviewIds = reviewIds
             self.currentIndex = 0
-            self.reviews = []
             self.getFirstPage()
         }
     }
     
     func getFirstPage() {
+        
         let maximum = max(reviewIds.count - 1,0)
         let start = currentIndex
         let end = min(currentIndex+40, maximum)
-        print("end: \(end), start =\(start)")
-        print(reviewIds[start..<end])
-        if maximum != currentIndex {
-            app.getReviewsForIDs(IDs: Array(reviewIds[start..<end])) { (error, reviews) in
-                guard error == nil else {
-                    self.isRefreshing = false
-                    return
-                }
-                self.reviews = reviews!
-                self.currentIndex += 40
+        
+        //disposables.removeAll()
+        app.reviewPublisher(ids: Array(reviewIds[start..<end]))
+            .receive(on:DispatchQueue.main)
+        .sink(receiveCompletion: { value in
+            switch value {
+            case .failure(let error):
+                print(error.localizedDescription)
+            case .finished:
                 self.isRefreshing = false
+                self.currentIndex += 40
+                print("Success!")
             }
-        }
+        }, receiveValue: { [weak self] value in
+            guard let self = self else {
+                return
+            }
+            self.reviews = value
+        })
+        .store(in: &disposables)
+        
     }
     
     func getNextPage() {
-        
+        print("getting next page")
         if isLoading == false {
             isLoading = true
-            print("GETTING NEXT PAGE, currentIndex:\(currentIndex)")
             let maximum = max(reviewIds.count - 1,0)
             let start = currentIndex
             let end = min(currentIndex+40, maximum)
-            print("end: \(end), start =\(start)")
-            print(reviewIds[start..<end])
             if maximum != currentIndex {
-                app.getReviewsForIDs(IDs: Array(reviewIds[start..<end])) { (error, reviews) in
-                    guard error == nil else {
+                app.reviewPublisher(ids: Array(reviewIds[start..<end]))
+                    .receive(on:DispatchQueue.main)
+                .sink(receiveCompletion: { value in
+                    switch value {
+                    case .failure(let error):
+                        print(error.localizedDescription)
+                    case .finished:
                         self.isLoading = false
+                        self.currentIndex += 40
+                        print("Success!")
+                    }
+                }, receiveValue: { [weak self] value in
+                    guard let self = self else {
                         return
                     }
-                    self.reviews.append(contentsOf: reviews!)
-                    self.currentIndex += 40
-                    self.isLoading = false
-                }
+                    self.reviews.append(contentsOf: value)
+                })
+                .store(in: &disposables)
             }
         }
         
