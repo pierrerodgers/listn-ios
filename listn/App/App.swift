@@ -72,10 +72,6 @@ class ListnApp : ListnAppData {
             var reviews = criticReviews +  userReviews
             
             reviews = reviews.sorted { $0.date > $1.date }
-            reviews.map({ review in
-                print(review.reviewType)
-                print(review.date.toString(format: "dd-MM HH:mm"))
-            })
             return reviews
         }
 
