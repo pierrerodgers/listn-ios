@@ -8,6 +8,23 @@
 
 import Foundation
 
+func dateFromMongoDB(_ mongoDbString:String) -> Date {
+    let formatter = ISO8601DateFormatter()
+    formatter.formatOptions = [
+        .withFullDate,
+        .withFullTime,
+        .withDashSeparatorInDate]
+    let date = formatter.date(from: mongoDbString)
+    guard let fullDate = date else {
+        formatter.formatOptions = [
+        .withFullDate,
+        .withFullTime,
+        .withDashSeparatorInDate,
+        .withFractionalSeconds]
+        return formatter.date(from: mongoDbString) ?? Date()
+    }
+    return fullDate
+}
 
 struct ListnAlbum {
     init(apolloResult: AlbumDetail) {
@@ -17,11 +34,7 @@ struct ListnAlbum {
         artwork = apolloResult.artwork ?? ""
         genres = apolloResult.genres?.compactMap({string in string!}) ?? []
         
-        // Initialise date
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-        releaseDate = dateFormatter.date(from: apolloResult.releaseDate ?? "")
+        releaseDate = dateFromMongoDB(apolloResult.releaseDate ?? "")
         
         // Initialise Artist
         self.artist = ListnArtist(apolloResult: (apolloResult.artist?.fragments.artistDetail)!)
@@ -38,10 +51,7 @@ struct ListnAlbum {
         genres = apolloResult.genres?.compactMap({string in string!}) ?? []
         
         // Initialise date
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-        releaseDate = dateFormatter.date(from: apolloResult.releaseDate ?? "")
+        releaseDate = dateFromMongoDB(apolloResult.releaseDate ?? "")
         
         // Initialise Artist
         self.artist = ListnArtist(apolloResult: artist)
@@ -118,9 +128,7 @@ struct ListnCriticReview : ListnReview {
         link = apolloResult.link!
         
         // Initialise date
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-        date = dateFormatter.date(from: apolloResult.date ?? "") ?? Date()
+        date = dateFromMongoDB(apolloResult.date ?? "")
         
         album = ListnAlbum(apolloResult: apolloResult.albumData!.fragments.reviewAlbumDetail, artist: apolloResult.artistData!.fragments.reviewArtistDetail)
         
@@ -178,11 +186,8 @@ struct ListnUserReview : ListnReview {
         score = apolloResult.score!
         text = apolloResult.text ?? ""
         
-        // Initialise date
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-        date = dateFormatter.date(from: apolloResult.date ?? "") ?? Date()
-        
+       // Initialise date
+        date = dateFromMongoDB(apolloResult.date ?? "")
         album = ListnAlbum(apolloResult: apolloResult.album!.fragments.albumDetail)
         user = ListnUser(apolloResult: apolloResult.user!.fragments.userDetail)
                 
