@@ -14,6 +14,8 @@ class ArtistDetailViewModel : ObservableObject {
     @Published var reviews : Array<ListnReview> = []
     @Published var albums : Array<ListnAlbum> = []
     
+    private var disposables = Set<AnyCancellable>()
+    
     var app : ListnApp
     
     init(artist: ListnArtist, app: ListnApp) {
@@ -24,25 +26,26 @@ class ArtistDetailViewModel : ObservableObject {
     }
     
     func getReviews() {
-        app.getReviews(artistId: artist._id) { error, reviews in
-            guard error == nil else {
-                return
-            }
-            print("Reviews for artist \(self.artist.name) fetched")
-            self.reviews = reviews!
+        app.reviewsPublisher(query: ListnApp.ListnReviewQuery(artist:artist._id))
+        .tryMap { review in
+            review as [ListnReview]
         }
+        .catch{ (error) -> Just<[ListnReview]> in
+            print(error)
+            return Just([])
+        }
+        .assign(to: \.reviews, on: self)
+        .store(in: &disposables)
     }
     
     func getAlbums() {
-        app.getAlbums(artistId: artist._id) { error, albums in
-            guard error == nil else {
-                print(error.debugDescription)
-                return
-            }
-            print("Albums for artist \(self.artist.name) fetched")
-            self.albums = albums!
-            
+        app.albumPublisher(query: ListnApp.ListnAlbumQuery(artist:artist._id))
+        .catch{ (error) -> Just<[ListnAlbum]> in
+            print(error)
+            return Just([])
         }
+        .assign(to: \.albums, on: self)
+        .store(in: &disposables)
     }
 
     

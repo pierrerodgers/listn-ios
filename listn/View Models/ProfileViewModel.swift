@@ -7,11 +7,14 @@
 //
 
 import UIKit
+import Combine
 
 class ProfileViewModel: ObservableObject {
     var app : ListnApp
     @Published var user : User
-    @Published var userReviews : Array<ListnReview> = []
+    @Published var userReviews : Array<ListnUserReview> = []
+    
+    var reviewsCancellable : AnyCancellable?
     
     init(app: ListnApp) {
         self.app = app
@@ -20,12 +23,13 @@ class ProfileViewModel: ObservableObject {
     }
     
     func updateReviews() {
-        app.getUserReviews() { error, reviews in
-            guard error == nil else {
-                print(error!.localizedDescription)
-                return
+        reviewsCancellable =
+            app.userReviewsPublisher(query: ListnApp.ListnUserReviewQuery(user:user._id.stringValue))
+            .catch { error -> Just<[ListnUserReview]> in
+                print(error)
+                return Just([])
             }
-            self.userReviews = reviews!
-        }
+            .assign(to:\.userReviews, on: self)
+            
     }
 }

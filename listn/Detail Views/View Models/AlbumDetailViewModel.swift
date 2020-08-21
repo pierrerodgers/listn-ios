@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Combine
 
 class AlbumDetailViewModel: ObservableObject {
     @Published var album : ListnAlbum
@@ -14,6 +15,8 @@ class AlbumDetailViewModel: ObservableObject {
     @Published var otherAlbums : Array<ListnAlbum>
     
     var app : ListnApp
+    
+    private var disposables = Set<AnyCancellable>()
     
     init(album: ListnAlbum, app: ListnApp) {
         self.app = app
@@ -25,23 +28,26 @@ class AlbumDetailViewModel: ObservableObject {
     }
     
     func getReviews() {
-        app.getReviews(albumId: album._id) { error, reviews in
-            guard error == nil else {
-                return
-            }
-            print("Review for album \(self.album.name) fetched")
-            self.reviews = reviews!
+        app.reviewsPublisher(query: ListnApp.ListnReviewQuery(album:album._id))
+        .tryMap { review in
+            review as [ListnReview]
         }
+        .catch{ (error) -> Just<[ListnReview]> in
+            print(error)
+            return Just([])
+        }
+        .assign(to: \.reviews, on: self)
+        .store(in: &disposables)
     }
     
     func getAlbums() {
-        app.getAlbums(artistId: album.artist._id) { error, albums in
-            guard error == nil else {
-                print(error!.localizedDescription)
-                return
-            }
-            self.otherAlbums = albums!
+        app.albumPublisher(query: ListnApp.ListnAlbumQuery(artist:album.artist._id))
+        .catch{ (error) -> Just<[ListnAlbum]> in
+            print(error)
+            return Just([])
         }
+        .assign(to: \.otherAlbums, on: self)
+        .store(in: &disposables)
     }
     
 }

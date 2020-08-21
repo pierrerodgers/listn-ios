@@ -61,7 +61,7 @@ class FeedModel: ObservableObject {
         let end = min(currentIndex+40, maximum)
         
         //disposables.removeAll()
-        app.reviewPublisher(ids: Array(reviewIds[start..<end]))
+        app.feedPublisher(ids: Array(reviewIds[start..<end]))
             .receive(on:DispatchQueue.main)
         .sink(receiveCompletion: { value in
             switch value {
@@ -90,7 +90,7 @@ class FeedModel: ObservableObject {
             let start = currentIndex
             let end = min(currentIndex+40, maximum)
             if maximum != currentIndex {
-                app.reviewPublisher(ids: Array(reviewIds[start..<end]))
+                app.feedPublisher(ids: Array(reviewIds[start..<end]))
                     .receive(on:DispatchQueue.main)
                 .sink(receiveCompletion: { value in
                     switch value {

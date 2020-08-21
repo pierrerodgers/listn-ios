@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Combine
 
 class ReviewDetailViewModel: ObservableObject {
     var app : ListnApp
@@ -14,6 +15,8 @@ class ReviewDetailViewModel: ObservableObject {
     @Published var review : ListnReview
     @Published var moreAlbumReviews : Array<ListnReview>
     @Published var moreReviewerReviews : Array<ListnReview>
+    
+    private var disposables = Set<AnyCancellable>()
     
     init(review: ListnReview, app: ListnApp) {
         self.review = review
@@ -24,31 +27,32 @@ class ReviewDetailViewModel: ObservableObject {
     }
     
     func refreshReviews() {
-        app.getReviews(albumId: review.album._id, completion: { error, reviews in
-            guard error == nil else {
-                return
-            }
-            self.moreAlbumReviews = reviews!
-        })
+        app.reviewsPublisher(query: ListnApp.ListnReviewQuery(album:review.album._id))
+        .tryMap { review in
+            review as [ListnReview]
+        }
+        .catch{ (error) -> Just<[ListnReview]> in
+            print(error)
+            return Just([])
+        }
+        .assign(to: \.moreAlbumReviews, on: self)
+        .store(in: &disposables)
+        
         
         if review.reviewType == .critic {
             let criticReview = review as! ListnCriticReview
-            app.getReviews(reviewerId: criticReview.reviewer._id, completion: { error, reviews in
-                guard error == nil else {
-                    return
-                }
-                self.moreReviewerReviews = reviews!
-            })
+            app.reviewsPublisher(query: ListnApp.ListnReviewQuery(reviewer:criticReview.reviewer._id))
+            .tryMap { review in
+                review as [ListnReview]
+            }
+            .catch{ (error) -> Just<[ListnReview]> in
+                print(error)
+                return Just([])
+            }
+            .assign(to: \.moreReviewerReviews, on: self)
+            .store(in: &disposables)
         }
-        else {
-            /*let userReview = review as! ListnUserReview
-            app.getUs: userReview.user?._id, completion: { error, reviews in
-                guard error == nil else {
-                    return
-                }
-                self.moreReviewerReviews = reviews!
-            })*/
-        }
+      
     }
     
     func toggleReviewLike() {

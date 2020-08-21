@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Combine
 
 class ReviewerDetailViewModel: ObservableObject {
     var app : ListnApp
@@ -14,6 +15,8 @@ class ReviewerDetailViewModel: ObservableObject {
     @Published var reviewer : ListnReviewer
     @Published var recentReviews: Array<ListnReview> = []
     @Published var isFollowing : Bool
+    
+    private var cancellable : AnyCancellable?
     
     init(app: ListnApp, reviewer:ListnReviewer) {
         self.app = app
@@ -23,12 +26,15 @@ class ReviewerDetailViewModel: ObservableObject {
     }
     
     func getReviews() {
-        app.getReviews(reviewerId: reviewer._id) { error, reviews in
-            guard error == nil else {
-                return
-            }
-            self.recentReviews = reviews!
+        cancellable = app.reviewsPublisher(query: ListnApp.ListnReviewQuery(reviewer:reviewer._id))
+        .tryMap { review in
+            review as [ListnReview]
         }
+        .catch{ (error) -> Just<[ListnReview]> in
+            print(error)
+            return Just([])
+        }
+        .assign(to: \.recentReviews, on: self)
     }
     
     func toggleFollow() {
