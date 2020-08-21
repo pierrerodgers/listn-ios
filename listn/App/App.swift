@@ -8,6 +8,8 @@
 
 import Foundation
 import RealmSwift
+import ApolloCombine
+import Combine
 
 class ListnApp : ListnAppData {
     
@@ -16,6 +18,72 @@ class ListnApp : ListnAppData {
     var user : User?
     var realm : Realm?
     var feedToken : NotificationToken?
+    
+    // MARK: Testing for ApolloCombine
+    
+    
+    /*
+    func searchPublisher(query:String ) -> AnyPublisher<SearchResults, Error> {
+        let publisher  = Network.shared.apollo.fetchPublisher(query: SearchQuery(input: query))
+            .compactMap({result in
+                return
+            }).eraseToAnyPublisher()
+        
+        return publisher
+    }*/
+    /*
+    enum ApolloError {
+        NetworkError(description:String) {
+            
+        }
+    }*/
+    
+    func reviewPublisher(ids:[String]) -> AnyPublisher<[ListnReview], URLError> {
+        let criticReviewPublisher = Network.shared.apollo.fetchPublisher(query: ReviewsQuery(query:ReviewQueryInput(_idIn:ids)))
+        .retry(3)
+        .compactMap { result in
+            result.data?.reviews
+        }
+        .compactMap{ reviews in
+            return reviews.compactMap { review in
+                ListnCriticReview(apolloResult: review!.fragments.reviewDetail) as ListnReview
+            }
+        }
+        .mapError { error in
+            return URLError(.notConnectedToInternet)
+        }.eraseToAnyPublisher()
+        
+        let userReviewPublisher = Network.shared.apollo.fetchPublisher(query:UserReviewsQuery(query: UserReviewQueryInput(_idIn:ids)))
+        .retry(3)
+        .compactMap { result in
+            return result.data?.userReviews
+        }
+        .compactMap { reviews in
+            reviews.compactMap { review in
+                ListnUserReview(apolloResult: (review?.fragments.userReviewDetail)!) as ListnReview
+            }
+        }
+        .mapError { error in
+            return URLError(.notConnectedToInternet)
+        }.eraseToAnyPublisher()
+        
+        let publisher = criticReviewPublisher.combineLatest(userReviewPublisher)
+        .compactMap{ criticReviews, userReviews -> [ListnReview] in
+            var reviews = criticReviews +  userReviews
+            
+            reviews = reviews.sorted { $0.date > $1.date }
+            reviews.map({ review in
+                print(review.reviewType)
+                print(review.date.toString(format: "dd-MM HH:mm"))
+            })
+            return reviews
+        }
+
+        return publisher.eraseToAnyPublisher()
+    }
+    
+    
+    
     
     var isLoggedIn : Bool {
         get {
