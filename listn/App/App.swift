@@ -171,19 +171,19 @@ class ListnAppData : AppData, SearchData {
                 let albumIds = graphQlResult.data?.search?.albums?.compactMap({albumId in albumId!})
                 let artistIds = graphQlResult.data?.search?.artists?.compactMap({artistId in artistId!})
                 let reviewerIds = graphQlResult.data?.search?.reviewers?.compactMap({reviewerId in reviewerId!})
-                self.getAlbums(albumIds: albumIds!) { error, results in
+                self.getAlbums(albumIds: albumIds ?? []) { error, results in
                     guard error == nil else {
                         completion(error, nil)
                         return
                     }
                     let albums = results!
-                    self.getArtists(artistIds: artistIds!) {  error, results in
+                    self.getArtists(artistIds: artistIds ?? []) {  error, results in
                         guard error == nil else {
                             completion(error, nil)
                             return
                         }
                         let artists = results!
-                        self.getReviewers(reviewerIds: reviewerIds!){ error, results in
+                        self.getReviewers(reviewerIds: reviewerIds ?? []){ error, results in
                              guard error == nil else {
                                 completion(error, nil)
                                 return
