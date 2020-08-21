@@ -68,7 +68,7 @@ class GraphQLTokenManager {
         let url = URL(string: "hhttps://realm.mongodb.com/api/client/v2.0/auth/session")!
         var request = URLRequest(url:url)
         request.httpMethod = "POST"
-        request.addValue("Bearer \(accessToken!)", forHTTPHeaderField: "Authorization")
+        request.addValue("Bearer \(refreshToken!)", forHTTPHeaderField: "Authorization")
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         
         let task = URLSession.shared.dataTask(with:request) {(data, response, error) in
@@ -78,7 +78,6 @@ class GraphQLTokenManager {
             let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
             if let responseJSON = responseJSON as? [String: Any] {
                 self.accessToken = responseJSON["access_token"] as? String ?? ""
-                self.refreshToken = responseJSON["refresh_token"] as? String ?? ""
             }
         }
         task.resume()
