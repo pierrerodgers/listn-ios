@@ -11,7 +11,7 @@ import RealmSwift
 import ApolloCombine
 import Combine
 
-class ListnApp : ListnAppData {
+class ListnApp  {
     
     var realmApp : RealmApp!
     var loginService : LoginService!
@@ -22,23 +22,188 @@ class ListnApp : ListnAppData {
     // MARK: Testing for ApolloCombine
     
     
-    /*
-    func searchPublisher(query:String ) -> AnyPublisher<SearchResults, Error> {
-        let publisher  = Network.shared.apollo.fetchPublisher(query: SearchQuery(input: query))
-            .compactMap({result in
-                return
-            }).eraseToAnyPublisher()
-        
-        return publisher
-    }*/
-    /*
-    enum ApolloError {
-        NetworkError(description:String) {
-            
-        }
-    }*/
     
-    func reviewPublisher(ids:[String]) -> AnyPublisher<[ListnReview], URLError> {
+    func searchPublisher(query:String ) -> AnyPublisher<SearchResults, URLError> {
+        let searchResults = Network.shared.apollo.fetchPublisher(query: SearchQuery(input: query))
+        .delay(for:0.5, scheduler: RunLoop.main)
+        .retry(3)
+        .compactMap { result in
+            result.data?.search
+        }
+        .compactMap { search -> ([String], [String], [String]) in
+            let albums = search.albums!.compactMap {$0!}
+            let artists = search.artists!.compactMap {$0!}
+            let reviewers = search.reviewers!.compactMap {$0!}
+            return (albums, artists, reviewers)
+        }
+        .compactMap { albums, artists, reviewers -> (ListnAlbumQuery, ListnArtistQuery, ListnReviewerQuery)  in
+            let albumsQuery = ListnAlbumQuery(ids:albums)
+            let artistsQuery = ListnArtistQuery(ids:artists)
+            let reviewersQuery = ListnReviewerQuery(ids:reviewers)
+            return (albumsQuery, artistsQuery, reviewersQuery)
+        }.map { albumQuery, artistQuery, reviewerQuery -> AnyPublisher<SearchResults, URLError> in
+            let albums = self.albumPublisher(query: albumQuery).eraseToAnyPublisher()
+            let artists = self.artistPublisher(query: artistQuery).eraseToAnyPublisher()
+            let reviewers = self.reviewerPublisher(query:reviewerQuery).eraseToAnyPublisher()
+            //return Publishers.Sequence<[AnyPublisher<SearchResults, URLError>]>(sequence: [albums, artists, reviewers])
+            
+            return albums.combineLatest(artists, reviewers)
+            .compactMap { albumResults, artistResults, reviewerResults in
+                return SearchResults(albums: albumResults, artists: artistResults, reviewers: reviewerResults)
+            }.mapError { error in
+                return URLError(.notConnectedToInternet)
+            }.eraseToAnyPublisher()
+        }.mapError { error in
+            return URLError(.notConnectedToInternet)
+        }
+        
+        
+        return searchResults.switchToLatest().eraseToAnyPublisher()
+    }
+    
+    struct ListnAlbumQuery {
+        var id : String?
+        var ids : [String]?
+        var artist : String?
+        
+        func query() -> AlbumQuery {
+            let artistQuery = (artist != nil) ? ArtistQueryInput(_id: artist) : nil
+            return AlbumQuery(query: AlbumQueryInput(artist: artistQuery, _idIn: ids, _id: id))
+        }
+    }
+    
+    struct ListnReviewQuery {
+        var id : String?
+        var ids : [String]?
+        var artist : String?
+        var album : String?
+        var reviewer : String?
+        
+        func query() -> ReviewsQuery {
+            return ReviewsQuery(query: ReviewQueryInput(_id: id, artist: artist, reviewer: reviewer, _idIn: ids,  album:album))
+        }
+    }
+    
+    struct ListnReviewerQuery {
+        var id : String?
+        var ids : [String]?
+        
+        func query() -> ReviewersQuery {
+            return ReviewersQuery(query: ReviewerQueryInput(_id: id, _idIn: ids))
+        }
+    }
+    
+    struct ListnArtistQuery {
+        var id : String?
+        var ids : [String]?
+        
+        func query() -> ArtistQuery {
+            return ArtistQuery(query:ArtistQueryInput(_idIn: ids, _id: id))
+        }
+    }
+    
+    struct ListnUserReviewQuery {
+        var id : String?
+        var user : String?
+        var ids : [String]?
+        var artist : String?
+        var album : String?
+        
+        func query() -> UserReviewsQuery {
+            return UserReviewsQuery(query:UserReviewQueryInput(userId: user, _idIn: ids,albumId:album, _id: id))
+        }
+    }
+    
+    
+    func albumPublisher(query:ListnAlbumQuery) -> AnyPublisher<[ListnAlbum], URLError> {
+        let albumPublisher = Network.shared.apollo.fetchPublisher(query: query.query())
+        .retry(3)
+        .compactMap { result in
+            result.data?.albums
+        }
+        .compactMap { albums in
+            albums.compactMap { album in
+                ListnAlbum(apolloResult: (album?.fragments.albumDetail)!)
+            }
+        }.mapError { error in
+            return URLError(.notConnectedToInternet)
+        }
+        
+        return albumPublisher.eraseToAnyPublisher()
+    
+    }
+    
+    func reviewerPublisher(query:ListnReviewerQuery) -> AnyPublisher<[ListnReviewer], URLError> {
+        let reviewerPublisher = Network.shared.apollo.fetchPublisher(query: query.query())
+        .retry(3)
+        .compactMap { result in
+            result.data?.reviewers
+        }
+        .compactMap { reviewers in
+            reviewers.compactMap { reviewer in
+                ListnReviewer(apolloResult: (reviewer?.fragments.reviewerDetail)!)
+            }
+        }.mapError { error in
+            return URLError(.notConnectedToInternet)
+        }
+        
+        return reviewerPublisher.eraseToAnyPublisher()
+    
+    }
+    
+    func artistPublisher(query:ListnArtistQuery) -> AnyPublisher<[ListnArtist], URLError> {
+        let artistPublisher = Network.shared.apollo.fetchPublisher(query: query.query())
+        .retry(3)
+        .compactMap { result in
+            result.data?.artists
+        }
+        .compactMap { artists in
+            artists.compactMap { artist in
+                ListnArtist(apolloResult: (artist?.fragments.artistDetail)!)
+            }
+        }.mapError { error in
+            return URLError(.notConnectedToInternet)
+        }
+        
+        return artistPublisher.eraseToAnyPublisher()
+    
+    }
+    
+    func reviewsPublisher(query:ListnReviewQuery) -> AnyPublisher<[ListnCriticReview], URLError> {
+        let reviewsPublisher = Network.shared.apollo.fetchPublisher(query: query.query())
+        .retry(3)
+        .compactMap { result in
+            result.data?.reviews
+        }
+        .compactMap { reviews in
+            reviews.compactMap { review in
+                ListnCriticReview(apolloResult: review!.fragments.reviewDetail)
+            }
+        }.mapError { error in
+            return URLError(.notConnectedToInternet)
+        }
+        
+        return reviewsPublisher.eraseToAnyPublisher()
+    }
+    
+    func userReviewsPublisher(query:ListnUserReviewQuery) -> AnyPublisher<[ListnUserReview], URLError> {
+        let reviewsPublisher = Network.shared.apollo.fetchPublisher(query: query.query())
+        .retry(3)
+        .compactMap { result in
+            result.data?.userReviews
+        }
+        .compactMap { reviews in
+            reviews.compactMap { review in
+                ListnUserReview(apolloResult: review!.fragments.userReviewDetail)
+            }
+        }.mapError { error in
+            return URLError(.notConnectedToInternet)
+        }
+        
+        return reviewsPublisher.eraseToAnyPublisher()
+    }
+    
+    func feedPublisher(ids:[String]) -> AnyPublisher<[ListnReview], URLError> {
         let criticReviewPublisher = Network.shared.apollo.fetchPublisher(query: ReviewsQuery(query:ReviewQueryInput(_idIn:ids)))
         .retry(3)
         .compactMap { result in
@@ -88,8 +253,6 @@ class ListnApp : ListnAppData {
     }
     
     init( completion: @escaping (Bool, ListnApp) -> Void) {
-        // Init AppData
-        super.init()
         
         // Initialise Realm App
         let config = AppConfiguration(baseURL: "https://realm.mongodb.com", transport: nil, localAppName: nil, localAppVersion: nil)
@@ -129,6 +292,7 @@ class ListnApp : ListnAppData {
         realmApp.functions.updateUserFeed([AnyBSON(user!._id)!]) { result, error in
             print("feed updated")
             DispatchQueue.main.async {
+                self.realm!.refresh()
                 self.getUserFeed(completion: completion)
             }
         }
@@ -164,21 +328,6 @@ class ListnApp : ListnAppData {
         let reviewIds = Array(feed).compactMap({review in return review.id!})
         completion(reviewIds)
     }
-    
-    func getUserReviews(completion: @escaping (Error?, (Array<ListnUserReview>?)) -> ()) {
-        Network.shared.apollo.fetch(query:UserReviewsQuery(query: UserReviewQueryInput(userId:user!._id.stringValue))) { result in
-            switch result {
-            case .success(let graphQlResult):
-                let reviews = graphQlResult.data?.userReviews.compactMap({review in review!})
-                let toReturn = reviews?.compactMap({review in ListnUserReview(apolloResult: review.fragments.userReviewDetail)})
-                completion(nil, toReturn!)
-            case .failure(let error) :
-                print(error)
-                completion(error, nil)
-            }
-        }
-    }
-    
     func postReview(review:ListnUserReview) {
         let userReview = UserReview(listnUserReview: review, partitionKey: realmApp.currentUser()!.identity!, user: user!)
         
@@ -222,223 +371,7 @@ class ListnApp : ListnAppData {
         }
     }
     
-    
-    
-    
 }
-
-class ListnAppData : AppData, SearchData {
-    func search(query: String, completion: @escaping (Error?, SearchResults?) -> ()) {
-        Network.shared.apollo.fetch(query: SearchQuery(input: query)) { result in
-            switch result {
-            case .success(let graphQlResult):
-                let albumIds = graphQlResult.data?.search?.albums?.compactMap({albumId in albumId!})
-                let artistIds = graphQlResult.data?.search?.artists?.compactMap({artistId in artistId!})
-                let reviewerIds = graphQlResult.data?.search?.reviewers?.compactMap({reviewerId in reviewerId!})
-                self.getAlbums(albumIds: albumIds ?? []) { error, results in
-                    guard error == nil else {
-                        completion(error, nil)
-                        return
-                    }
-                    let albums = results!
-                    self.getArtists(artistIds: artistIds ?? []) {  error, results in
-                        guard error == nil else {
-                            completion(error, nil)
-                            return
-                        }
-                        let artists = results!
-                        self.getReviewers(reviewerIds: reviewerIds ?? []){ error, results in
-                             guard error == nil else {
-                                completion(error, nil)
-                                return
-                             }
-                             let reviewers = results!
-                            completion(nil, SearchResults(albums: albums, artists: artists, reviewers: reviewers))
-                        }
-                    }
-                }
-                //completion(nil, SearchResults(albums: albumIds!, artists: artistIds!, reviewers: reviewerIds!))
-            case .failure(let error) :
-                print(error)
-                completion(error,nil)
-            }
-        }
-    }
-    
-    func getReviewsForIDs(IDs: [String], completion: @escaping (Error?, Array<ListnReview>?) -> ()) {
-        //Network.shared.apollo.fetch(query: ReviewsQuery(query: ReviewQueryInput(_idIn:IDs))) { result in
-        Network.shared.apollo.fetch(query: ReviewsQuery(query: ReviewQueryInput(_idIn:IDs))) { result in
-            switch result {
-            case .success(let graphQlResult):
-                /*let reviews = graphQlResult.data?.reviews.compactMap({review in review!})
-                let criticReviews = reviews?.compactMap({review in ListnCriticReview(apolloResult: review.fragments.reviewDetail)})*/
-                let reviews = graphQlResult.data?.reviews.compactMap({review in review!})
-                let criticReviews = reviews?.compactMap({review in ListnCriticReview(apolloResult: review.fragments.reviewDetail)})
-                Network.shared.apollo.fetch(query: UserReviewsQuery(query: UserReviewQueryInput(_idIn:IDs))) {result in
-                    switch result {
-                        case .success( let graphQlResult):
-                        let reviews = graphQlResult.data?.userReviews.compactMap({review in review!})
-                        let userReviews = reviews?.compactMap({review in ListnUserReview(apolloResult: review.fragments.userReviewDetail)})
-                        var toReturn = Array<ListnReview>()
-                        toReturn = userReviews! + criticReviews!
-                        completion(nil, toReturn)
-                    case.failure(let error):
-                        print(error)
-                        completion(error, nil)
-                    }
-                }
-                
-                //completion(nil, toReturn!)
-                //let albums = graphQlResult.data?.albums.map( return result! )
-                //completion(nil, graphQlResult.data?.albums)
-            case .failure(let error) :
-                print(error)
-                completion(error, nil)
-            }
-        }
-    }
-    
-    
-    func getAlbums(artistId: String, completion: @escaping (Error?, Array<ListnAlbum>?) -> Void) {
-        print("FETCHING DATA")
-        Network.shared.apollo.fetch(query: AlbumQuery(query: AlbumQueryInput(artist:ArtistQueryInput(_id: artistId)))) { result in
-            switch result {
-            case .success(let graphQlResult):
-                let albums = graphQlResult.data?.albums.compactMap({albumResult in albumResult!})
-                let toReturn = albums?.compactMap({album in ListnAlbum(apolloResult: album.fragments.albumDetail)})
-                completion(nil, toReturn!)
-                //let albums = graphQlResult.data?.albums.map( return result! )
-                //completion(nil, graphQlResult.data?.albums)
-            case .failure(let error) :
-                print(error)
-                completion(error, nil)
-            }
-        }
-    }
-    
-    func getReviews(artistId: String, completion: @escaping (Error?, Array<ListnReview>?) -> ()) {
-        Network.shared.apollo.fetch(query: ReviewsQuery(query: ReviewQueryInput(artist: artistId))) { result in
-            switch result {
-            case .success(let graphQlResult):
-                let reviews = graphQlResult.data?.reviews.compactMap({review in review!})
-                let toReturn = reviews?.compactMap({review in ListnCriticReview(apolloResult: review.fragments.reviewDetail)})
-                completion(nil, toReturn!)
-                //let albums = graphQlResult.data?.albums.map( return result! )
-                //completion(nil, graphQlResult.data?.albums)
-            case .failure(let error) :
-                print(error)
-                completion(error, nil)
-            }
-        }
-    }
-    
-    func getReviews(albumId: String, completion: @escaping (Error?, Array<ListnReview>?) -> ()) {
-        Network.shared.apollo.fetch(query: ReviewsQuery(query: ReviewQueryInput(album: albumId))) { result in
-            switch result {
-            case .success(let graphQlResult):
-                let reviews = graphQlResult.data?.reviews.compactMap({review in review!})
-                let toReturn = reviews?.compactMap({review in ListnCriticReview(apolloResult: review.fragments.reviewDetail)})
-                completion(nil, toReturn!)
-                //let albums = graphQlResult.data?.albums.map( return result! )
-                //completion(nil, graphQlResult.data?.albums)
-            case .failure(let error) :
-                print(error)
-                completion(error, nil)
-            }
-        }
-    }
-    
-    func getReviews(reviewerId: String, completion: @escaping (Error?, Array<ListnReview>?) -> ()) {
-        Network.shared.apollo.fetch(query: ReviewsQuery(query: ReviewQueryInput(reviewer:reviewerId), limit: 20)) { result in
-            switch result {
-            case .success(let graphQlResult):
-                let reviews = graphQlResult.data?.reviews.compactMap({review in review!})
-                let toReturn = reviews?.compactMap({review in ListnCriticReview(apolloResult: review.fragments.reviewDetail)})
-                completion(nil, toReturn!)
-                //let albums = graphQlResult.data?.albums.map( return result! )
-                //completion(nil, graphQlResult.data?.albums)
-            case .failure(let error) :
-                print(error)
-                completion(error, nil)
-            }
-        }
-    }
-    
-    // Assumes that token is already added to Network class!
-    func getLatestReviews(completion: @escaping (Error?, Array<ListnReview>?) -> ()) {
-        Network.shared.apollo.fetch(query: LatestReviewsQuery()) { result in
-            switch result {
-            case .success(let graphQlResult):
-                let reviews = graphQlResult.data?.reviews.compactMap({review in review!})
-                let toReturn = reviews?.compactMap({review in ListnCriticReview(apolloResult: review.fragments.reviewDetail)})
-                completion(nil, toReturn!)
-                //let albums = graphQlResult.data?.albums.map( return result! )
-                //completion(nil, graphQlResult.data?.albums)
-            case .failure(let error) :
-                print(error)
-                completion(error, nil)
-            }
-        }
-    }
-    
-    func getAlbums(albumIds: [String], completion: @escaping (Error?, Array<ListnAlbum>?) -> ()) {
-        Network.shared.apollo.fetch(query:AlbumQuery(query: AlbumQueryInput(_idIn:albumIds))) { result in
-            switch result {
-            case .success(let graphQlResult):
-                let albums = graphQlResult.data?.albums.compactMap({albumResult in albumResult!})
-                let toReturn = albums?.compactMap({album in ListnAlbum(apolloResult: album.fragments.albumDetail)})
-                completion(nil, toReturn!)
-                //let albums = graphQlResult.data?.albums.map( return result! )
-                //completion(nil, graphQlResult.data?.albums)
-            case .failure(let error) :
-                print(error)
-                completion(error, nil)
-            }
-        }
-    }
-    
-    func getReviewers(reviewerIds:[String], completion: @escaping (Error?, Array<ListnReviewer>?) -> ()) {
-        Network.shared.apollo.fetch(query:ReviewersQuery(query: ReviewerQueryInput(_idIn:reviewerIds))) { result in
-            switch result {
-            case .success(let graphQlResult):
-                let reviewers = graphQlResult.data?.reviewers.compactMap({reviewerResult in reviewerResult!})
-                let toReturn = reviewers?.compactMap({reviewer in ListnReviewer(apolloResult: reviewer.fragments.reviewerDetail)})
-                completion(nil, toReturn!)
-                //let albums = graphQlResult.data?.albums.map( return result! )
-                //completion(nil, graphQlResult.data?.albums)
-            case .failure(let error) :
-                print(error)
-                completion(error, nil)
-            }
-        }
-    }
-    
-    
-    
-    func searchReviewers(query: String, completion: @escaping (Error?, Array<String>?) -> ()) {
-        completion(nil, nil)
-    }
-    
-    func getArtists(artistIds: [String], completion: @escaping (Error?, Array<ListnArtist>?) -> ()) {
-        Network.shared.apollo.fetch(query:ArtistQuery(query: ArtistQueryInput(_idIn:artistIds))) { result in
-            switch result {
-            case .success(let graphQlResult):
-                let artists = graphQlResult.data?.artists.compactMap({artistResult in artistResult!})
-                let toReturn = artists?.compactMap({artist in ListnArtist(apolloResult: artist.fragments.artistDetail)})
-                completion(nil, toReturn!)
-                //let albums = graphQlResult.data?.albums.map( return result! )
-                //completion(nil, graphQlResult.data?.albums)
-            case .failure(let error) :
-                print(error)
-                completion(error, nil)
-            }
-        }
-    }
-    
-    
-    
-}
-
 
 
 class MongoLoginService : LoginService {
