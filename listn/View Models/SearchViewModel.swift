@@ -13,6 +13,23 @@ class SearchViewModel: ObservableObject {
     @Published var artistResults : Array<ListnArtist> = []
     @Published var reviewerResults: Array<ListnReviewer> = []
     
+    @Published var isLoading : Bool = false
+    
+    @Published var query : String = "" {
+        didSet {
+            task.cancel()
+            let workItem = DispatchWorkItem { [weak self] in
+                self!.search(query: self!.query)
+            }
+            self.task = workItem
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.3, execute: task)
+        }
+    }
+    
+    var task = DispatchWorkItem {
+        
+    }
+    
     var app : ListnApp
     
     init(app: ListnApp) {
@@ -20,7 +37,9 @@ class SearchViewModel: ObservableObject {
     }
     
     func search(query: String) {
+        isLoading = true
         app.search(query: query) { error, results in
+            self.isLoading = false
             guard error == nil else {
                 print(error.debugDescription)
                 return
