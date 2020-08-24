@@ -8,15 +8,21 @@
 
 import SwiftUI
 import SDWebImageSwiftUI
+import TextView
 
 struct NewReview {
     var score : Int = 0
     var text : String = ""
 }
 
+
+
 struct AddReviewView: View {
     @ObservedObject var model : AddReviewViewModel
+    @EnvironmentObject var showReviewSheet : ShowReviewSheet
     @State var review  = NewReview()
+    
+    @State var isEditing : Bool = false
     
     
     var body: some View {
@@ -44,10 +50,17 @@ struct AddReviewView: View {
                             Text(String(score))
                         }
                     }
-                    TextField("Add details", text: $review.text)
-                    SaveReviewButton(action:{self.model.postReview(review: self.review)})
+                    TextView(text: $review.text, isEditing: $isEditing, placeholder: "Add details").frame(minHeight:500, maxHeight:.infinity)
+                    
                 }
             }.navigationBarTitle("Rave about")
+                .navigationBarItems(leading:Button(action:{self.showReviewSheet.isAddingReview = false}){
+                    Text("Cancel").foregroundColor(.red)
+                },
+                trailing: SaveReviewButton(action:{
+                    self.model.postReview(review: self.review)
+                    self.showReviewSheet.isAddingReview = false
+                }))
         }
     }
     
