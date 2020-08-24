@@ -23,8 +23,8 @@ struct AppView: View {
             FeedView(model: FeedModel(app: app)).tab(title: "Feed")
             SearchView(model: SearchViewModel(app: app)).tab(title:"Search")
             ProfileView(model: ProfileViewModel(app: app)).tab(title: "Profile")
-        }.environmentObject(showReviewSheet).sheet(isPresented: $showReviewSheet.isAddingReview){
-            AddReviewView(model: AddReviewViewModel(album: self.showReviewSheet.albumReviewing, app: self.app))
+        }.environmentObject(showReviewSheet).sheet(isPresented: $showReviewSheet.isAddingReview) {
+            AddReviewView(model: AddReviewViewModel(album: self.showReviewSheet.albumReviewing, app: self.app)).environmentObject(self.showReviewSheet)
         }
     }
 }
