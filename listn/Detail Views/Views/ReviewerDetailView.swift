@@ -7,23 +7,33 @@
 //
 
 import SwiftUI
+import ActivityIndicatorView
 
 struct ReviewerDetailView: View {
     @ObservedObject var model : ReviewerDetailViewModel
     
     var body: some View {
-        ScrollView {
-            VStack{
-                HStack{
-                    Text("135 followers")
-                    Text("150 following")
-                }
-                FollowButton(action: model.toggleFollow)
-                ForEach(model.recentReviews, id:\._id) { review in
+        List {
+            HStack{
+                Text("135 followers")
+                Text("150 following")
+            }
+            FollowButton(action: model.toggleFollow)
+            ForEach(model.recentReviews, id:\._id) { review in
+                NavigationLink(destination:LazyView(ReviewDetailView(model: ReviewDetailViewModel(review: review, app: self.model.app)))) {
                     FeedReviewCard(review: review)
-                }
-            }.frame(maxWidth:.infinity)
-        }.navigationBarTitle(model.reviewer.name).frame(maxWidth:.infinity)
+                    .onAppear() {
+                        print(review.album.name)
+                        if review._id == self.model.last {
+                            print(self.model.last ?? "")
+                            self.model.getNextPage()
+                        }
+                    }
+                }.buttonStyle(PlainButtonStyle())
+                
+            }
+            ActivityIndicatorView(isVisible: $model.isLoading, type: .arcs).frame(width:50, height:50)
+        }.navigationBarTitle(model.reviewer.name)
     }
 }
 /*

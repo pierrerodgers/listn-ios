@@ -68,7 +68,7 @@ class ListnApp  {
         
         func query() -> AlbumQuery {
             let artistQuery = (artist != nil) ? ArtistQueryInput(_id: artist) : nil
-            return AlbumQuery(query: AlbumQueryInput(artist: artistQuery, _idIn: ids, _id: id))
+            return AlbumQuery(query: AlbumQueryInput(_idIn: ids, artist: artistQuery, _id: id))
         }
     }
     
@@ -78,9 +78,15 @@ class ListnApp  {
         var artist : String?
         var album : String?
         var reviewer : String?
+        var paginated : Bool = false
+        var last : String?
         
         func query() -> ReviewsQuery {
-            return ReviewsQuery(query: ReviewQueryInput(_id: id, artist: artist, reviewer: reviewer, _idIn: ids,  album:album))
+            return ReviewsQuery(query: ReviewQueryInput(artist: artist, _id: id,reviewer:reviewer, album:album, _idIn: ids))
+        }
+        
+        func paginatedQuery() -> ReviewPageQuery {
+            return ReviewPageQuery(input: ReviewPageInput(album: album, artist: artist, reviewer: reviewer, user: nil, last: last))
         }
     }
     
@@ -110,7 +116,7 @@ class ListnApp  {
         var album : String?
         
         func query() -> UserReviewsQuery {
-            return UserReviewsQuery(query:UserReviewQueryInput(userId: user, _idIn: ids,albumId:album, _id: id))
+            return UserReviewsQuery(query:UserReviewQueryInput(_idIn: ids, albumId:album, _id: id, userId: user))
         }
     }
     
@@ -169,7 +175,7 @@ class ListnApp  {
     
     }
     
-    func reviewsPublisher(query:ListnReviewQuery) -> AnyPublisher<[ListnCriticReview], URLError> {
+    func reviewsPublisher(query:ListnReviewQuery, paginated: Bool = true) -> AnyPublisher<[ListnCriticReview], URLError> {
         let reviewsPublisher = Network.shared.apollo.fetchPublisher(query: query.query())
         .retry(3)
         .compactMap { result in
@@ -185,6 +191,24 @@ class ListnApp  {
         
         return reviewsPublisher.eraseToAnyPublisher()
     }
+    
+    func paginatedReviewsPublisher(query:ListnReviewQuery, paginated: Bool = true) -> AnyPublisher<[ListnCriticReview], URLError> {
+        let reviewsPublisher = Network.shared.apollo.fetchPublisher(query: query.paginatedQuery())
+        .retry(3)
+        .compactMap { result in
+            result.data?.reviewPage
+        }
+        .compactMap { reviews in
+            reviews.compactMap { review in
+                ListnCriticReview(apolloResult: review!.fragments.reviewDetail)
+            }
+        }.mapError { error in
+            return URLError(.notConnectedToInternet)
+        }
+        
+        return reviewsPublisher.eraseToAnyPublisher()
+    }
+    
     
     func userReviewsPublisher(query:ListnUserReviewQuery) -> AnyPublisher<[ListnUserReview], URLError> {
         let reviewsPublisher = Network.shared.apollo.fetchPublisher(query: query.query())

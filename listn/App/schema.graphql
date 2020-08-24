@@ -160,4 +160,9 @@ query Search($input:String) {
     }
 }
 
+query ReviewPage($input:ReviewPageInput) {
+    ReviewPage(input:$input) {
+        ...ReviewDetail
+    }
+}
 

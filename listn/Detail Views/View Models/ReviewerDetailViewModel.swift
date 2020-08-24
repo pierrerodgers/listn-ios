@@ -15,6 +15,9 @@ class ReviewerDetailViewModel: ObservableObject {
     @Published var reviewer : ListnReviewer
     @Published var recentReviews: Array<ListnReview> = []
     @Published var isFollowing : Bool
+    @Published var isLoading : Bool = true
+    
+    var last : String?
     
     private var cancellable : AnyCancellable?
     
@@ -22,19 +25,25 @@ class ReviewerDetailViewModel: ObservableObject {
         self.app = app
         self.reviewer = reviewer
         isFollowing = (app.findFollow(reviewerId: reviewer._id) != nil)
-        getReviews()
+        getNextPage()
     }
     
-    func getReviews() {
-        cancellable = app.reviewsPublisher(query: ListnApp.ListnReviewQuery(reviewer:reviewer._id))
+    func getNextPage() {
+        self.isLoading = true
+        cancellable = app.paginatedReviewsPublisher(query: ListnApp.ListnReviewQuery(reviewer:reviewer._id, last: self.last))
         .tryMap { review in
             review as [ListnReview]
         }
         .catch{ (error) -> Just<[ListnReview]> in
             print(error)
+            self.isLoading = false
             return Just([])
         }
-        .assign(to: \.recentReviews, on: self)
+        .sink() { reviews in
+            self.isLoading = false
+            self.last = reviews.last?._id
+            self.recentReviews.append(contentsOf: reviews)
+        }
     }
     
     func toggleFollow() {
