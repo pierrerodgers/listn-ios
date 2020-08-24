@@ -40,11 +40,13 @@ class GraphQLTokenManager {
     var timer : Timer?
     
     init() {
-        timer = Timer.scheduledTimer(withTimeInterval: 60*25, repeats: true) { timer in
+        timer = Timer.scheduledTimer(withTimeInterval: 60*60*25, repeats: true) { timer in
             self.refreshAccessToken()
         }
         getToken()
     }
+    
+    
     
     func getToken() {
         let url = URL(string: "https://realm.mongodb.com/api/client/v2.0/app/listn-graphql-gdipr/auth/providers/anon-user/login")!
@@ -65,7 +67,7 @@ class GraphQLTokenManager {
     }
     
     func refreshAccessToken() {
-        let url = URL(string: "hhttps://realm.mongodb.com/api/client/v2.0/auth/session")!
+        let url = URL(string: "https://realm.mongodb.com/api/client/v2.0/auth/session")!
         var request = URLRequest(url:url)
         request.httpMethod = "POST"
         request.addValue("Bearer \(refreshToken!)", forHTTPHeaderField: "Authorization")
@@ -83,3 +85,65 @@ class GraphQLTokenManager {
         task.resume()
     }
 }
+/*
+class GraphQLTokenManager {
+    
+    var accessToken: String?
+    var refreshToken : String?
+    var lastFetched : Date?
+    
+    init() {
+        lastFetched = Date()
+        getToken()
+    }
+    
+    func getToken() -> String  {
+        if accessToken == nil {
+            let url = URL(string: "https://realm.mongodb.com/api/client/v2.0/app/listn-graphql-gdipr/auth/providers/anon-user/login")!
+            var request = URLRequest(url:url)
+            request.httpMethod = "POST"
+            
+            let task = URLSession.shared.dataTask(with:request) {(data, response, error) in
+                guard let data = data, error == nil else {
+                    return
+                }
+                let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+                if let responseJSON = responseJSON as? [String: Any] {
+                    self.accessToken = responseJSON["access_token"] as? String ?? ""
+                    self.refreshToken = responseJSON["refresh_token"] as? String ?? ""
+                }
+            }
+            task.resume()
+        }
+        let date = Date()
+        let timeInterval = date.timeIntervalSince(lastFetched ?? date)
+        if timeInterval < 60*60*25 {
+            return accessToken ?? ""
+        }
+        else {
+            refreshAccessToken()
+        }
+        
+        return accessToken ?? ""
+    }
+    
+    func refreshAccessToken() {
+        let url = URL(string: "https://realm.mongodb.com/api/client/v2.0/auth/session")!
+        var request = URLRequest(url:url)
+        request.httpMethod = "POST"
+        request.addValue("Bearer \(refreshToken!)", forHTTPHeaderField: "Authorization")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let task = URLSession.shared.dataTask(with:request) {(data, response, error) in
+            guard let data = data, error == nil else {
+                return
+            }
+            let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+            if let responseJSON = responseJSON as? [String: Any] {
+                self.accessToken = responseJSON["access_token"] as? String ?? ""
+            }
+        }
+        task.resume()
+    }
+}
+*/
