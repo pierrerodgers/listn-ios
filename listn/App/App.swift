@@ -11,7 +11,7 @@ import RealmSwift
 import ApolloCombine
 import Combine
 
-class ListnApp  {
+class ListnApp : ObservableObject {
     
     var realmApp : RealmApp!
     var loginService : LoginService!
@@ -20,9 +20,11 @@ class ListnApp  {
     var realm : Realm?
     var feedToken : NotificationToken?
     
-    // MARK: Testing for ApolloCombine
+    @Published var isLoading = true
+    @Published var isLoggedIn = false
+    @Published var loginError = false
     
-    
+    // MARK: ApolloCombine Publishers
     
     func searchPublisher(query:String ) -> AnyPublisher<SearchResults, URLError> {
         let searchResults = Network.shared.apollo.fetchPublisher(query: SearchQuery(input: query))
@@ -61,57 +63,7 @@ class ListnApp  {
         
         return searchResults.switchToLatest().eraseToAnyPublisher()
     }
-    
-    struct ListnAlbumQuery {
-        var id : String?
-        var ids : [String]?
-        var artist : String?
         
-        func query() -> AlbumQuery {
-            let artistQuery = (artist != nil) ? ArtistQueryInput(_id: artist) : nil
-            return AlbumQuery(query: AlbumQueryInput(_id: id, artist: artistQuery, _idIn: ids))
-        }
-    }
-    
-    struct ListnReviewQuery {
-        var id : String?
-        var ids : [String]?
-        var artist : String?
-        var album : String?
-        var reviewer : String?
-        var paginated : Bool = false
-        var user : String?
-        var last : String?
-        
-        func query() -> ReviewsQuery {
-            return ReviewsQuery(query: ReviewQueryInput(artist: artist, _id: id, _idIn: ids, user:user, album:album))
-        }
-        
-        func paginatedQuery() -> ReviewPageQuery {
-            return ReviewPageQuery(input: ReviewPageInput(user: user, last: last, album: album, artist: artist))
-        }
-    }
-    
-    struct ListnUserQuery {
-        var id : String?
-        var ids : [String]?
-        
-        func query() -> UsersQuery {
-            return UsersQuery(query: UserQueryInput(_idIn: ids, _id: id))
-        }
-    }
-    
-    struct ListnArtistQuery {
-        var id : String?
-        var ids : [String]?
-        
-        func query() -> ArtistQuery {
-            return ArtistQuery(query:ArtistQueryInput(_idIn: ids, _id: id))
-        }
-    }
-    
-    
-    
     func albumPublisher(query:ListnAlbumQuery) -> AnyPublisher<[ListnAlbum], URLError> {
         let albumPublisher = Network.shared.apollo.fetchPublisher(query: query.query())
         .retry(3)
@@ -219,16 +171,59 @@ class ListnApp  {
         return publisher.eraseToAnyPublisher()
     }
     
+    // MARK: Query type definitions
     
-    
-    
-    var isLoggedIn : Bool {
-        get {
-            return loginService.isLoggedIn
+    struct ListnAlbumQuery {
+        var id : String?
+        var ids : [String]?
+        var artist : String?
+        
+        func query() -> AlbumQuery {
+            let artistQuery = (artist != nil) ? ArtistQueryInput(_id: artist) : nil
+            return AlbumQuery(query: AlbumQueryInput(_id: id, artist: artistQuery, _idIn: ids))
         }
     }
     
-    init( completion: @escaping (Bool, ListnApp) -> Void) {
+    struct ListnReviewQuery {
+        var id : String?
+        var ids : [String]?
+        var artist : String?
+        var album : String?
+        var reviewer : String?
+        var paginated : Bool = false
+        var user : String?
+        var last : String?
+        
+        func query() -> ReviewsQuery {
+            return ReviewsQuery(query: ReviewQueryInput(artist: artist, _id: id, _idIn: ids, user:user, album:album))
+        }
+        
+        func paginatedQuery() -> ReviewPageQuery {
+            return ReviewPageQuery(input: ReviewPageInput(user: user, last: last, album: album, artist: artist))
+        }
+    }
+    
+    struct ListnUserQuery {
+        var id : String?
+        var ids : [String]?
+        
+        func query() -> UsersQuery {
+            return UsersQuery(query: UserQueryInput(_idIn: ids, _id: id))
+        }
+    }
+    
+    struct ListnArtistQuery {
+        var id : String?
+        var ids : [String]?
+        
+        func query() -> ArtistQuery {
+            return ArtistQuery(query:ArtistQueryInput(_idIn: ids, _id: id))
+        }
+    }
+    
+    // MARK: Async initialiser
+    
+    init() {
         
         // Initialise Realm App
         let config = AppConfiguration(baseURL: "https://realm.mongodb.com", transport: nil, localAppName: nil, localAppVersion: nil)
@@ -237,33 +232,29 @@ class ListnApp  {
         // Initialise login service and fill variables if logged in
         loginService = MongoLoginService(app: realmApp)
         if loginService.isLoggedIn {
-            realmApp.currentUser()?.refreshCustomData({(error) in
-                guard error == nil else {
-                    self.loginService.logOut(completion: {error in
-                        completion(false, self)
-                    })
+            Network.shared.tokenManger = GraphQLTokenManager()
+            Realm.asyncOpen(configuration: self.realmApp.currentUser()!.configuration(partitionValue:(self.realmApp.currentUser()?.identity)!), callbackQueue: DispatchQueue.main) { realm, error in
+                guard realm != nil else {
+                    self.loginError = true
                     return
                 }
-                Network.shared.tokenManger = GraphQLTokenManager()
-                Realm.asyncOpen(configuration: self.realmApp.currentUser()!.configuration(partitionValue:(self.realmApp.currentUser()?.identity)!), callbackQueue: DispatchQueue.main) { realm, error in
-                    guard realm != nil else {
-                        completion(false, self)
-                        return
-                    }
-                    self.realm = realm!
-                    let user = realm!.objects(User.self).first!
-                    self.user = user
-                    self.listnUser = ListnUser(user: user)
-                    completion(true, self)
-                }
-                
-            })
+                self.realm = realm!
+                let user = realm!.objects(User.self).first!
+                self.user = user
+                self.listnUser = ListnUser(user: user)
+                self.isLoggedIn = true
+                self.isLoading = false
+            }
         }
         else {
-            completion(false, self)
+            self.isLoggedIn = false
+            self.isLoading = false
         }
         
     }
+    
+    
+    // MARK: Realm functions (posting reviews, etc.)
     
     func refreshUserFeed(completion: @escaping(Array<String>) -> Void) {
         realmApp.functions.updateUserFeed([AnyBSON(user!._id!)!]) { result, error in
