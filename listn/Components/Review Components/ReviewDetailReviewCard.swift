@@ -18,12 +18,12 @@ struct ReviewDetailReviewCard: View {
             HStack{
                 // Reviewer/User image
                 Circle().frame(width:40, height:40)
-                Text("@\(review.username)").title()
+                Text("@\(review.user.username)").title()
                 Spacer()
                 Text(review.score).scoreText()
             }
             Text("Comments to come")
-            if(review.reviewType == .critic) {
+            if(review.isCritic) {
                 FullReviewButton(link: review.link ?? "")
             }
         }
@@ -39,7 +39,7 @@ struct ReviewComments {
 struct ReviewDetailReviewCard_Previews: PreviewProvider {
     
     static var previews: some View {
-        let review = ListnCriticReview(forPreview: true)
+        let review = ListnReview(forPreview: true)
 
         return ReviewDetailReviewCard(review: review)
     }

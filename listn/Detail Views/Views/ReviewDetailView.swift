@@ -20,7 +20,7 @@ struct ReviewDetailView: View {
                 ForEach(model.moreAlbumReviews.prefix(5), id:\._id) { review in
                     ReviewRow(review:review)
                 }
-                Text("More from @\(self.model.review.username)").font(.headline)
+                Text("More from @\(self.model.review.user.username)").font(.headline)
                 ForEach(model.moreReviewerReviews.prefix(5), id:\._id) { review in
                     NavigationLink(destination: LazyView(ReviewDetailView(model: ReviewDetailViewModel(review: review, app: self.model.app)))) {
                         FeedReviewCard(review: review)

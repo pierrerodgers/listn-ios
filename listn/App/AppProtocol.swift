@@ -52,5 +52,5 @@ protocol SearchData {
 struct SearchResults {
     var albums : Array<ListnAlbum>
     var artists : Array<ListnArtist>
-    var reviewers : Array<ListnReviewer>
+    var users : Array<ListnUser>
 }

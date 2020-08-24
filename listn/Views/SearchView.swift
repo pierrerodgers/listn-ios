@@ -39,9 +39,9 @@ struct SearchView: View {
                         }.buttonStyle(PlainButtonStyle())
                     }
                     
-                    ForEach(model.reviewerResults[0..<min(model.reviewerResults.count, 5)], id:\._id) { reviewer in
-                        NavigationLink(destination:LazyView(ReviewerDetailView(model: ReviewerDetailViewModel(app: self.model.app, reviewer:reviewer)))) {
-                            SearchReviewerRow(reviewer: reviewer)
+                    ForEach(model.userResults[0..<min(model.userResults.count, 5)], id:\._id) { user in
+                        NavigationLink(destination:LazyView(ProfileView(model: ProfileViewModel(app: self.model.app, user:user)))) {
+                            SearchUserRow(user:user)
                         }.buttonStyle(PlainButtonStyle())
                     }
                     Spacer()

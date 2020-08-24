@@ -12,7 +12,7 @@ import Combine
 class ReviewerDetailViewModel: ObservableObject {
     var app : ListnApp
     
-    @Published var reviewer : ListnReviewer
+    @Published var user : ListnUser
     @Published var recentReviews: Array<ListnReview> = []
     @Published var isFollowing : Bool
     @Published var isLoading : Bool = true
@@ -21,16 +21,16 @@ class ReviewerDetailViewModel: ObservableObject {
     
     private var cancellable : AnyCancellable?
     
-    init(app: ListnApp, reviewer:ListnReviewer) {
+    init(app: ListnApp, user:ListnUser) {
         self.app = app
-        self.reviewer = reviewer
-        isFollowing = (app.findFollow(reviewerId: reviewer._id) != nil)
+        self.user = user
+        isFollowing = (app.findFollow(userId: user._id) != nil)
         getNextPage()
     }
     
     func getNextPage() {
         self.isLoading = true
-        cancellable = app.paginatedReviewsPublisher(query: ListnApp.ListnReviewQuery(reviewer:reviewer._id, last: self.last))
+        cancellable = app.paginatedReviewsPublisher(query: ListnApp.ListnReviewQuery(user:user._id, last: self.last))
         .tryMap { review in
             review as [ListnReview]
         }
@@ -47,7 +47,7 @@ class ReviewerDetailViewModel: ObservableObject {
     }
     
     func toggleFollow() {
-        app.toggleFollow(reviewerId: reviewer._id)
-        isFollowing = (app.findFollow(reviewerId: reviewer._id) != nil)
+        app.toggleFollow(userId: user._id)
+        isFollowing = (app.findFollow(userId: user._id) != nil)
     }
 }

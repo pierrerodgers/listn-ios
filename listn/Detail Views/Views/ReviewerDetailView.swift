@@ -33,7 +33,7 @@ struct ReviewerDetailView: View {
                 
             }
             ActivityIndicatorView(isVisible: $model.isLoading, type: .arcs).frame(width:50, height:50)
-        }.navigationBarTitle(model.reviewer.name)
+        }.navigationBarTitle(model.user.name)
     }
 }
 /*

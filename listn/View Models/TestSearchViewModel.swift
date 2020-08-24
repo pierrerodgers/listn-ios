@@ -11,7 +11,7 @@ import UIKit
 class TestSearchViewModel: ObservableObject {
     @Published var albumResults : Array<ListnAlbum> = []
     @Published var artistResults : Array<ListnArtist> = []
-    @Published var reviewerResults: Array<ListnReviewer> = []
+    @Published var reviewerResults: Array<ListnUser> = []
     
     var app : ListnApp
     

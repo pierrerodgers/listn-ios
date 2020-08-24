@@ -11,7 +11,7 @@ import Combine
 class SearchViewModel: ObservableObject {
     @Published var albumResults : Array<ListnAlbum> = []
     @Published var artistResults : Array<ListnArtist> = []
-    @Published var reviewerResults: Array<ListnReviewer> = []
+    @Published var userResults: Array<ListnUser> = []
     
     @Published var isLoading : Bool = false
     
@@ -27,9 +27,10 @@ class SearchViewModel: ObservableObject {
                         self!.isLoading = false
                     }
             }, receiveValue: { [weak self] searchResults in
+                print(searchResults)
                 self!.albumResults = searchResults.albums
                 self!.artistResults = searchResults.artists
-                self!.reviewerResults = searchResults.reviewers
+                self!.userResults = searchResults.users
                 
             })
         }

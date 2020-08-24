@@ -26,8 +26,10 @@ class AddReviewViewModel: ObservableObject {
     @Published var album : ListnAlbum?
     @Published var inputValid : ReviewInputValidState
     
+    var user: ListnUser
     
-    init(album:ListnAlbum?, app: ListnApp) {
+    
+    init(album:ListnAlbum?, app: ListnApp, user: ListnUser) {
         self.album = album
         self.app = app
         if album == nil {
@@ -36,11 +38,12 @@ class AddReviewViewModel: ObservableObject {
         else {
             self.inputValid = ReviewInputValidState(missingAlbum:false)
         }
+        self.user = user
         
     }
     
     func postReview(review: NewReview) {
-        let review = ListnUserReview(album:album!, score:String(review.score), text: review.text)
+        let review = ListnReview(album:album!, score:String(review.score), text: review.text, user: user)
         
         app.postReview(review: review)
     }

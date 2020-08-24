@@ -17,7 +17,7 @@ struct ReviewRow: View {
             HStack{
                 // Reviewer/User image
                 Circle().frame(width:30, height:30)
-                Text("@\(review.username)")
+                Text("@\(review.user.username)")
                 Spacer()
                 
             }
@@ -28,7 +28,7 @@ struct ReviewRow: View {
 
 struct ReviewRow_Previews: PreviewProvider {
     static var previews: some View {
-        let review = ListnCriticReview(forPreview: true)
+        let review = ListnReview(forPreview: true)
         return ReviewRow(review: review)
     }
 }

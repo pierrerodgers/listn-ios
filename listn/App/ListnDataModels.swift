@@ -120,110 +120,82 @@ struct ListnStreamingUrls {
     var spotify : String
 }
 
-struct ListnCriticReview : ListnReview {
+struct ListnReview {
     
     init(apolloResult: ReviewDetail) {
         _id = apolloResult._id!
         score = apolloResult.score!
-        link = apolloResult.link!
+        isCritic = apolloResult.isCritic ?? false
+        
+        link = apolloResult.link
+        
+        user = ListnUser(apolloResult: apolloResult.userData!.fragments.reviewUserDetail)
         
         // Initialise date
         date = dateFromMongoDB(apolloResult.date ?? "")
         
         album = ListnAlbum(apolloResult: apolloResult.albumData!.fragments.reviewAlbumDetail, artist: apolloResult.artistData!.fragments.reviewArtistDetail)
         
-        reviewer = ListnReviewer(apolloResult: apolloResult.reviewerData!.fragments.reviewReviewerDetail)
         
     }
     
-    var _id : String?
-    var reviewer : ListnReviewer
-    var username : String {
-        get {
-            return reviewer.name
-        }
+    init(album: ListnAlbum, score:String, text:String, user:ListnUser) {
+        self.album = album
+        self.score = score
+        self.text = text
+        self.isCritic = false
+        self.date = Date()
+        self.user = user
     }
+    
+    init(forPreview: Bool) {
+        _id = ""
+        user = ListnUser(forPreview:true)
+        album = ListnAlbum(forPreview: true)
+        isCritic = true
+        link = ""
+        score = "90"
+        date = Date()
+        text = "Album detail text"
+    }
+    
+    var _id : String?
+    var user : ListnUser
     var album : ListnAlbum
+    var isCritic : Bool
     var link : String?
     var score : String
     var date : Date
     var text: String?
-    var reviewType: ReviewType = .critic
 }
 
-struct ListnReviewer {
-    init(apolloResult: ReviewReviewerDetail) {
-        _id = apolloResult._id!
-        name = apolloResult.name!
-        link = apolloResult.link!
-    }
-    init(apolloResult: ReviewerDetail) {
-        _id = apolloResult._id!
-        name = apolloResult.name!
-        link = apolloResult.link!
-    }
-    
-    
-    var _id : String
-    var name : String
-    var link : String
-}
 
 struct ListnUser {
     init(apolloResult: UserDetail) {
-        _id = apolloResult._id
-        name = apolloResult.name
+        _id = apolloResult._id!
+        name = apolloResult.name!
         username = apolloResult.username!
+        link = apolloResult.link
+        isCritic = apolloResult.isCritic ?? false
+    }
+    init(apolloResult: ReviewUserDetail) {
+        _id = apolloResult._id!
+        name = apolloResult.name!
+        link = apolloResult.link
+        isCritic = apolloResult.isCritic ?? false
+        username = apolloResult.username!
+    }
+    init(user:User) {
+        self.name = user.name!
+        self._id = user._id!.stringValue
+        self.link = user.link
+        self.username = user.username!
+        self.isCritic = false
     }
     var name : String
     var _id : String
     var username : String
-}
-
-struct ListnUserReview : ListnReview {
-    init(apolloResult: UserReviewDetail) {
-        _id = apolloResult._id!
-        score = apolloResult.score!
-        text = apolloResult.text ?? ""
-        
-       // Initialise date
-        date = dateFromMongoDB(apolloResult.date ?? "")
-        album = ListnAlbum(apolloResult: apolloResult.album!.fragments.albumDetail)
-        user = ListnUser(apolloResult: apolloResult.user!.fragments.userDetail)
-                
-    }
-    
-    init(album:ListnAlbum, score: String, text: String?) {
-        self.album = album
-        self.score = score
-        self.text = text
-        self.date = Date()
-    }
-    var _id : String?
-    var album : ListnAlbum
-    var score : String
-    var date : Date
-    var text : String?
-    var user : ListnUser?
-    var reviewType: ReviewType = .user
     var link : String?
-    var username : String {
-        get {
-            return user?.username ?? ""
-        }
-    }
+    var isCritic : Bool
 }
 
-protocol ListnReview {
-    var username :String { get }
-    var score : String { get }
-    var text : String? { get }
-    var date : Date { get }
-    var _id : String? { get }
-    var album : ListnAlbum { get }
-    var reviewType : ReviewType { get }
-    var link : String? { get }
-}
-enum ReviewType {
-    case user, critic
-}

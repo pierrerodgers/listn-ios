@@ -11,25 +11,43 @@ import Combine
 
 class ProfileViewModel: ObservableObject {
     var app : ListnApp
-    @Published var user : User
-    @Published var userReviews : Array<ListnUserReview> = []
+    @Published var user : ListnUser
+    @Published var recentReviews : Array<ListnReview> = []
+    @Published var isFollowing : Bool = false
+    @Published var isLoading : Bool = true
     
-    var reviewsCancellable : AnyCancellable?
+    var last : String?
+
     
-    init(app: ListnApp) {
+    var cancellable : AnyCancellable?
+    
+    init(app: ListnApp, user: ListnUser) {
         self.app = app
-        self.user = app.user!.freeze()
-        updateReviews()
+        self.user = user
+        getNextPage()
     }
     
-    func updateReviews() {
-        reviewsCancellable =
-            app.userReviewsPublisher(query: ListnApp.ListnUserReviewQuery(user:user._id.stringValue))
-            .catch { error -> Just<[ListnUserReview]> in
-                print(error)
-                return Just([])
-            }
-            .assign(to:\.userReviews, on: self)
+    func getNextPage() {
+        self.isLoading = true
+        cancellable = app.paginatedReviewsPublisher(query: ListnApp.ListnReviewQuery(user:user._id, last: self.last))
+        .tryMap { review in
+            review as [ListnReview]
+        }
+        .catch{ (error) -> Just<[ListnReview]> in
+            print(error)
+            self.isLoading = false
+            return Just([])
+        }
+        .sink() { reviews in
+            self.isLoading = false
+            self.last = reviews.last?._id
+            self.recentReviews.append(contentsOf: reviews)
+        }
             
+    }
+    
+    func toggleFollow() {
+        app.toggleFollow(userId: user._id)
+        isFollowing = (app.findFollow(userId: user._id) != nil)
     }
 }

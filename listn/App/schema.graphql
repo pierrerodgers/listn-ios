@@ -69,67 +69,38 @@ fragment ReviewAlbumDetail on ReviewAlbumDatum {
 }
 
 fragment ReviewDetail on Review {
-    album {
-        ...AlbumDetail
-    }
-    artist {
-        ...ArtistDetail
-    }
-    reviewer {
-        ...ReviewerDetail
-    }
-    _id
-    link
-    date
-    score
-
-}
-fragment ReviewDetail on Review {
     albumData {
         ...ReviewAlbumDetail
     }
     artistData {
         ...ReviewArtistDetail
     }
-    reviewerData {
-        ...ReviewReviewerDetail
+    userData {
+        ...ReviewUserDetail
     }
     _id
     link
     date
     score
-
+    isCritic
 }
 
 
-fragment UserReviewDetail on UserReview {
-    album {
-        ...AlbumDetail
-    }
-    user {
-        ...UserDetail
-    }
-    _id
-    date
-    score
-    text
-}
-
-fragment ReviewerDetail on Reviewer {
+fragment ReviewUserDetail on ReviewUserDatum {
     _id
     link
     name
-}
-fragment ReviewReviewerDetail on ReviewReviewerDatum {
-    _id
     link
-    name
+    username
+    isCritic
 }
 
 fragment UserDetail on User {
     _id
     name
     username
+    link
+    isCritic
 }
 
 query Reviews($query:ReviewQueryInput, $limit:Int = 100) {
@@ -138,15 +109,9 @@ query Reviews($query:ReviewQueryInput, $limit:Int = 100) {
     }
 }
 
-query UserReviews($query:UserReviewQueryInput, $limit:Int = 20) {
-    userReviews(query: $query, limit:$limit) {
-        ...UserReviewDetail
-    }
-}
-
-query Reviewers($query:ReviewerQueryInput) {
-    reviewers(query:$query) {
-        ...ReviewerDetail
+query Users($query:UserQueryInput) {
+    users (query:$query) {
+    ...UserDetail
     }
 }
 
@@ -156,7 +121,7 @@ query Search($input:String) {
     Search(input:{query:$input}) {
         artists
         albums
-        reviewers
+        users
     }
 }
 

@@ -39,19 +39,16 @@ class ReviewDetailViewModel: ObservableObject {
         .store(in: &disposables)
         
         
-        if review.reviewType == .critic {
-            let criticReview = review as! ListnCriticReview
-            app.reviewsPublisher(query: ListnApp.ListnReviewQuery(reviewer:criticReview.reviewer._id))
-            .tryMap { review in
-                review as [ListnReview]
-            }
-            .catch{ (error) -> Just<[ListnReview]> in
-                print(error)
-                return Just([])
-            }
-            .assign(to: \.moreReviewerReviews, on: self)
-            .store(in: &disposables)
+        app.reviewsPublisher(query: ListnApp.ListnReviewQuery(reviewer:review.user._id))
+        .tryMap { review in
+            review as [ListnReview]
         }
+        .catch{ (error) -> Just<[ListnReview]> in
+            print(error)
+            return Just([])
+        }
+        .assign(to: \.moreReviewerReviews, on: self)
+        .store(in: &disposables)
       
     }
     

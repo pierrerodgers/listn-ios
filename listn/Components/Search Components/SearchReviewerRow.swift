@@ -8,13 +8,13 @@
 
 import SwiftUI
 
-struct SearchReviewerRow: View {
-    var reviewer : ListnReviewer
+struct SearchUserRow: View {
+    var user : ListnUser
     
     var body: some View {
         HStack{
             Circle().frame(width:60, height:60)
-            Text("@\(reviewer.name)")
+            Text("@\(user.name)")
             Spacer()
         }.frame(maxWidth:.infinity, maxHeight:60)
     }
@@ -22,6 +22,6 @@ struct SearchReviewerRow: View {
 
 struct SearchReviewerRow_Previews: PreviewProvider {
     static var previews: some View {
-        SearchReviewerRow(reviewer: ListnReviewer(forPreview: true))
+        SearchUserRow(user: ListnUser(forPreview: true))
     }
 }

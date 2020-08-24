@@ -23,7 +23,7 @@ struct FeedReviewCard: View {
                 Text(review.score).scoreText()
                 HStack{
                     Circle().frame(width: 30, height: 30)
-                    Text("@") + Text(review.username)
+                    Text("@") + Text(review.user.username)
                 }
                 
             }.padding(.trailing).padding(.vertical)
@@ -35,7 +35,7 @@ struct FeedReviewCard: View {
 struct FeedReviewCard_Previews: PreviewProvider {
     
     static var previews: some View {
-        let review = ListnCriticReview(forPreview:true)
+        let review = ListnReview(forPreview:true)
         return Group{
             FeedReviewCard(review: review).previewLayout(.fixed(width: 414, height: 200))
             
@@ -48,16 +48,6 @@ struct FeedReviewCard_Previews: PreviewProvider {
     }
 }
 
-extension ListnCriticReview {
-    init(forPreview:Bool) {
-        self._id = "1"
-        self.reviewer = ListnReviewer(forPreview: true)
-        self.album = ListnAlbum(forPreview: true)
-        self.date = Date()
-        self.reviewType = .critic
-        self.score = "90"
-    }
-}
 
 extension ListnAlbum {
     init(forPreview:Bool) {
@@ -80,10 +70,12 @@ extension ListnArtist {
     }
 }
 
-extension ListnReviewer {
+extension ListnUser {
     init(forPreview:Bool) {
         self._id = ""
         self.name = "pitchfork"
         self.link = "www.pitchfork.com"
+        self.username = "pitchfork"
+        self.isCritic = true
     }
 }

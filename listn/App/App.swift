@@ -16,6 +16,7 @@ class ListnApp  {
     var realmApp : RealmApp!
     var loginService : LoginService!
     var user : User?
+    var listnUser : ListnUser?
     var realm : Realm?
     var feedToken : NotificationToken?
     
@@ -33,23 +34,23 @@ class ListnApp  {
         .compactMap { search -> ([String], [String], [String]) in
             let albums = search.albums!.compactMap {$0!}
             let artists = search.artists!.compactMap {$0!}
-            let reviewers = search.reviewers!.compactMap {$0!}
+            let reviewers = search.users!.compactMap {$0!}
             return (albums, artists, reviewers)
         }
-        .compactMap { albums, artists, reviewers -> (ListnAlbumQuery, ListnArtistQuery, ListnReviewerQuery)  in
+        .compactMap { albums, artists, reviewers -> (ListnAlbumQuery, ListnArtistQuery, ListnUserQuery)  in
             let albumsQuery = ListnAlbumQuery(ids:albums)
             let artistsQuery = ListnArtistQuery(ids:artists)
-            let reviewersQuery = ListnReviewerQuery(ids:reviewers)
-            return (albumsQuery, artistsQuery, reviewersQuery)
-        }.map { albumQuery, artistQuery, reviewerQuery -> AnyPublisher<SearchResults, URLError> in
+            let usersQuery = ListnUserQuery(ids:reviewers)
+            return (albumsQuery, artistsQuery, usersQuery)
+        }.map { albumQuery, artistQuery, userQuery -> AnyPublisher<SearchResults, URLError> in
             let albums = self.albumPublisher(query: albumQuery).eraseToAnyPublisher()
             let artists = self.artistPublisher(query: artistQuery).eraseToAnyPublisher()
-            let reviewers = self.reviewerPublisher(query:reviewerQuery).eraseToAnyPublisher()
+            let users = self.userPublisher(query:userQuery).eraseToAnyPublisher()
             //return Publishers.Sequence<[AnyPublisher<SearchResults, URLError>]>(sequence: [albums, artists, reviewers])
             
-            return albums.combineLatest(artists, reviewers)
-            .compactMap { albumResults, artistResults, reviewerResults in
-                return SearchResults(albums: albumResults, artists: artistResults, reviewers: reviewerResults)
+            return albums.combineLatest(artists, users)
+            .compactMap { albumResults, artistResults, userResults in
+                return SearchResults(albums: albumResults, artists: artistResults, users: userResults)
             }.mapError { error in
                 return URLError(.notConnectedToInternet)
             }.eraseToAnyPublisher()
@@ -68,7 +69,7 @@ class ListnApp  {
         
         func query() -> AlbumQuery {
             let artistQuery = (artist != nil) ? ArtistQueryInput(_id: artist) : nil
-            return AlbumQuery(query: AlbumQueryInput(_idIn: ids, artist: artistQuery, _id: id))
+            return AlbumQuery(query: AlbumQueryInput(_id: id, artist: artistQuery, _idIn: ids))
         }
     }
     
@@ -79,23 +80,24 @@ class ListnApp  {
         var album : String?
         var reviewer : String?
         var paginated : Bool = false
+        var user : String?
         var last : String?
         
         func query() -> ReviewsQuery {
-            return ReviewsQuery(query: ReviewQueryInput(artist: artist, _id: id,reviewer:reviewer, album:album, _idIn: ids))
+            return ReviewsQuery(query: ReviewQueryInput(artist: artist, _id: id, _idIn: ids, user:user, album:album))
         }
         
         func paginatedQuery() -> ReviewPageQuery {
-            return ReviewPageQuery(input: ReviewPageInput(album: album, artist: artist, reviewer: reviewer, user: nil, last: last))
+            return ReviewPageQuery(input: ReviewPageInput(user: user, last: last, album: album, artist: artist))
         }
     }
     
-    struct ListnReviewerQuery {
+    struct ListnUserQuery {
         var id : String?
         var ids : [String]?
         
-        func query() -> ReviewersQuery {
-            return ReviewersQuery(query: ReviewerQueryInput(_id: id, _idIn: ids))
+        func query() -> UsersQuery {
+            return UsersQuery(query: UserQueryInput(_idIn: ids, _id: id))
         }
     }
     
@@ -108,17 +110,6 @@ class ListnApp  {
         }
     }
     
-    struct ListnUserReviewQuery {
-        var id : String?
-        var user : String?
-        var ids : [String]?
-        var artist : String?
-        var album : String?
-        
-        func query() -> UserReviewsQuery {
-            return UserReviewsQuery(query:UserReviewQueryInput(_idIn: ids, albumId:album, _id: id, userId: user))
-        }
-    }
     
     
     func albumPublisher(query:ListnAlbumQuery) -> AnyPublisher<[ListnAlbum], URLError> {
@@ -139,15 +130,15 @@ class ListnApp  {
     
     }
     
-    func reviewerPublisher(query:ListnReviewerQuery) -> AnyPublisher<[ListnReviewer], URLError> {
+    func userPublisher(query:ListnUserQuery) -> AnyPublisher<[ListnUser], URLError> {
         let reviewerPublisher = Network.shared.apollo.fetchPublisher(query: query.query())
         .retry(3)
         .compactMap { result in
-            result.data?.reviewers
+            result.data?.users
         }
-        .compactMap { reviewers in
-            reviewers.compactMap { reviewer in
-                ListnReviewer(apolloResult: (reviewer?.fragments.reviewerDetail)!)
+        .compactMap { user in
+            user.compactMap { reviewer in
+                ListnUser(apolloResult: (reviewer?.fragments.userDetail)!)
             }
         }.mapError { error in
             return URLError(.notConnectedToInternet)
@@ -175,7 +166,7 @@ class ListnApp  {
     
     }
     
-    func reviewsPublisher(query:ListnReviewQuery, paginated: Bool = true) -> AnyPublisher<[ListnCriticReview], URLError> {
+    func reviewsPublisher(query:ListnReviewQuery, paginated: Bool = true) -> AnyPublisher<[ListnReview], URLError> {
         let reviewsPublisher = Network.shared.apollo.fetchPublisher(query: query.query())
         .retry(3)
         .compactMap { result in
@@ -183,7 +174,7 @@ class ListnApp  {
         }
         .compactMap { reviews in
             reviews.compactMap { review in
-                ListnCriticReview(apolloResult: review!.fragments.reviewDetail)
+                ListnReview(apolloResult: review!.fragments.reviewDetail)
             }
         }.mapError { error in
             return URLError(.notConnectedToInternet)
@@ -192,7 +183,7 @@ class ListnApp  {
         return reviewsPublisher.eraseToAnyPublisher()
     }
     
-    func paginatedReviewsPublisher(query:ListnReviewQuery, paginated: Bool = true) -> AnyPublisher<[ListnCriticReview], URLError> {
+    func paginatedReviewsPublisher(query:ListnReviewQuery, paginated: Bool = true) -> AnyPublisher<[ListnReview], URLError> {
         let reviewsPublisher = Network.shared.apollo.fetchPublisher(query: query.paginatedQuery())
         .retry(3)
         .compactMap { result in
@@ -200,7 +191,7 @@ class ListnApp  {
         }
         .compactMap { reviews in
             reviews.compactMap { review in
-                ListnCriticReview(apolloResult: review!.fragments.reviewDetail)
+                ListnReview(apolloResult: review!.fragments.reviewDetail)
             }
         }.mapError { error in
             return URLError(.notConnectedToInternet)
@@ -209,61 +200,22 @@ class ListnApp  {
         return reviewsPublisher.eraseToAnyPublisher()
     }
     
-    
-    func userReviewsPublisher(query:ListnUserReviewQuery) -> AnyPublisher<[ListnUserReview], URLError> {
-        let reviewsPublisher = Network.shared.apollo.fetchPublisher(query: query.query())
-        .retry(3)
-        .compactMap { result in
-            result.data?.userReviews
-        }
-        .compactMap { reviews in
-            reviews.compactMap { review in
-                ListnUserReview(apolloResult: review!.fragments.userReviewDetail)
-            }
-        }.mapError { error in
-            return URLError(.notConnectedToInternet)
-        }
-        
-        return reviewsPublisher.eraseToAnyPublisher()
-    }
     
     func feedPublisher(ids:[String]) -> AnyPublisher<[ListnReview], URLError> {
-        let criticReviewPublisher = Network.shared.apollo.fetchPublisher(query: ReviewsQuery(query:ReviewQueryInput(_idIn:ids)))
+        let publisher = Network.shared.apollo.fetchPublisher(query: ReviewsQuery(query:ReviewQueryInput(_idIn:ids)))
         .retry(3)
         .compactMap { result in
             result.data?.reviews
         }
         .compactMap{ reviews in
             return reviews.compactMap { review in
-                ListnCriticReview(apolloResult: review!.fragments.reviewDetail) as ListnReview
+                ListnReview(apolloResult: review!.fragments.reviewDetail) as ListnReview
             }
         }
         .mapError { error in
             return URLError(.notConnectedToInternet)
         }.eraseToAnyPublisher()
         
-        let userReviewPublisher = Network.shared.apollo.fetchPublisher(query:UserReviewsQuery(query: UserReviewQueryInput(_idIn:ids)))
-        .retry(3)
-        .compactMap { result in
-            return result.data?.userReviews
-        }
-        .compactMap { reviews in
-            reviews.compactMap { review in
-                ListnUserReview(apolloResult: (review?.fragments.userReviewDetail)!) as ListnReview
-            }
-        }
-        .mapError { error in
-            return URLError(.notConnectedToInternet)
-        }.eraseToAnyPublisher()
-        
-        let publisher = criticReviewPublisher.combineLatest(userReviewPublisher)
-        .compactMap{ criticReviews, userReviews -> [ListnReview] in
-            var reviews = criticReviews +  userReviews
-            
-            reviews = reviews.sorted { $0.date > $1.date }
-            return reviews
-        }
-
         return publisher.eraseToAnyPublisher()
     }
     
@@ -301,6 +253,7 @@ class ListnApp  {
                     self.realm = realm!
                     let user = realm!.objects(User.self).first!
                     self.user = user
+                    self.listnUser = ListnUser(user: user)
                     completion(true, self)
                 }
                 
@@ -313,7 +266,7 @@ class ListnApp  {
     }
     
     func refreshUserFeed(completion: @escaping(Array<String>) -> Void) {
-        realmApp.functions.updateUserFeed([AnyBSON(user!._id)!]) { result, error in
+        realmApp.functions.updateUserFeed([AnyBSON(user!._id!)!]) { result, error in
             print("feed updated")
             DispatchQueue.main.async {
                 self.realm!.refresh()
@@ -352,8 +305,8 @@ class ListnApp  {
         let reviewIds = Array(feed).compactMap({review in return review.id!})
         completion(reviewIds)
     }
-    func postReview(review:ListnUserReview) {
-        let userReview = UserReview(listnUserReview: review, partitionKey: realmApp.currentUser()!.identity!, user: user!)
+    func postReview(review:ListnReview) {
+        let userReview = Review(listnReview: review, partitionKey: realmApp.currentUser()!.identity!)
         
         do {
             try realm!.write {
@@ -365,13 +318,14 @@ class ListnApp  {
         }
     }
     
-    func toggleFollow(reviewerId: String) {
-        let follow = findFollow(reviewerId: reviewerId)
+    func toggleFollow(userId: String) {
+        let follow = findFollow(userId: userId)
         guard follow != nil else {
-            let follow = ReviewerFollow()
+            let follow = UserFollow()
             follow._partitionKey = realmApp.currentUser()!.identity!
-            follow.reviewerFollowed_id = try! ObjectId(string: reviewerId)
-            follow.user = user!
+            follow.userFollowed = try! ObjectId(string: userId)
+            print(follow.userFollowed!)
+            follow.user = user?._id!
             
             try! realm!.write {
                 realm!.add(follow)
@@ -383,9 +337,9 @@ class ListnApp  {
         }
     }
     
-    func findFollow(reviewerId:String) -> ReviewerFollow? {
-        let follows = realm!.objects(ReviewerFollow.self)
-        let predicate = NSPredicate(format: "reviewerFollowed_id == %@", try! ObjectId(string:reviewerId))
+    func findFollow(userId :String) -> UserFollow? {
+        let follows = realm!.objects(UserFollow.self)
+        let predicate = NSPredicate(format: "userFollowed == %@", try! ObjectId(string:userId))
         let matchingFollows = follows.filter(predicate)
         if matchingFollows.count > 0 {
             return matchingFollows[0]
