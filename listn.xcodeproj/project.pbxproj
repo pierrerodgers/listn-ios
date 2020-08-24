@@ -50,6 +50,7 @@
 		C187616624E3F88400459AE0 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C187616524E3F88400459AE0 /* ProfileView.swift */; };
 		C187616824E3F89000459AE0 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C187616724E3F89000459AE0 /* ProfileViewModel.swift */; };
 		C18E4C0024EFE3990072F2E1 /* TextView in Frameworks */ = {isa = PBXBuildFile; productRef = C18E4BFF24EFE3990072F2E1 /* TextView */; };
+		C1A66E1824F3730A00B9E44F /* PopupView in Frameworks */ = {isa = PBXBuildFile; productRef = C1A66E1724F3730A00B9E44F /* PopupView */; };
 		C1C0BAB924DD30F70029BEF8 /* ReviewDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1C0BAB824DD30F70029BEF8 /* ReviewDetailViewModel.swift */; };
 		C1E1012E24E8DA1E006B61BE /* AlbumSmallCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E1012D24E8DA1E006B61BE /* AlbumSmallCard.swift */; };
 		C1E1013124E8E6FD006B61BE /* ActivityIndicatorView in Frameworks */ = {isa = PBXBuildFile; productRef = C1E1013024E8E6FD006B61BE /* ActivityIndicatorView */; };
@@ -152,6 +153,7 @@
 			files = (
 				C1E1013724EA1EB9006B61BE /* IQKeyboardManagerSwift in Frameworks */,
 				C156559324EF598B00703B55 /* ApolloCombine in Frameworks */,
+				C1A66E1824F3730A00B9E44F /* PopupView in Frameworks */,
 				C1E1013424E91BC6006B61BE /* SwiftUIRefresh in Frameworks */,
 				C1E1013124E8E6FD006B61BE /* ActivityIndicatorView in Frameworks */,
 				C18E4C0024EFE3990072F2E1 /* TextView in Frameworks */,
@@ -423,6 +425,7 @@
 				C1E1013624EA1EB9006B61BE /* IQKeyboardManagerSwift */,
 				C156559224EF598B00703B55 /* ApolloCombine */,
 				C18E4BFF24EFE3990072F2E1 /* TextView */,
+				C1A66E1724F3730A00B9E44F /* PopupView */,
 			);
 			productName = listn;
 			productReference = C12F6EF724C827600083BF92 /* listn.app */;
@@ -485,6 +488,7 @@
 				C1E1013524EA1EB9006B61BE /* XCRemoteSwiftPackageReference "IQKeyboardManager" */,
 				C156559124EF598B00703B55 /* XCRemoteSwiftPackageReference "ApolloCombine" */,
 				C18E4BFE24EFE3990072F2E1 /* XCRemoteSwiftPackageReference "TextView" */,
+				C1A66E1624F3730A00B9E44F /* XCRemoteSwiftPackageReference "PopupView" */,
 			);
 			productRefGroup = C12F6EF824C827600083BF92 /* Products */;
 			projectDirPath = "";
@@ -952,6 +956,14 @@
 				minimumVersion = 1.4.7;
 			};
 		};
+		C1A66E1624F3730A00B9E44F /* XCRemoteSwiftPackageReference "PopupView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/exyte/PopupView";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 0.0.7;
+			};
+		};
 		C1E1012F24E8E6FD006B61BE /* XCRemoteSwiftPackageReference "ActivityIndicatorView" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/exyte/ActivityIndicatorView.git";
@@ -1009,6 +1021,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C18E4BFE24EFE3990072F2E1 /* XCRemoteSwiftPackageReference "TextView" */;
 			productName = TextView;
+		};
+		C1A66E1724F3730A00B9E44F /* PopupView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C1A66E1624F3730A00B9E44F /* XCRemoteSwiftPackageReference "PopupView" */;
+			productName = PopupView;
 		};
 		C1E1013024E8E6FD006B61BE /* ActivityIndicatorView */ = {
 			isa = XCSwiftPackageProductDependency;
