@@ -65,7 +65,7 @@ struct ArtistDetailView: View {
                 }
                 
                 ForEach(model.reviews, id:\._id) { review in
-                    NavigationLink(destination:LazyView(ReviewDetailView(model:ReviewDetailViewModel(review: review, app: self.model.app)))) {
+                    NavigationLink(destination:LazyView(ReviewDetailView().environmentObject(ReviewDetailViewModel(review: review, app: self.model.app)))) {
                         FeedReviewCard(review: review)
                     }.buttonStyle(PlainButtonStyle())
                      

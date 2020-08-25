@@ -141,6 +141,32 @@ struct FollowButton : View {
     }
 }
 
+struct LikeButton: View {
+    var action: () -> Void
+    @Binding var isLiked : Bool
+    
+    var body : some View {
+        Button(action:action) {
+            if isLiked {
+                Image(systemName: "heart.fill").font(.system(size: 30)).foregroundColor(.red)
+            }
+            else {
+                Image(systemName:"heart").font(.system(size: 30)).foregroundColor(.red)
+            }
+        }
+    }
+}
+
+struct CommentButton: View {
+    var action: () -> Void
+    
+    var body : some View {
+        Button(action:action) {
+            Image(systemName: "text.bubble").font(.system(size: 30))
+        }
+    }
+}
+
 struct Buttons_Previews: PreviewProvider {
     static var previews: some View {
         Group {

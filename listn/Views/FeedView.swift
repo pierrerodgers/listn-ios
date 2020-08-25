@@ -21,7 +21,7 @@ struct FeedView: View {
 
                     List {
                         ForEach(model.reviews.enumerated().map({$0}), id: \.element._id) { index, review in
-                            NavigationLink(destination: LazyView(ReviewDetailView(model: ReviewDetailViewModel(review: review, app: self.model.app))) ) {
+                            NavigationLink(destination: LazyView(ReviewDetailView().environmentObject(ReviewDetailViewModel(review: review, app: self.model.app)) )) {
                                 FeedReviewCard(review: review).listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0)).onAppear() {
                                     if index == self.model.reviews.count - 5 {
                                         self.model.getNextPage()

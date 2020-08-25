@@ -16,6 +16,8 @@ class ReviewDetailViewModel: ObservableObject {
     @Published var moreAlbumReviews : Array<ListnReview>
     @Published var moreReviewerReviews : Array<ListnReview>
     
+    @Published var isLiked : Bool
+    
     private var disposables = Set<AnyCancellable>()
     
     init(review: ListnReview, app: ListnApp) {
@@ -23,6 +25,7 @@ class ReviewDetailViewModel: ObservableObject {
         self.moreReviewerReviews = []
         self.moreAlbumReviews = []
         self.app = app
+        self.isLiked = app.isLiked(review._id!)
         refreshReviews()
     }
     
@@ -53,6 +56,7 @@ class ReviewDetailViewModel: ObservableObject {
     }
     
     func toggleReviewLike() {
-        
+        app.toggleLike(reviewId: review._id!)
+        isLiked = app.isLiked(review._id!)
     }
 }

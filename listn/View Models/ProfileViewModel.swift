@@ -39,6 +39,7 @@ class ProfileViewModel: ObservableObject {
             self.isLoading = false
             return Just([])
         }
+        .receive(on: DispatchQueue.main)
         .sink() { reviews in
             self.isLoading = false
             self.last = reviews.last?._id

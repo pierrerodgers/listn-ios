@@ -13,7 +13,7 @@ import Combine
 
 class ListnApp : ObservableObject {
     
-    var realmApp : RealmApp!
+    var realmApp : RealmApp
     var loginService : LoginService!
     var user : User?
     var listnUser : ListnUser?
@@ -67,6 +67,7 @@ class ListnApp : ObservableObject {
     func albumPublisher(query:ListnAlbumQuery) -> AnyPublisher<[ListnAlbum], URLError> {
         let albumPublisher = Network.shared.apollo.fetchPublisher(query: query.query())
         .retry(3)
+        .retryWithDelay()
         .compactMap { result in
             result.data?.albums
         }
@@ -85,6 +86,7 @@ class ListnApp : ObservableObject {
     func userPublisher(query:ListnUserQuery) -> AnyPublisher<[ListnUser], URLError> {
         let reviewerPublisher = Network.shared.apollo.fetchPublisher(query: query.query())
         .retry(3)
+        .retryWithDelay()
         .compactMap { result in
             result.data?.users
         }
@@ -103,6 +105,7 @@ class ListnApp : ObservableObject {
     func artistPublisher(query:ListnArtistQuery) -> AnyPublisher<[ListnArtist], URLError> {
         let artistPublisher = Network.shared.apollo.fetchPublisher(query: query.query())
         .retry(3)
+        .retryWithDelay()
         .compactMap { result in
             result.data?.artists
         }
@@ -121,6 +124,7 @@ class ListnApp : ObservableObject {
     func reviewsPublisher(query:ListnReviewQuery, paginated: Bool = true) -> AnyPublisher<[ListnReview], URLError> {
         let reviewsPublisher = Network.shared.apollo.fetchPublisher(query: query.query())
         .retry(3)
+        .retryWithDelay()
         .compactMap { result in
             result.data?.reviews
         }
@@ -138,6 +142,7 @@ class ListnApp : ObservableObject {
     func paginatedReviewsPublisher(query:ListnReviewQuery, paginated: Bool = true) -> AnyPublisher<[ListnReview], URLError> {
         let reviewsPublisher = Network.shared.apollo.fetchPublisher(query: query.paginatedQuery())
         .retry(3)
+        .retryWithDelay()
         .compactMap { result in
             result.data?.reviewPage
         }
@@ -155,7 +160,8 @@ class ListnApp : ObservableObject {
     
     func feedPublisher(ids:[String]) -> AnyPublisher<[ListnReview], URLError> {
         let publisher = Network.shared.apollo.fetchPublisher(query: ReviewsQuery(query:ReviewQueryInput(_idIn:ids)))
-        .retry(3)
+            .retry(3)
+        .retryWithDelay()
         .compactMap { result in
             result.data?.reviews
         }
@@ -233,18 +239,31 @@ class ListnApp : ObservableObject {
         loginService = MongoLoginService(app: realmApp)
         if loginService.isLoggedIn {
             Network.shared.tokenManger = GraphQLTokenManager()
-            Realm.asyncOpen(configuration: self.realmApp.currentUser()!.configuration(partitionValue:(self.realmApp.currentUser()?.identity)!), callbackQueue: DispatchQueue.main) { realm, error in
-                guard realm != nil else {
-                    self.loginError = true
-                    return
+            self.realm = try! Realm(configuration: self.realmApp.currentUser()!.configuration(partitionValue:(self.realmApp.currentUser()?.identity)!))
+            
+            let user = realm?.objects(User.self).first
+            let feed = realm?.objects(UserFeed.self).first
+            
+            guard user != nil && feed != nil else {
+                Realm.asyncOpen(configuration: self.realmApp.currentUser()!.configuration(partitionValue:(self.realmApp.currentUser()?.identity)!), callbackQueue: DispatchQueue.main) { realm, error in
+                    guard realm != nil else {
+                        self.loginError = true
+                        return
+                    }
+                    self.realm = realm!
+                    let user = realm!.objects(User.self).first!
+                    self.user = user
+                    self.listnUser = ListnUser(user: user)
+                    self.isLoggedIn = true
+                    self.isLoading = false
                 }
-                self.realm = realm!
-                let user = realm!.objects(User.self).first!
-                self.user = user
-                self.listnUser = ListnUser(user: user)
-                self.isLoggedIn = true
-                self.isLoading = false
+                return
             }
+            self.user = user!
+            self.listnUser = ListnUser(user : user!)
+            self.isLoading = false
+            self.isLoggedIn = true
+            
         }
         else {
             self.isLoggedIn = false
@@ -340,6 +359,35 @@ class ListnApp : ObservableObject {
         }
     }
     
+    func findLike(reviewId: String) -> ReviewLike? {
+        let likes = realm!.objects(ReviewLike.self)
+        let predicate = NSPredicate(format: "reviewLiked == %@", try! ObjectId(string:reviewId))
+        let matchingLikes = likes.filter(predicate)
+        return matchingLikes.first
+    }
+    
+    func isLiked(_ reviewId: String) -> Bool {
+        return (findLike(reviewId: reviewId) != nil)
+    }
+    
+    func toggleLike(reviewId: String) {
+        let like = findLike(reviewId: reviewId)
+        guard like != nil else {
+            let like = ReviewLike()
+            like._partitionKey = realmApp.currentUser()!.identity!
+            like.reviewLiked = try! ObjectId(string: reviewId)
+            like.user = user?._id!
+            
+            try! realm!.write {
+                realm!.add(like)
+            }
+            return
+        }
+        try! realm!.write{
+            realm!.delete(like!)
+        }
+    }
+        
 }
 
 
@@ -396,4 +444,19 @@ extension Date {
         formatter.dateFormat = format
         return formatter.string(from: self)
     }
+}
+
+
+extension Publisher {
+  func retryWithDelay<T, E>()
+    -> Combine.Publishers.Catch<Self, AnyPublisher<T, E>> where T == Self.Output, E == Self.Failure
+  {
+    return self.catch { error -> AnyPublisher<T, E> in
+      return Publishers.Delay(
+        upstream: self,
+        interval: 1,
+        tolerance: 1,
+        scheduler: DispatchQueue.global()).retry(2).eraseToAnyPublisher()
+    }
+  }
 }

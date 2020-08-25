@@ -14,7 +14,7 @@ struct ProfileView: View {
     
     var body: some View {
             List {
-                Text("@\(model.user.username)").title()
+                Text("@\(model.user.username)").font(.largeTitle)
                 HStack{
                     Text("135 followers")
                     Spacer()
@@ -22,7 +22,7 @@ struct ProfileView: View {
                 }
                 FollowButton(action: model.toggleFollow, isFollowing:$model.isFollowing)
                 ForEach(model.recentReviews, id:\._id) { review in
-                    NavigationLink(destination:LazyView(ReviewDetailView(model: ReviewDetailViewModel(review: review, app: self.model.app)))) {
+                    NavigationLink(destination:LazyView(ReviewDetailView().environmentObject(ReviewDetailViewModel(review: review, app: self.model.app)))) {
                         FeedReviewCard(review: review)
                         .onAppear() {
                             print(review.album.name)

@@ -11,28 +11,36 @@ import SDWebImageSwiftUI
 
 struct ReviewDetailReviewCard: View {
     let review : ListnReview
-    @EnvironmentObject var app : ListnApp
+    @EnvironmentObject var model : ReviewDetailViewModel
     //let comments : Array<ListnComment>
     
     var body: some View {
-        VStack (alignment:.leading){
-            HStack{
-                // Reviewer/User image
-                NavigationLink(destination: LazyView(ProfileView(model: ProfileViewModel(app: self.app, user: self.review.user)))) {
-                    HStack{
-                        Circle().frame(width:40, height:40)
-                        Text("@\(review.user.username)").title()
-                    }
-                }.onTapGesture {
-                    print("TPped!")
-                }.buttonStyle(PlainButtonStyle())
+        VStack{
+            VStack (alignment:.leading){
+                HStack{
+                    // Reviewer/User image
+                    NavigationLink(destination: LazyView(ProfileView(model: ProfileViewModel(app: self.model.app, user: self.review.user)))) {
+                        HStack{
+                            Circle().frame(width:40, height:40)
+                            Text("@\(review.user.username)").title()
+                        }
+                    }.onTapGesture {
+                        print("TPped!")
+                    }.buttonStyle(PlainButtonStyle())
+                    Spacer()
+                    Text(review.score).scoreText()
+                }
+                
+                Text(review.text ?? "")
+                if(review.isCritic) {
+                    FullReviewButton(link: review.link ?? "")
+                }
+
+            }.padding(.bottom, 5)
+            HStack(spacing:20){
+                LikeButton(action:self.model.toggleReviewLike, isLiked: self.$model.isLiked)
+                CommentButton(action:{})
                 Spacer()
-                Text(review.score).scoreText()
-            }
-            Text(review.text ?? "")
-            Text("Comments to come")
-            if(review.isCritic) {
-                FullReviewButton(link: review.link ?? "")
             }
         }
     }

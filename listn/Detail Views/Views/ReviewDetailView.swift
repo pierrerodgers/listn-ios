@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct ReviewDetailView: View {
-    @ObservedObject var model : ReviewDetailViewModel
+    @EnvironmentObject var model : ReviewDetailViewModel
     
     var body: some View {
         ScrollView{
@@ -25,7 +25,7 @@ struct ReviewDetailView: View {
                 }
                 Text("More from @\(self.model.review.user.username)").font(.headline)
                 ForEach(model.moreReviewerReviews.prefix(5), id:\._id) { review in
-                    NavigationLink(destination: LazyView(ReviewDetailView(model: ReviewDetailViewModel(review: review, app: self.model.app)))) {
+                    NavigationLink(destination: LazyView(ReviewDetailView().environmentObject(ReviewDetailViewModel(review: review, app: self.model.app)))) {
                         FeedReviewCard(review: review)
                     }.buttonStyle(PlainButtonStyle())
                 }
