@@ -133,6 +133,7 @@ struct ListnReview {
         
         // Initialise date
         date = dateFromMongoDB(apolloResult.date ?? "")
+        text = apolloResult.text
         
         album = ListnAlbum(apolloResult: apolloResult.albumData!.fragments.reviewAlbumDetail, artist: apolloResult.artistData!.fragments.reviewArtistDetail)
         

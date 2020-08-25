@@ -13,13 +13,14 @@ struct ProfileView: View {
     @ObservedObject var model : ProfileViewModel
     
     var body: some View {
-        NavigationView {
             List {
+                Text("@\(model.user.username)").title()
                 HStack{
                     Text("135 followers")
+                    Spacer()
                     Text("150 following")
                 }
-                FollowButton(action: model.toggleFollow)
+                FollowButton(action: model.toggleFollow, isFollowing:$model.isFollowing)
                 ForEach(model.recentReviews, id:\._id) { review in
                     NavigationLink(destination:LazyView(ReviewDetailView(model: ReviewDetailViewModel(review: review, app: self.model.app)))) {
                         FeedReviewCard(review: review)
@@ -31,11 +32,9 @@ struct ProfileView: View {
                             }
                         }
                     }.buttonStyle(PlainButtonStyle())
-                    
                 }
                 ActivityIndicatorView(isVisible: $model.isLoading, type: .arcs).frame(width:50, height:50)
-            }.navigationBarTitle(model.user.name)
-        }
+            }.navigationBarTitle("", displayMode: .inline)
     }
 }
 /*

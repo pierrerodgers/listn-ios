@@ -132,10 +132,11 @@ struct SaveReviewButton : View {
 
 struct FollowButton : View {
     var action: () -> Void
+    @Binding var isFollowing : Bool
     
     var body: some View {
         Button(action:action) {
-            Text("Follow").padding().background(Color.gray).cornerRadius(5)
+            Text((isFollowing) ? "Unfollow" : "Follow").padding().background(Color.gray).cornerRadius(5)
         }.buttonStyle(PlainButtonStyle())
     }
 }
@@ -151,7 +152,7 @@ struct Buttons_Previews: PreviewProvider {
                 
             }.previewLayout(PreviewLayout.fixed(width: 400, height: 50))
             ButtonStack(streamingUrls: ListnStreamingUrls(appleMusic: "", spotify: "")).padding()
-        }
+        } 
         
     }
 }

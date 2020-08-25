@@ -24,6 +24,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Create the SwiftUI view that provides the window contents.
        
         UINavigationBar.appearance().tintColor = UIColor.label
+        //UINavigationBar.appearance().barTintColor = .systemBackground
+        //UINavigationBar.appearance().setBackgroundImage(UIImage(), for:.default)
   
 
         // Use a UIHostingController as window root view controller.

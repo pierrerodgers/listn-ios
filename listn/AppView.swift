@@ -38,13 +38,14 @@ struct AppView: View {
             UIKitTabView {
                 FeedView(model: FeedModel(app: app)).tab(title: "Feed")
                 SearchView(model: SearchViewModel(app: app)).tab(title:"Search")
-                ProfileView(model: ProfileViewModel(app: app, user: self.app.listnUser!)).tab(title: "Profile")
+                NavigationView{ProfileView(model: ProfileViewModel(app: app, user: self.app.listnUser!))}.tab(title: "Profile")
             }.environmentObject(showReviewSheet).sheet(isPresented: $showReviewSheet.isAddingReview) {
                 AddReviewView(model: AddReviewViewModel(album: self.showReviewSheet.albumReviewing, app: self.app, user: self.app.listnUser!)).environmentObject(self.showReviewSheet)
             })
         }
         
     }
+    
 }
 
 struct LazyView<Content: View>: View {

@@ -24,6 +24,7 @@ class ProfileViewModel: ObservableObject {
     init(app: ListnApp, user: ListnUser) {
         self.app = app
         self.user = user
+        isFollowing = (app.findFollow(userId: user._id) != nil)
         getNextPage()
     }
     

@@ -39,7 +39,7 @@ class ReviewDetailViewModel: ObservableObject {
         .store(in: &disposables)
         
         
-        app.reviewsPublisher(query: ListnApp.ListnReviewQuery(reviewer:review.user._id))
+        app.reviewsPublisher(query: ListnApp.ListnReviewQuery(user:review.user._id))
         .tryMap { review in
             review as [ListnReview]
         }

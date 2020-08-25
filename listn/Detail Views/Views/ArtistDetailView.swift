@@ -71,11 +71,45 @@ struct ArtistDetailView: View {
                      
                 }
             }
-        }.onAppear(){
-            UINavigationBar.appearance().backgroundColor = UIColor(hue: 0, saturation: 0, brightness: 0, alpha: 0)
-        }.navigationBarTitle("").edgesIgnoringSafeArea(.top)
+        }.navigationBarTitle("", displayMode: .large).edgesIgnoringSafeArea(.top)
     }
 }
+
+
+
+/*struct NavigationBarModifier: ViewModifier {
+    
+    @Environment(\.presentationMode) var presentation
+    
+    func body(content: Content) -> some View {
+        ZStack{
+            content
+            VStack {
+                GeometryReader { geometry in
+                    Button(action: { self.presentation.wrappedValue.dismiss() }) {
+                      HStack {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(Color(UIColor.label))
+                          .imageScale(.large)
+                      }
+                    }
+                    //Color(self.backgroundColor ?? .clear)
+                        .frame(height: geometry.safeAreaInsets.top)
+                        .edgesIgnoringSafeArea(.top)
+                    Spacer()
+                }
+            }
+        }
+    }
+}
+
+extension View {
+ 
+    func navBarHidden() -> some View {
+        self.modifier(NavigationBarModifier())
+    }
+
+}*/
 
 /*struct ArtistDetailView: PreviewProvider {
     static var previews: some View {

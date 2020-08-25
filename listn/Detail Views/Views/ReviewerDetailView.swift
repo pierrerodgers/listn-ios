@@ -18,7 +18,7 @@ struct ReviewerDetailView: View {
                 Text("135 followers")
                 Text("150 following")
             }
-            FollowButton(action: model.toggleFollow)
+            //FollowButton(action: model.toggleFollow)
             ForEach(model.recentReviews, id:\._id) { review in
                 NavigationLink(destination:LazyView(ReviewDetailView(model: ReviewDetailViewModel(review: review, app: self.model.app)))) {
                     FeedReviewCard(review: review)
