@@ -135,6 +135,8 @@ struct ListnReview {
         date = dateFromMongoDB(apolloResult.date ?? "")
         text = apolloResult.text
         
+        likes = Int(apolloResult.likes!)
+        
         album = ListnAlbum(apolloResult: apolloResult.albumData!.fragments.reviewAlbumDetail, artist: apolloResult.artistData!.fragments.reviewArtistDetail)
         
         
@@ -168,6 +170,7 @@ struct ListnReview {
     var score : String
     var date : Date
     var text: String?
+    var likes : Int?
 }
 
 
@@ -193,6 +196,14 @@ struct ListnUser {
         self.username = user.username!
         self.isCritic = false
     }
+    
+    init(empty:Bool) {
+        name = ""
+        _id = ""
+        username = ""
+        isCritic = false
+    }
+    
     var name : String
     var _id : String
     var username : String
@@ -200,3 +211,39 @@ struct ListnUser {
     var isCritic : Bool
 }
 
+struct ListnComment {
+    var _id : String
+    var reviewCommented : String
+    var commentText : String
+    var user : String
+    
+    var listnUser = ListnUser(empty:true)
+    
+    init(commentText:String, reviewCommented:String, user:String) {
+        _id = ""
+        self.commentText = commentText
+        self.reviewCommented = reviewCommented
+        self.user = user
+    }
+    
+    init(apolloResult: CommentDetail) {
+        _id = apolloResult._id!
+        reviewCommented = apolloResult.reviewCommented!
+        commentText = apolloResult.commentText!
+        user = apolloResult.user!
+    }
+}
+
+struct ListnLike {
+    var _id : String
+    var reviewLiked : String
+    var user : String
+    
+    var listnUser = ListnUser(empty:true)
+
+    init(apolloResult: LikeDetail) {
+        _id = apolloResult._id!
+        reviewLiked = apolloResult.reviewLiked!
+        user = apolloResult.user!
+    }
+}

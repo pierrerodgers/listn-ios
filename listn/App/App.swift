@@ -83,6 +83,25 @@ class ListnApp : ObservableObject {
     
     }
     
+    func commentPublisher(query:ListnCommentQuery) -> AnyPublisher<[ListnComment], URLError> {
+        let commentPublisher = Network.shared.apollo.fetchPublisher(query: query.query(), cachePolicy: .fetchIgnoringCacheData)
+        .retry(3)
+        .retryWithDelay()
+        .compactMap { result in
+            result.data?.reviewComments
+        }
+        .compactMap { comments in
+            comments.compactMap { comment in
+                ListnComment(apolloResult: (comment?.fragments.commentDetail)!)
+            }
+        }.mapError { error in
+            return URLError(.notConnectedToInternet)
+        }
+        
+        return commentPublisher.eraseToAnyPublisher()
+    
+    }
+    
     func userPublisher(query:ListnUserQuery) -> AnyPublisher<[ListnUser], URLError> {
         let reviewerPublisher = Network.shared.apollo.fetchPublisher(query: query.query())
         .retry(3)
@@ -133,6 +152,32 @@ class ListnApp : ObservableObject {
                 ListnReview(apolloResult: review!.fragments.reviewDetail)
             }
         }.mapError { error in
+            return URLError(.notConnectedToInternet)
+        }
+        
+        return reviewsPublisher.eraseToAnyPublisher()
+    }
+    
+    func reviewPublisher(query:ListnReviewQuery) -> AnyPublisher<ListnReview, URLError> {
+        let reviewsPublisher = Network.shared.apollo.fetchPublisher(query:query.query(), cachePolicy: .fetchIgnoringCacheData)
+        .retry(3)
+        .compactMap { result  in
+            return result.data?.reviews
+        }
+        .compactMap { reviews -> [ListnReview] in
+            print("received result at time: \(Date().toString(format: "HH:ss.SSS"))")
+            return reviews.compactMap { review in
+                ListnReview(apolloResult: review!.fragments.reviewDetail)
+            }
+        }.tryMap() { reviews -> ListnReview in
+            if let review = reviews.first {
+                return review
+            }
+            else {
+                throw URLError(.notConnectedToInternet)
+            }
+        }
+        .mapError { error in
             return URLError(.notConnectedToInternet)
         }
         
@@ -190,6 +235,14 @@ class ListnApp : ObservableObject {
         }
     }
     
+    struct ListnCommentQuery {
+        var review : String?
+        
+        func query() -> CommentsQuery {
+            return CommentsQuery(query: ReviewCommentQueryInput(reviewCommented:review!))
+        }
+    }
+    
     struct ListnReviewQuery {
         var id : String?
         var ids : [String]?
@@ -201,11 +254,11 @@ class ListnApp : ObservableObject {
         var last : String?
         
         func query() -> ReviewsQuery {
-            return ReviewsQuery(query: ReviewQueryInput(artist: artist, _id: id, _idIn: ids, user:user, album:album))
+            return ReviewsQuery(query: ReviewQueryInput(_id:id, _idIn:ids, album:album, user:user, artist:artist))
         }
         
         func paginatedQuery() -> ReviewPageQuery {
-            return ReviewPageQuery(input: ReviewPageInput(user: user, last: last, album: album, artist: artist))
+            return ReviewPageQuery(input: ReviewPageInput(album: user, artist: last, reviewer: reviewer))
         }
     }
     
@@ -223,7 +276,7 @@ class ListnApp : ObservableObject {
         var ids : [String]?
         
         func query() -> ArtistQuery {
-            return ArtistQuery(query:ArtistQueryInput(_idIn: ids, _id: id))
+            return ArtistQuery(query:ArtistQueryInput(_id: id, _idIn: ids))
         }
     }
     
@@ -387,6 +440,19 @@ class ListnApp : ObservableObject {
             realm!.delete(like!)
         }
     }
+    
+    func postComment(comment:ListnComment) {
+        let comment = ReviewComment(listnComment: comment, partitionKey: realmApp.currentUser()!.identity!)
+        
+        do {
+            try realm!.write {
+                realm!.add(comment)
+            }
+        }
+        catch {
+            print(error)
+        }
+    }
         
 }
 
@@ -454,9 +520,18 @@ extension Publisher {
     return self.catch { error -> AnyPublisher<T, E> in
       return Publishers.Delay(
         upstream: self,
-        interval: 1,
+        interval: .seconds(2),
         tolerance: 1,
         scheduler: DispatchQueue.global()).retry(2).eraseToAnyPublisher()
     }
   }
+    
+    func withDelay<T,E>(seconds:Int) -> AnyPublisher<T,E> where T == Self.Output, E == Self.Failure {
+        print("with delay at time: \(Date().toString(format: "HH:ss.SSS"))")
+        return Combine.Publishers.Delay(
+            upstream: self,
+            interval: .seconds(seconds),
+            tolerance: 1,
+            scheduler: DispatchQueue.global()).retry(2).eraseToAnyPublisher()
+    }
 }

@@ -84,6 +84,8 @@ fragment ReviewDetail on Review {
     score
     isCritic
     text
+    likes
+    comments
 }
 
 
@@ -102,6 +104,18 @@ fragment UserDetail on User {
     username
     link
     isCritic
+}
+
+fragment CommentDetail on ReviewComment {
+    _id
+    reviewCommented
+    commentText
+    user
+}
+fragment LikeDetail on ReviewLike {
+    _id
+    reviewLiked
+    user
 }
 
 query Reviews($query:ReviewQueryInput, $limit:Int = 100) {
@@ -132,3 +146,14 @@ query ReviewPage($input:ReviewPageInput) {
     }
 }
 
+query Comments($query:ReviewCommentQueryInput) {
+    reviewComments(query:$query) {
+        ...CommentDetail
+    }
+}
+
+query Likes($query:ReviewLikeQueryInput) {
+    reviewLikes(query:$query) {
+        ...LikeDetail
+    }
+}

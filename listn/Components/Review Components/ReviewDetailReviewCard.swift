@@ -24,14 +24,12 @@ struct ReviewDetailReviewCard: View {
                             Circle().frame(width:40, height:40)
                             Text("@\(review.user.username)").title()
                         }
-                    }.onTapGesture {
-                        print("TPped!")
                     }.buttonStyle(PlainButtonStyle())
                     Spacer()
                     Text(review.score).scoreText()
                 }
                 
-                Text(review.text ?? "")
+                Text(review.text ?? "").fixedSize(horizontal: false, vertical: true)
                 if(review.isCritic) {
                     FullReviewButton(link: review.link ?? "")
                 }
@@ -39,15 +37,48 @@ struct ReviewDetailReviewCard: View {
             }.padding(.bottom, 5)
             HStack(spacing:20){
                 LikeButton(action:self.model.toggleReviewLike, isLiked: self.$model.isLiked)
+                Text("\(review.likes!)").foregroundColor(.red)
                 CommentButton(action:{})
                 Spacer()
             }
+            ReviewComments()
         }
     }
 }
 
-struct ReviewComments {
+struct ReviewComments : View {
+    @EnvironmentObject var model : ReviewDetailViewModel
+    @State var commentText : String = ""
     
+    var body : some View {
+        VStack (alignment:.leading){
+            
+            ForEach(Array(model.comments.prefix(min(model.comments.count, 5))), id:\._id) { comment in
+                VStack(alignment:.leading){
+                    Text("@username")
+                    Text(comment.commentText).font(.subheadline)
+                    Spacer()
+                }
+            }
+            HStack{
+                TextField("Add a comment", text: $commentText)
+                Button(action: postComment) {
+                    Text("Post")
+                }
+            }
+        }
+    }
+    
+    func postComment() {
+        if (commentText != "") {
+            
+            
+            let comment = ListnComment(commentText: commentText, reviewCommented: model.review._id!, user: model.app.listnUser!._id)
+            model.postComment(comment: comment)
+            commentText = ""
+        }
+        
+    }
 }
 
 

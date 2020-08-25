@@ -78,3 +78,25 @@ class User: Object {
     }
 }
 
+class ReviewComment: Object {
+    init(listnComment:ListnComment, partitionKey:String) {
+        self.user = try! ObjectId(string:listnComment.user)
+        self.commentText = listnComment.commentText
+        self._partitionKey = partitionKey
+        self.reviewCommented = try! ObjectId(string:listnComment.reviewCommented)
+    }
+    
+    required init() {
+        
+    }
+    
+    
+    @objc dynamic var _id: ObjectId? = ObjectId.generate()
+    @objc dynamic var _partitionKey: String? = nil
+    @objc dynamic var commentText: String? = nil
+    @objc dynamic var reviewCommented: ObjectId? = nil
+    @objc dynamic var user: ObjectId? = nil
+    override static func primaryKey() -> String? {
+        return "_id"
+    }
+}
