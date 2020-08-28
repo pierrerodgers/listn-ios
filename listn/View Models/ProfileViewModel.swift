@@ -48,6 +48,25 @@ class ProfileViewModel: ObservableObject {
             
     }
     
+    func refresh() {
+        self.isLoading = true
+        cancellable = app.paginatedReviewsPublisher(query: ListnApp.ListnReviewQuery(user:user._id))
+        .tryMap { review in
+            review as [ListnReview]
+        }
+        .catch{ (error) -> Just<[ListnReview]> in
+            print(error)
+            self.isLoading = false
+            return Just(self.recentReviews)
+        }
+        .receive(on: DispatchQueue.main)
+        .sink() { reviews in
+            self.isLoading = false
+            self.last = reviews.last?._id
+            self.recentReviews = reviews
+        }
+    }
+    
     func toggleFollow() {
         app.toggleFollow(userId: user._id)
         isFollowing = (app.findFollow(userId: user._id) != nil)

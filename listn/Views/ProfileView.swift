@@ -34,7 +34,7 @@ struct ProfileView: View {
                     }.buttonStyle(PlainButtonStyle())
                 }
                 ActivityIndicatorView(isVisible: $model.isLoading, type: .arcs).frame(width:50, height:50)
-            }.navigationBarTitle("", displayMode: .inline)
+            }.pullToRefresh(isShowing: $model.isLoading, onRefresh: model.refresh).navigationBarTitle("", displayMode: .inline)
     }
 }
 /*

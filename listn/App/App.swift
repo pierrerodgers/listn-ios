@@ -185,7 +185,7 @@ class ListnApp : ObservableObject {
     }
     
     func paginatedReviewsPublisher(query:ListnReviewQuery, paginated: Bool = true) -> AnyPublisher<[ListnReview], URLError> {
-        let reviewsPublisher = Network.shared.apollo.fetchPublisher(query: query.paginatedQuery())
+        let reviewsPublisher = Network.shared.apollo.fetchPublisher(query: query.paginatedQuery(), cachePolicy: .returnCacheDataAndFetch)
         .retry(3)
         .retryWithDelay()
         .compactMap { result in
@@ -258,7 +258,7 @@ class ListnApp : ObservableObject {
         }
         
         func paginatedQuery() -> ReviewPageQuery {
-            return ReviewPageQuery(input: ReviewPageInput(album: user, artist: last, reviewer: reviewer))
+            return ReviewPageQuery(input: ReviewPageInput( album:album, artist: artist, reviewer: reviewer, user: user, last:last))
         }
     }
     
@@ -290,39 +290,65 @@ class ListnApp : ObservableObject {
         
         // Initialise login service and fill variables if logged in
         loginService = MongoLoginService(app: realmApp)
-        if loginService.isLoggedIn {
-            Network.shared.tokenManger = GraphQLTokenManager()
-            self.realm = try! Realm(configuration: self.realmApp.currentUser()!.configuration(partitionValue:(self.realmApp.currentUser()?.identity)!))
-            
-            let user = realm?.objects(User.self).first
-            let feed = realm?.objects(UserFeed.self).first
-            
-            guard user != nil && feed != nil else {
-                Realm.asyncOpen(configuration: self.realmApp.currentUser()!.configuration(partitionValue:(self.realmApp.currentUser()?.identity)!), callbackQueue: DispatchQueue.main) { realm, error in
-                    guard realm != nil else {
-                        self.loginError = true
-                        return
-                    }
-                    self.realm = realm!
-                    let user = realm!.objects(User.self).first!
-                    self.user = user
-                    self.listnUser = ListnUser(user: user)
-                    self.isLoggedIn = true
-                    self.isLoading = false
+        
+        if loginService.signingUp {
+            self.isLoading = true
+            realmApp.currentUser()?.refreshCustomData() { data in
+                if self.realmApp.currentUser()!.customData?["username"] ?? "" == "" {
+                    
                 }
-                return
+                else {
+                    self.initialiseRealm()
+                }
+                
             }
-            self.user = user!
-            self.listnUser = ListnUser(user : user!)
-            self.isLoading = false
-            self.isLoggedIn = true
-            
+            self.isLoggedIn = false
+        }
+        
+        else if loginService.isLoggedIn {
+            initialiseRealm()
         }
         else {
             self.isLoggedIn = false
             self.isLoading = false
         }
         
+    }
+    
+    func initialiseRealm() {
+        Network.shared.tokenManger = GraphQLTokenManager()
+        self.realm = try! Realm(configuration: self.realmApp.currentUser()!.configuration(partitionValue:(self.realmApp.currentUser()?.identity)!))
+        
+        let user = realm?.objects(User.self).first
+        let feed = realm?.objects(UserFeed.self).first
+        
+        guard user != nil && feed != nil else {
+            Realm.asyncOpen(configuration: self.realmApp.currentUser()!.configuration(partitionValue:(self.realmApp.currentUser()?.identity)!), callbackQueue: DispatchQueue.main) { realm, error in
+                guard realm != nil else {
+                    self.loginError = true
+                    return
+                }
+                self.realm = realm!
+                let user = realm!.objects(User.self).first
+                let feed = realm?.objects(UserFeed.self).first
+                
+                guard user != nil && feed != nil else {
+                    self.isLoggedIn = false
+                    return
+                }
+                
+                
+                self.user = user!
+                self.listnUser = ListnUser(user: user!)
+                self.isLoggedIn = true
+                self.isLoading = false
+            }
+            return
+        }
+        self.user = user!
+        self.listnUser = ListnUser(user : user!)
+        self.isLoading = false
+        self.isLoggedIn = true
     }
     
     
@@ -335,6 +361,16 @@ class ListnApp : ObservableObject {
                 self.realm!.refresh()
                 self.getUserFeed(completion: completion)
             }
+        }
+    }
+    
+    func usernameExists(username:String, completion: @escaping(Bool, Error?) -> ()) {
+        realmApp.functions.checkUsername([AnyBSON(username)!]) { result, error in
+            guard error == nil else {
+                completion(true, error!)
+                return
+            }
+            completion(result!.boolValue!, nil)
         }
     }
     
@@ -463,6 +499,7 @@ class MongoLoginService : LoginService {
     private var app : RealmApp
     
     var isLoggedIn: Bool
+    var signingUp : Bool = false
     
     
     
@@ -472,6 +509,10 @@ class MongoLoginService : LoginService {
         // Check if User is looged in (THIS CODE NEEDS TO BE FIXED!!
         if (app.currentUser() != nil) {
             isLoggedIn = true
+            if app.currentUser()!.customData?["username"] ?? "" == "" {
+                signingUp = true
+            }
+            
         }
         else {
             isLoggedIn = false
@@ -482,7 +523,7 @@ class MongoLoginService : LoginService {
         app.usernamePasswordProviderClient().registerEmail(username, password:password, completion: { error in
             guard error == nil else {
                 print("Signup failed")
-               completion(error)
+                completion(error)
                 return
             }
             print("Signup successful")
@@ -527,7 +568,6 @@ extension Publisher {
   }
     
     func withDelay<T,E>(seconds:Int) -> AnyPublisher<T,E> where T == Self.Output, E == Self.Failure {
-        print("with delay at time: \(Date().toString(format: "HH:ss.SSS"))")
         return Combine.Publishers.Delay(
             upstream: self,
             interval: .seconds(seconds),

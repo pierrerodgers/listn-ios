@@ -22,11 +22,13 @@ struct AppView: View {
         
         if app.isLoading {
             return AnyView(ContentView())
+
         }
-        if app.isLoggedIn == false {
-            return AnyView(LoginView(viewModel: LoginViewModel(loginService: app.loginService)))
+        
+        else if app.isLoggedIn == false {
+            return AnyView(LoginView( viewModel: LoginViewModel(loginService: app.loginService, app:app)))
         }
-        if app.loginError {
+        else if app.loginError {
             return AnyView(
                 VStack{
                     Text("Error logging in").font(.title)

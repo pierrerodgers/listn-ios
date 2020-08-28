@@ -15,6 +15,8 @@ protocol LoginService {
     
     var isLoggedIn : Bool { get }
     
+    var signingUp : Bool { get }
+    
     func logOut(completion: @escaping (Error?) -> Void)
     
 }

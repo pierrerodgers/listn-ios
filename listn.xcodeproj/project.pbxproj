@@ -61,6 +61,7 @@
 		C1E21E5424E6251B00F7921E /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E21E5324E6251B00F7921E /* Buttons.swift */; };
 		C1E21E5724E6B0AB00F7921E /* ReviewRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E21E5624E6B0AB00F7921E /* ReviewRow.swift */; };
 		C1E21E5924E78C2600F7921E /* AlbumDetailCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E21E5824E78C2600F7921E /* AlbumDetailCard.swift */; };
+		C1E4641424F6034000BC2EBC /* FloatingLabelTextFieldSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = C1E4641324F6034000BC2EBC /* FloatingLabelTextFieldSwiftUI */; };
 		C1FB5B4224DBB2D000B85E7E /* FloatingSegmentedControl in Frameworks */ = {isa = PBXBuildFile; productRef = C1FB5B4124DBB2D000B85E7E /* FloatingSegmentedControl */; };
 		C1FB5B4424DBB2E100B85E7E /* SearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1FB5B4324DBB2E100B85E7E /* SearchViewModel.swift */; };
 		C1FB5B4624DBB63600B85E7E /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1FB5B4524DBB63600B85E7E /* SearchView.swift */; };
@@ -154,6 +155,7 @@
 				C1E1013124E8E6FD006B61BE /* ActivityIndicatorView in Frameworks */,
 				C18E4C0024EFE3990072F2E1 /* TextView in Frameworks */,
 				C10BE68F24D941B000C70DBA /* SDWebImageSwiftUI in Frameworks */,
+				C1E4641424F6034000BC2EBC /* FloatingLabelTextFieldSwiftUI in Frameworks */,
 				C1FB5B4924DBBD5100B85E7E /* GenericSegmentedControl in Frameworks */,
 				C1FB5B4224DBB2D000B85E7E /* FloatingSegmentedControl in Frameworks */,
 				BD0DC7FDDC0872CB6A0AEB36 /* Pods_listn.framework in Frameworks */,
@@ -420,6 +422,7 @@
 				C156559224EF598B00703B55 /* ApolloCombine */,
 				C18E4BFF24EFE3990072F2E1 /* TextView */,
 				C1A66E1724F3730A00B9E44F /* PopupView */,
+				C1E4641324F6034000BC2EBC /* FloatingLabelTextFieldSwiftUI */,
 			);
 			productName = listn;
 			productReference = C12F6EF724C827600083BF92 /* listn.app */;
@@ -483,6 +486,7 @@
 				C156559124EF598B00703B55 /* XCRemoteSwiftPackageReference "ApolloCombine" */,
 				C18E4BFE24EFE3990072F2E1 /* XCRemoteSwiftPackageReference "TextView" */,
 				C1A66E1624F3730A00B9E44F /* XCRemoteSwiftPackageReference "PopupView" */,
+				C1E4641224F6034000BC2EBC /* XCRemoteSwiftPackageReference "FloatingLabelTextFieldSwiftUI" */,
 			);
 			productRefGroup = C12F6EF824C827600083BF92 /* Products */;
 			projectDirPath = "";
@@ -980,6 +984,14 @@
 				minimumVersion = 6.5.6;
 			};
 		};
+		C1E4641224F6034000BC2EBC /* XCRemoteSwiftPackageReference "FloatingLabelTextFieldSwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kishanraja/FloatingLabelTextFieldSwiftUI.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.2;
+			};
+		};
 		C1FB5B4024DBB2D000B85E7E /* XCRemoteSwiftPackageReference "FloatingSegmentedControl" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/darioGzlez/FloatingSegmentedControl.git";
@@ -1033,6 +1045,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C1E1013524EA1EB9006B61BE /* XCRemoteSwiftPackageReference "IQKeyboardManager" */;
 			productName = IQKeyboardManagerSwift;
+		};
+		C1E4641324F6034000BC2EBC /* FloatingLabelTextFieldSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C1E4641224F6034000BC2EBC /* XCRemoteSwiftPackageReference "FloatingLabelTextFieldSwiftUI" */;
+			productName = FloatingLabelTextFieldSwiftUI;
 		};
 		C1FB5B4124DBB2D000B85E7E /* FloatingSegmentedControl */ = {
 			isa = XCSwiftPackageProductDependency;
