@@ -8,22 +8,22 @@
 
 import UIKit
 import RealmSwift
+import Combine
 
 class LoginViewModel: ObservableObject {
-    @Published var hasError : Bool = false
     @Published var error : String?
-    @Published var signingUp : Bool = false
-    @Published var finishedSignUp : Bool = false
+    @Published var isAuthenticated : Bool = false
     @Published var isLoggedIn : Bool = false
     @Published var usernameFree : Bool = true
     @Published var checkingUsername : Bool = true
     
-    let loginService : LoginService
+    let loginService : MongoLoginService
     let app : ListnApp
     
     private var timer : Timer?
+    //private var subscribers : Set<AnyCancellable> = []
     
-    func debounce(seconds: TimeInterval, function: @escaping () -> Swift.Void ) {
+    private func debounce(seconds: TimeInterval, function: @escaping () -> Swift.Void ) {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: seconds, repeats: false, block: { _ in
             function()
@@ -31,24 +31,36 @@ class LoginViewModel: ObservableObject {
     }
     
     
-    init(loginService:LoginService, app: ListnApp) {
+    init(loginService:MongoLoginService, app: ListnApp) {
         self.loginService = loginService
+        isAuthenticated = loginService.isAuthenticated
         isLoggedIn = loginService.isLoggedIn
-        signingUp = loginService.signingUp
         self.app = app
+        
+        /*$isLoggedIn.sink { newValue in
+            if newValue == true {
+                self.app.isLoggedIn = true
+            }
+        }.store(in: &subscribers)
+        
+        $isLoggedIn.sink(receiveValue: {value in
+            self.app.isLoggedIn = value
+        }).store(in: &subscribers)*/
     }
     
-    func logIn(username:String, password:String) {
-        loginService.logIn(username: username, password: password, completion: {error in
+    func logIn(email:String, password:String) {
+        loginService.logIn(email: email, password: password, completion: {isAuthenticated, isLoggedIn, error in
             guard error == nil else {
                 DispatchQueue.main.async {
                     self.error = error!.localizedDescription
-                    self.hasError = true
                 }
                 return
             }
             DispatchQueue.main.async {
-                self.isLoggedIn = true
+                self.isLoggedIn = isLoggedIn
+                self.isAuthenticated = isAuthenticated
+                self.app.isLoggedIn = isLoggedIn
+
             }
             
             
@@ -73,23 +85,23 @@ class LoginViewModel: ObservableObject {
         }
     }
     
-    func signUp(username:String, password:String) {
+    func signUp(email:String, password:String) {
         
-        loginService.signUp(username: username, password: password, completion: {error in
+        loginService.signUp(email: email, password: password) { isAuthenticated, isLoggedIn, error in
             guard error == nil else {
                 DispatchQueue.main.async {
                     self.error = error!.localizedDescription
-                    self.hasError = true
                 }
                 return
             }
             DispatchQueue.main.async {
-                self.signingUp = true
-                self.isLoggedIn = true
+                self.isAuthenticated = isAuthenticated
+                self.isLoggedIn = isLoggedIn
+                self.app.isLoggedIn = isLoggedIn
             }
             
             
-        })
+        }
     }
     
     func logOut() {
@@ -99,7 +111,10 @@ class LoginViewModel: ObservableObject {
                 return
             }
             DispatchQueue.main.async {
+                self.isAuthenticated = false
                 self.isLoggedIn = false
+                self.app.isLoggedIn = false
+
             }
             
             
@@ -107,20 +122,17 @@ class LoginViewModel: ObservableObject {
     }
     
     func completeSignUp(name: String, username: String) {
-        let client = app.realmApp.mongoClient("mongodb-atlas")
-        let database = client.database(withName: "music")
-        let collection = database.collection(withName: "users")
-        collection.updateOneDocument(
-            filter: ["user_id": AnyBSON(app.realmApp.currentUser()!.identity!)],
-            update: ["$set": ["name": AnyBSON(name), "username":AnyBSON(username)]]
-        ) { (updateResult, error) in
-              guard error == nil else {
-                  print("Failed to update: \(error!.localizedDescription)")
-                  return
-              }
-            DispatchQueue.main.async {
-                self.app.initialiseRealm()
+        loginService.completeSignUp(username: username, name: name) { isAuthenticated, isLoggedIn, error in
+            guard error == nil else {
+                self.error = error!.localizedDescription
+                return
             }
+            
+            
+            self.isAuthenticated = isAuthenticated
+            self.isLoggedIn = isLoggedIn
+            self.app.isLoggedIn = isLoggedIn
+
             
         }
     }

@@ -35,6 +35,9 @@ struct ProfileView: View {
                 }
                 ActivityIndicatorView(isVisible: $model.isLoading, type: .arcs).frame(width:50, height:50)
             }.pullToRefresh(isShowing: $model.isLoading, onRefresh: model.refresh).navigationBarTitle("", displayMode: .inline)
+                .navigationBarItems(trailing: Button(action: model.logout ) {
+                    Text("Log out")
+                })
     }
 }
 /*

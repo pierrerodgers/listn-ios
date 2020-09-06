@@ -19,7 +19,7 @@ struct AppView: View {
     @ObservedObject var showReviewSheet = ShowReviewSheet()
     
     var body: some View {
-        
+        print("logged in: \(app.isLoggedIn)")
         if app.isLoading {
             return AnyView(ContentView())
 

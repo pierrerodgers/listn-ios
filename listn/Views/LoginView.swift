@@ -18,25 +18,16 @@ struct LoginView: View {
     @State var name : String = ""
     @State var email : String = ""
     
+    @State var signingUp : Bool = false
+    
     
     var body: some View {
         
         return VStack {
-            if viewModel.isLoggedIn {
-                if !viewModel.finishedSignUp {
-                    AnyView(completeSignUpView)
-                }
-                else {
-                    AnyView(
-                        HStack{
-                            Text("Logged in!")
-                            Button(action: {self.viewModel.logOut()}, label: {Text("Log out")})
-                        }
-                    
-                    )
-                }
+            if viewModel.isAuthenticated {
+                AnyView(completeSignUpView)
             }
-            else if viewModel.signingUp {
+            else if signingUp{
                 AnyView(signUpView)
             }
             else {
@@ -55,16 +46,18 @@ struct LoginView: View {
         VStack (alignment:.center) {
             
             FloatingLabelTextField($email, placeholder: "Email address")
-                .addValidation(.init(condition: email.isValid(.email), errorMessage: "Please enter a valid email"))
-                .isShowError(true).errorColor(.red)
+            .addValidation(.init(condition: email.isValid(.email), errorMessage: "Please enter a valid email"))
+            .isShowError(true).errorColor(.red)
+            .textColor(.primary)
             .frame(height:70)
             
             FloatingLabelTextField($password, placeholder: "Password")
             .isSecureTextEntry(true)
+            .textColor(.primary)
             .frame(height:70)
             
             Button(action:{
-                self.viewModel.signUp(username: self.email, password: self.password)
+                self.viewModel.signUp(email: self.email, password: self.password)
                 
             }) {
                 Text("Sign up")
@@ -81,7 +74,6 @@ struct LoginView: View {
         }, set: {
             self.username = $0
             self.viewModel.checkUsername(self.username)
-            // do whatever you want here
         })
         
         return VStack{
@@ -92,13 +84,13 @@ struct LoginView: View {
             
             FloatingLabelTextField($name, placeholder: "Name")
             .addValidations([.init(condition: name.isValid(.name), errorMessage: "Invalid name"), .init(condition: name.count >= 2, errorMessage: "Enter your full name")])
+            .textColor(.primary)
             .isShowError(true)
             .errorColor(.red)
             .frame(height:70)
             
-            FloatingLabelTextField(bindingUsername, placeholder: "Username") {
-                self.viewModel.checkUsername(self.username)
-            }
+            FloatingLabelTextField(bindingUsername, placeholder: "Username")
+            .textColor(.primary)
             .addValidations([.init(condition:viewModel.usernameFree, errorMessage:"Username already exists"), .init(condition:isValidUsername(username: username), errorMessage: "Username is not valid")])
             .isShowError(true)
             .errorColor(.red)
@@ -117,16 +109,21 @@ struct LoginView: View {
     var loginView : some View {
         VStack {
             Text("log in")
-            TextField("Username", text: $username)
-            SecureField("Password", text: $password)
-            Button(action: {self.viewModel.logIn(username: self.username, password: self.password)}, label: {Text("Log In")})
-            if viewModel.hasError {
-                Text("Error \(viewModel.error!)")
+            FloatingLabelTextField($email, placeholder: "Email address")
+            .textColor(.primary)
+            .frame(height:70)
+            
+            FloatingLabelTextField($password, placeholder: "Password")
+            .textColor(.primary)
+            .isSecureTextEntry(true)
+            .frame(height:70)
+            
+            Button(action: {self.viewModel.logIn(email: self.email, password: self.password)}, label: {Text("Log In")})
+            if (viewModel.error != nil) {
+                Text("Error logging in: \(viewModel.error!)")
             }
-            Button(action: {self.viewModel.signingUp = true}, label: {Text("Sign up")})
-            if viewModel.hasError {
-                Text("Error \(viewModel.error!)")
-            }
+            
+            Button(action: {self.signingUp = true}, label: {Text("Sign up")})
         }
     }
     

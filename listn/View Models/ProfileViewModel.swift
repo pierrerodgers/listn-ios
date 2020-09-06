@@ -67,6 +67,12 @@ class ProfileViewModel: ObservableObject {
         }
     }
     
+    func logout() {
+        self.app.loginService.logOut() { error in
+            print("logged out")
+        }
+    }
+    
     func toggleFollow() {
         app.toggleFollow(userId: user._id)
         isFollowing = (app.findFollow(userId: user._id) != nil)
