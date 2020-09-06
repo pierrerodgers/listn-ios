@@ -633,6 +633,10 @@ class MongoLoginService {
         let credentials = AppCredentials(username: email, password: password)
         print(credentials)
         app.login(withCredential:credentials) {user, error in
+            guard error == nil else {
+                completion(false, false, error)
+                return
+            }
             DispatchQueue.main.async {
                 self.listnApp.initialiseRealm() { isAuthenticated, isLoggedIn, error in
                     self.isAuthenticated = isAuthenticated

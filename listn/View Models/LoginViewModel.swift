@@ -17,6 +17,8 @@ class LoginViewModel: ObservableObject {
     @Published var usernameFree : Bool = true
     @Published var checkingUsername : Bool = true
     
+    @Published var isLoading : Bool = false
+    
     let loginService : MongoLoginService
     let app : ListnApp
     
@@ -49,7 +51,10 @@ class LoginViewModel: ObservableObject {
     }
     
     func logIn(email:String, password:String) {
+        self.error = nil
+        self.isLoading = true
         loginService.logIn(email: email, password: password, completion: {isAuthenticated, isLoggedIn, error in
+            self.isLoading = false
             guard error == nil else {
                 DispatchQueue.main.async {
                     self.error = error!.localizedDescription
@@ -86,8 +91,10 @@ class LoginViewModel: ObservableObject {
     }
     
     func signUp(email:String, password:String) {
-        
+        self.error = nil
+        self.isLoading = true
         loginService.signUp(email: email, password: password) { isAuthenticated, isLoggedIn, error in
+            self.isLoading = false
             guard error == nil else {
                 DispatchQueue.main.async {
                     self.error = error!.localizedDescription
@@ -122,7 +129,10 @@ class LoginViewModel: ObservableObject {
     }
     
     func completeSignUp(name: String, username: String) {
+        self.error = nil
+        self.isLoading = true
         loginService.completeSignUp(username: username, name: name) { isAuthenticated, isLoggedIn, error in
+            self.isLoading = false
             guard error == nil else {
                 self.error = error!.localizedDescription
                 return

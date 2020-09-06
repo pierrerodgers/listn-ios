@@ -8,6 +8,7 @@
 
 import SwiftUI
 import FloatingLabelTextFieldSwiftUI
+import ActivityIndicatorView
 
 struct LoginView: View {
     @ObservedObject var viewModel : LoginViewModel
@@ -19,7 +20,6 @@ struct LoginView: View {
     @State var email : String = ""
     
     @State var signingUp : Bool = false
-    
     
     var body: some View {
         
@@ -37,32 +37,39 @@ struct LoginView: View {
                 Text(viewModel.error!).foregroundColor(.red).font(.callout).bold()
             }
             Spacer()
-        }
+        }.disabled(viewModel.isLoading).overlay(ActivityIndicatorView(isVisible: $viewModel.isLoading, type: .default).frame(width:50, height:50))
         
         
     }
     
     var signUpView : some View {
         VStack (alignment:.center) {
+            Text("Rave").font(.largeTitle).bold()
+            Text("Sign up to rave").font(.title)
+            
             
             FloatingLabelTextField($email, placeholder: "Email address")
-            .addValidation(.init(condition: email.isValid(.email), errorMessage: "Please enter a valid email"))
-            .isShowError(true).errorColor(.red)
-            .textColor(.primary)
-            .frame(height:70)
+                .addValidation(.init(condition: email.isValid(.email), errorMessage: "Please enter a valid email"))
+                .isShowError(true).errorColor(.red)
+                .textColor(.primary)
+                .frame(height:70)
+                .padding(.horizontal)
             
             FloatingLabelTextField($password, placeholder: "Password")
-            .isSecureTextEntry(true)
-            .textColor(.primary)
-            .frame(height:70)
+                .isSecureTextEntry(true)
+                .textColor(.primary)
+                .frame(height:70)
+                .padding(.horizontal)
             
-            Button(action:{
+            
+            LoginButton(action:{
                 self.viewModel.signUp(email: self.email, password: self.password)
-                
-            }) {
-                Text("Sign up")
-            }
-            Spacer()
+            }, buttonType: .signup)
+            
+            Button(action:{self.signingUp = false} ) {
+                Text("Log in")
+            }.padding(.top)
+            
             
             
         }
@@ -76,7 +83,9 @@ struct LoginView: View {
             self.viewModel.checkUsername(self.username)
         })
         
-        return VStack{
+        
+        
+        return VStack {
             Text("Welcome to Rave").font(.largeTitle).bold()
             
             Text("Finish signing up:").font(.title)
@@ -88,44 +97,57 @@ struct LoginView: View {
             .isShowError(true)
             .errorColor(.red)
             .frame(height:70)
+                .padding(.horizontal)
             
             FloatingLabelTextField(bindingUsername, placeholder: "Username")
             .textColor(.primary)
             .addValidations([.init(condition:viewModel.usernameFree, errorMessage:"Username already exists"), .init(condition:isValidUsername(username: username), errorMessage: "Username is not valid")])
             .isShowError(true)
             .errorColor(.red)
-            .frame(height:70)
+                .frame(height:70)
+                .padding(.horizontal)
             
             
             Button(action: {
-                self.viewModel.completeSignUp(name:self.name, username:self.username)
+               self.viewModel.completeSignUp(name:self.name, username:self.username)
             } ) {
-                Text("Finish signing up")
+                Text("Finish signing up").padding().background(Color.blue).foregroundColor(.white)
             }.disabled(!isValidInput())
-            Spacer()
         }
     }
     
     var loginView : some View {
         VStack {
-            Text("log in")
+            Text("Rave").font(.largeTitle).bold()
+            
+            Text("Log in or sign up").font(.title)
+            
             FloatingLabelTextField($email, placeholder: "Email address")
             .textColor(.primary)
             .frame(height:70)
+                .padding(.horizontal)
             
             FloatingLabelTextField($password, placeholder: "Password")
             .textColor(.primary)
             .isSecureTextEntry(true)
             .frame(height:70)
+                .padding(.horizontal)
             
-            Button(action: {self.viewModel.logIn(email: self.email, password: self.password)}, label: {Text("Log In")})
-            if (viewModel.error != nil) {
-                Text("Error logging in: \(viewModel.error!)")
-            }
             
-            Button(action: {self.signingUp = true}, label: {Text("Sign up")})
+            HStack {
+                Spacer()
+                LoginButton(action: { self.viewModel.logIn(email: self.email, password: self.password) }, buttonType: .login)
+                
+                LoginButton(action:{
+                    self.signingUp = true
+                    self.viewModel.error = nil
+                }, buttonType: .signup)
+                Spacer()
+            }.padding(.vertical)
+            
         }
     }
+    
     
     func isValidInput() -> Bool {
         return name.isValid(.name) && isValidUsername(username: username) && viewModel.usernameFree && !viewModel.checkingUsername
@@ -135,6 +157,23 @@ struct LoginView: View {
         let regex = #"^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$"#
         
         return username.range(of: regex, options: .regularExpression) != nil
+    }
+}
+
+struct LoginButton : View {
+    enum LoginButtonType : String {
+        case signup = "Sign up", login = "Log in"
+    }
+    
+    let action : () -> Void
+    
+    let buttonType : LoginButtonType
+    
+    
+    var body : some View {
+        Button(action: action) {
+            Text(buttonType.rawValue).padding().background(Color.blue).foregroundColor(.white).cornerRadius(5)
+        }
     }
 }
 
