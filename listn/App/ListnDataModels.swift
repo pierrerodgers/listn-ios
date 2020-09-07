@@ -216,21 +216,24 @@ struct ListnComment {
     var reviewCommented : String
     var commentText : String
     var user : String
+    var username : String = "username"
     
     var listnUser = ListnUser(empty:true)
     
-    init(commentText:String, reviewCommented:String, user:String) {
+    init(commentText:String, reviewCommented:String, user:String, username:String) {
         _id = ""
         self.commentText = commentText
         self.reviewCommented = reviewCommented
         self.user = user
+        self.username = username
     }
     
     init(apolloResult: CommentDetail) {
         _id = apolloResult._id!
         reviewCommented = apolloResult.reviewCommented!
         commentText = apolloResult.commentText!
-        user = apolloResult.user!
+        user = apolloResult.user!._id!
+        username = apolloResult.user!.username!
     }
 }
 

@@ -110,7 +110,10 @@ fragment CommentDetail on ReviewComment {
     _id
     reviewCommented
     commentText
-    user
+    user {
+        _id
+        username
+    }
 }
 fragment LikeDetail on ReviewLike {
     _id

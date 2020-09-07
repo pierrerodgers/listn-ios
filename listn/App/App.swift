@@ -231,7 +231,7 @@ class ListnApp : ObservableObject {
         
         func query() -> AlbumQuery {
             let artistQuery = (artist != nil) ? ArtistQueryInput(_id: artist) : nil
-            return AlbumQuery(query: AlbumQueryInput(_id: id, artist: artistQuery, _idIn: ids))
+            return AlbumQuery(query: AlbumQueryInput(_idIn: ids, artist: artistQuery, _id: id))
         }
     }
     
@@ -254,7 +254,7 @@ class ListnApp : ObservableObject {
         var last : String?
         
         func query() -> ReviewsQuery {
-            return ReviewsQuery(query: ReviewQueryInput(_id:id, _idIn:ids, album:album, user:user, artist:artist))
+            return ReviewsQuery(query: ReviewQueryInput(_id:id, album:album,  user:user, _idIn:ids, artist:artist))
         }
         
         func paginatedQuery() -> ReviewPageQuery {
@@ -267,7 +267,7 @@ class ListnApp : ObservableObject {
         var ids : [String]?
         
         func query() -> UsersQuery {
-            return UsersQuery(query: UserQueryInput(_idIn: ids, _id: id))
+            return UsersQuery(query: UserQueryInput(_id: id, _idIn: ids))
         }
     }
     

@@ -13,22 +13,28 @@ struct FeedReviewCard: View {
     let review : ListnReview
     
     var body: some View {
-        HStack{
-            WebImage(url: URL(string:review.album.smallArtwork ?? "")).resizable().placeholder(content: {Rectangle()}).frame(width:130, height: 130)
-            //Rectangle().frame(width:200, height:200)
-            VStack(alignment:.leading){
-                Text(review.album.name)
-                Text(review.album.artist.name).fontWeight(.light)
+        VStack(alignment:.leading, spacing:0){
+            HStack(alignment: .top){
+                WebImage(url: URL(string:review.album.smallArtwork ?? "")).resizable().placeholder(content: {Rectangle()}).frame(width:130, height: 130).cornerRadius(5)
+                //Rectangle().frame(width:200, height:200)
+                VStack(alignment:.leading){
+                    Text(review.album.name)
+                    Text(review.album.artist.name).fontWeight(.light)
+                    Spacer()
+                    Text(review.score).scoreText()
+                    HStack{
+                        Circle().frame(width: 30, height: 30)
+                        Text("@") + Text(review.user.username)
+                    }
+                    
+                    
+                }.padding(.trailing).padding(.vertical).frame(maxHeight:130)
                 Spacer()
-                Text(review.score).scoreText()
-                HStack{
-                    Circle().frame(width: 30, height: 30)
-                    Text("@") + Text(review.user.username)
-                }
-                
-            }.padding(.trailing).padding(.vertical)
-            Spacer()
-        }.frame(minWidth:0, maxWidth: .infinity, minHeight: 0, maxHeight:130)
+            }.frame(minWidth:0, maxWidth: .infinity, minHeight: 0, maxHeight:130)
+            if review.text != nil && review.text != "" {
+                Text(review.text!).padding(5).lineLimit(2)
+            }
+        }.frame(maxHeight:180)
     }
 }
 

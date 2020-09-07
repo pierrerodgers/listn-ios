@@ -55,7 +55,7 @@ struct ReviewComments : View {
             
             ForEach(Array(model.comments.prefix(min(model.comments.count, 5))), id:\._id) { comment in
                 VStack(alignment:.leading){
-                    Text("@username")
+                    Text("@\(comment.username)")
                     Text(comment.commentText).font(.subheadline)
                     Spacer()
                 }
@@ -73,7 +73,7 @@ struct ReviewComments : View {
         if (commentText != "") {
             
             
-            let comment = ListnComment(commentText: commentText, reviewCommented: model.review._id!, user: model.app.listnUser!._id)
+            let comment = ListnComment(commentText: commentText, reviewCommented: model.review._id!, user: model.app.listnUser!._id, username:model.app.listnUser!.username)
             model.postComment(comment: comment)
             commentText = ""
         }
