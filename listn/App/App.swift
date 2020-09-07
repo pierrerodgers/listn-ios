@@ -59,8 +59,6 @@ class ListnApp : ObservableObject {
         }.mapError { error in
             return URLError(.notConnectedToInternet)
         }
-        
-        
         return searchResults.switchToLatest().eraseToAnyPublisher()
     }
         

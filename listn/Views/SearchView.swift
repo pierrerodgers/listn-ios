@@ -24,7 +24,15 @@ struct SearchView: View {
     var body: some View {
         NavigationView {
             VStack {
-                TextField("search", text: $model.query).textFieldStyle(RoundedBorderTextFieldStyle()).padding(.horizontal)
+                HStack {
+                    TextField("Search", text: $model.query)
+                    Button (action: {
+                        self.model.query = ""
+                    }){
+                        Image(systemName: "x.circle")
+                    }
+                }.padding(8).overlay(RoundedRectangle(cornerRadius: 5).stroke(Color.gray, lineWidth: 1)).padding(.horizontal)
+                
                 ActivityIndicatorView(isVisible: $model.isLoading, type: .arcs).frame(width:50, height:50)
                 List {
                     ForEach(model.albumResults[0..<min(model.albumResults.count, 5)], id:\._id) { album in

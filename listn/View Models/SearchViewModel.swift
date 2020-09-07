@@ -18,10 +18,20 @@ class SearchViewModel: ObservableObject {
     @Published var query : String = "" {
         didSet {
             searchCancellable?.cancel()
+            isLoading = true
+            if self.query == "" {
+                self.albumResults = []
+                self.userResults = []
+                self.artistResults = []
+            }
             searchCancellable = app.searchPublisher(query: self.query).sink(
                 receiveCompletion: { [weak self] completion in
+                    self!.isLoading = false
                     switch completion {
                     case .failure(let error ):
+                        self!.albumResults = []
+                        self!.artistResults = []
+                        self!.userResults = []
                         print(error)
                     case .finished:
                         self!.isLoading = false

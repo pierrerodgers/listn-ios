@@ -52,7 +52,7 @@ protocol SearchData {
 }
 
 struct SearchResults {
-    var albums : Array<ListnAlbum>
-    var artists : Array<ListnArtist>
-    var users : Array<ListnUser>
+    var albums : Array<ListnAlbum> = []
+    var artists : Array<ListnArtist> = []
+    var users : Array<ListnUser> = []
 }
