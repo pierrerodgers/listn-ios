@@ -220,6 +220,25 @@ class ListnApp : ObservableObject {
         return publisher.eraseToAnyPublisher()
     }
     
+    func notificationsPublisher(userId:String) -> AnyPublisher<[ListnNotification], URLError> {
+        let publisher = Network.shared.apollo.fetchPublisher(query: NotificationsQuery(query: NotificationQueryInput(user:userId)))
+            .retry(3)
+            .retryWithDelay()
+            .compactMap { result in
+                result.data?.notifications
+            }
+            .compactMap { notifications  in
+                return notifications.compactMap { notification in
+                    ListnNotification(apolloResult:notification!.fragments.notificationDetail) as ListnNotification
+                }
+            }
+            .mapError {error in
+                return URLError(.notConnectedToInternet)
+            }.eraseToAnyPublisher()
+        
+        return publisher
+    }
+    
     // MARK: Query type definitions
     
     struct ListnAlbumQuery {
@@ -229,7 +248,7 @@ class ListnApp : ObservableObject {
         
         func query() -> AlbumQuery {
             let artistQuery = (artist != nil) ? ArtistQueryInput(_id: artist) : nil
-            return AlbumQuery(query: AlbumQueryInput(_idIn: ids, artist: artistQuery, _id: id))
+            return AlbumQuery(query: AlbumQueryInput(artist: artistQuery, _idIn: ids, _id: id))
         }
     }
     
@@ -252,7 +271,7 @@ class ListnApp : ObservableObject {
         var last : String?
         
         func query() -> ReviewsQuery {
-            return ReviewsQuery(query: ReviewQueryInput(_id:id, album:album,  user:user, _idIn:ids, artist:artist))
+            return ReviewsQuery(query: ReviewQueryInput(user:user, _idIn:ids, _id:id, artist:artist, album:album))
         }
         
         func paginatedQuery() -> ReviewPageQuery {
@@ -265,7 +284,7 @@ class ListnApp : ObservableObject {
         var ids : [String]?
         
         func query() -> UsersQuery {
-            return UsersQuery(query: UserQueryInput(_id: id, _idIn: ids))
+            return UsersQuery(query: UserQueryInput(_idIn: ids, _id: id))
         }
     }
     
