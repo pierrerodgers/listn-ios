@@ -250,3 +250,16 @@ struct ListnLike {
         user = apolloResult.user!
     }
 }
+
+struct ListnNotification {
+    var _id : String
+    var content : String
+    var actor : String
+    
+    init(apolloResult: NotificationDetail) {
+        self._id = apolloResult._id!
+        self.content = apolloResult.content!
+        self.actor = apolloResult.actor!
+    }
+    
+}
