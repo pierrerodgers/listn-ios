@@ -40,6 +40,7 @@ struct AppView: View {
             UIKitTabView {
                 FeedView(model: FeedModel(app: app)).tab(title: "Feed")
                 SearchView(model: SearchViewModel(app: app)).tab(title:"Search")
+                NotificationsView(model: NotificationsViewModel(app: app)).tab(title:"Notifications")
                 NavigationView{ProfileView(model: ProfileViewModel(app: app, user: self.app.listnUser!))}.tab(title: "Profile")
             }.environmentObject(showReviewSheet).sheet(isPresented: $showReviewSheet.isAddingReview) {
                 AddReviewView(model: AddReviewViewModel(album: self.showReviewSheet.albumReviewing, app: self.app, user: self.app.listnUser!)).environmentObject(self.showReviewSheet)
