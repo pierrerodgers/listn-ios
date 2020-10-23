@@ -20,7 +20,11 @@ enum SearchViewType : String, SegmentBindable {
 struct SearchView: View {
     @ObservedObject var model : SearchViewModel
     @State var selectedType : SearchViewType = SearchViewType.albums
-        
+    
+    @State var maxAlbumCount = 15
+    @State var maxArtistCount = 15
+    @State var maxUserCount = 15
+    
     var body: some View {
         NavigationView {
             VStack {
@@ -35,19 +39,19 @@ struct SearchView: View {
                 
                 ActivityIndicatorView(isVisible: $model.isLoading, type: .arcs).frame(width:50, height:50)
                 List {
-                    ForEach(model.albumResults[0..<min(model.albumResults.count, 5)], id:\._id) { album in
+                    ForEach(model.albumResults[0..<min(model.albumResults.count, maxAlbumCount)], id:\._id) { album in
                         NavigationLink(destination:LazyView(AlbumDetailView(model: AlbumDetailViewModel(album: album, app: self.model.app)))) {
                             SearchAlbumRow(album: album)
                         }.buttonStyle(PlainButtonStyle())
                     }
                     
-                    ForEach(model.artistResults[0..<min(model.artistResults.count, 5)], id:\._id) { artist in
+                    ForEach(model.artistResults[0..<min(model.artistResults.count, maxArtistCount)], id:\._id) { artist in
                         NavigationLink(destination:LazyView(ArtistDetailView(model: ArtistDetailViewModel(artist:artist, app: self.model.app)))) {
                             SearchArtistRow(artist: artist)
                         }.buttonStyle(PlainButtonStyle())
                     }
                     
-                    ForEach(model.userResults[0..<min(model.userResults.count, 5)], id:\._id) { user in
+                    ForEach(model.userResults[0..<min(model.userResults.count, maxUserCount)], id:\._id) { user in
                         NavigationLink(destination:LazyView(ProfileView(model: ProfileViewModel(app: self.model.app, user:user)))) {
                             SearchUserRow(user:user)
                         }.buttonStyle(PlainButtonStyle())
