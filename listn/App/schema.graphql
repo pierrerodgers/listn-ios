@@ -121,6 +121,12 @@ fragment LikeDetail on ReviewLike {
     user
 }
 
+fragment NotificationDetail on Notification {
+     _id
+     content
+     actor
+}
+
 query Reviews($query:ReviewQueryInput, $limit:Int = 100) {
     reviews (query: $query, limit:$limit, sortBy: DATE_DESC) {
         ...ReviewDetail
@@ -158,5 +164,11 @@ query Comments($query:ReviewCommentQueryInput) {
 query Likes($query:ReviewLikeQueryInput) {
     reviewLikes(query:$query) {
         ...LikeDetail
+    }
+}
+
+query Notifications($query:NotificationQueryInput) {
+    notifications(query:$query) {
+    ...NotificationDetail
     }
 }
