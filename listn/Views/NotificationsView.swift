@@ -14,7 +14,7 @@ struct NotificationsView: View {
     var body: some View {
         List(model.notifications, id: \._id){ notification in
             Text(notification.content)
-        }
+        }.navigationBarTitle("Notifications").pullToRefresh(isShowing: $model.isLoading, onRefresh: model.refresh)
     }
 }
 /*

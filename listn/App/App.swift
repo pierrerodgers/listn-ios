@@ -221,7 +221,7 @@ class ListnApp : ObservableObject {
     }
     
     func notificationsPublisher(userId:String) -> AnyPublisher<[ListnNotification], URLError> {
-        let publisher = Network.shared.apollo.fetchPublisher(query: NotificationsQuery(query: NotificationQueryInput(user:userId)))
+        let publisher = Network.shared.apollo.fetchPublisher(query: NotificationsQuery(query: NotificationQueryInput(user:userId)), cachePolicy: .fetchIgnoringCacheCompletely)
             .retry(3)
             .retryWithDelay()
             .compactMap { result in

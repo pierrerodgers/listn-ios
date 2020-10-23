@@ -18,11 +18,15 @@ class NotificationsViewModel : ObservableObject {
     
     init(app:ListnApp) {
         self.app = app
+        self.refresh()
+    }
+    
+    func refresh() {
         isLoading = true
-        cancellable = self.app.notificationsPublisher(userId: app.user!._id!.stringValue).receive(on: DispatchQueue.main).sink(receiveCompletion: { [weak self] completed in
-            self!.isLoading = false
-        }, receiveValue: { [weak self] notifications in
-            self!.notifications = notifications
+        cancellable = self.app.notificationsPublisher(userId: app.user!._id!.stringValue).receive(on: DispatchQueue.main).sink(receiveCompletion: { completed in
+            self.isLoading = false
+        }, receiveValue: { notifications in
+            self.notifications = notifications
         })
     }
 }
