@@ -29,7 +29,7 @@ struct FeedView: View {
                                 }
                                 NavigationLink(destination: LazyView(ReviewDetailView().environmentObject(ReviewDetailViewModel(review: review, app: self.model.app)) )) {
                                     EmptyView()
-                                    }.hidden().buttonStyle(PlainButtonStyle())
+                                    }.opacity(0).buttonStyle(PlainButtonStyle())
                             }.listRowInsets(.init(top: 5, leading: 0, bottom: 5, trailing: 0))
                             
                         }
@@ -39,7 +39,7 @@ struct FeedView: View {
                             Spacer()
                         }
                         
-                    }.pullToRefresh(isShowing: $model.isRefreshing){
+                    }.listStyle(PlainListStyle()).pullToRefresh(isShowing: $model.isRefreshing){
                         self.model.refreshUserFeed()
                     }.onAppear() {
                         if #available(iOS 14.0, *) {
