@@ -125,6 +125,7 @@ fragment NotificationDetail on Notification {
      _id
      content
      actor
+     type
 }
 
 query Reviews($query:ReviewQueryInput, $limit:Int = 100) {

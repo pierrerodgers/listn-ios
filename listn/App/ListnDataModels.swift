@@ -251,15 +251,30 @@ struct ListnLike {
     }
 }
 
+enum ListnNotificationType : String {
+    case like = "like", follow = "follow", comment = "comment"
+}
+
 struct ListnNotification {
     var _id : String
     var content : String
     var actor : String
+    var type : ListnNotificationType = .comment
     
     init(apolloResult: NotificationDetail) {
         self._id = apolloResult._id!
         self.content = apolloResult.content!
         self.actor = apolloResult.actor!
+        switch apolloResult.type {
+        case "comment":
+            self.type = .comment
+        case "like":
+            self.type = .like
+        case "follow":
+            self.type = .follow
+        default:
+            self.type = .follow
+        }
     }
     
 }
