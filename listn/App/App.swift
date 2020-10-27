@@ -271,7 +271,7 @@ class ListnApp : ObservableObject {
         var last : String?
         
         func query() -> ReviewsQuery {
-            return ReviewsQuery(query: ReviewQueryInput(user:user, _idIn:ids, _id:id, artist:artist, album:album))
+            return ReviewsQuery(query: ReviewQueryInput(_id:id, album:album, user:user, artist:artist, _idIn:ids))
         }
         
         func paginatedQuery() -> ReviewPageQuery {
@@ -284,7 +284,7 @@ class ListnApp : ObservableObject {
         var ids : [String]?
         
         func query() -> UsersQuery {
-            return UsersQuery(query: UserQueryInput(_idIn: ids, _id: id))
+            return UsersQuery(query: UserQueryInput(_id: id, _idIn: ids))
         }
     }
     

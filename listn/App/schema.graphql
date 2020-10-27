@@ -124,7 +124,10 @@ fragment LikeDetail on ReviewLike {
 fragment NotificationDetail on Notification {
      _id
      content
-     actor
+     actor {
+        _id
+        username
+    }
      type
 }
 

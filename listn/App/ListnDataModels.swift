@@ -258,22 +258,28 @@ enum ListnNotificationType : String {
 struct ListnNotification {
     var _id : String
     var content : String
-    var actor : String
+    var actorUsername : String
     var type : ListnNotificationType = .comment
+    
+    var description : String = ""
     
     init(apolloResult: NotificationDetail) {
         self._id = apolloResult._id!
         self.content = apolloResult.content!
-        self.actor = apolloResult.actor!
+        self.actorUsername = apolloResult.actor!.username!
         switch apolloResult.type {
         case "comment":
             self.type = .comment
+            self.description = "\(actorUsername) commented on your review."
         case "like":
             self.type = .like
+            self.description = "\(actorUsername) liked your review."
         case "follow":
             self.type = .follow
+            self.description = "\(actorUsername) followed you."
         default:
             self.type = .follow
+            self.description = "\(actorUsername) followed you."
         }
     }
     

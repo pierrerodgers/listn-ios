@@ -13,10 +13,7 @@ struct NotificationCard: View {
     
     var body: some View {
         VStack{
-            Text(notification.type.rawValue)
-            Text(notification._id)
-            Text(notification.actor)
-            Text(notification.content)
+            Text(notification.description)
         }
     }
 }
