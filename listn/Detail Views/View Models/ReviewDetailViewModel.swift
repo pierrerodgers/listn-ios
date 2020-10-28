@@ -21,6 +21,8 @@ class ReviewDetailViewModel: ObservableObject {
     
     @Published var isCommenting : Bool = false
     
+    @Published var isLoading : Bool = false
+    
     private var disposables = Set<AnyCancellable>()
     
     init(review: ListnReview, app: ListnApp) {
@@ -33,6 +35,30 @@ class ReviewDetailViewModel: ObservableObject {
         refreshReviews()
         getComments()
         refresh()
+    }
+    
+    init(reviewId:String, app: ListnApp) {
+        self.review = ListnReview(forPreview: true)
+        self.moreReviewerReviews = []
+        self.moreAlbumReviews = []
+        self.comments = []
+        self.app = app
+        self.isLiked = false
+        self.loadReview(reviewId: reviewId)
+    }
+    
+    func loadReview(reviewId: String) {
+        app.reviewPublisher(query: ListnApp.ListnReviewQuery(id:reviewId))
+            .sink(receiveCompletion: { error in
+                self.isLoading = false
+                
+            }, receiveValue: {  review in
+                self.review = review
+                self.isLiked = self.app.isLiked(review._id!)
+                self.getComments()
+                self.refreshReviews()
+            })
+            .store(in: &disposables)
     }
     
     func getComments() {

@@ -37,7 +37,7 @@ struct ReviewDetailReviewCard: View {
             }.padding(.bottom, 5)
             HStack(spacing:20){
                 LikeButton(action:self.model.toggleReviewLike, isLiked: self.$model.isLiked)
-                Text("\(review.likes!)").foregroundColor(.red)
+                Text("\(review.likes ?? 0)").foregroundColor(.red)
                 CommentButton(action:{})
                 Spacer()
             }

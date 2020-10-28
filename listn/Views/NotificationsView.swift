@@ -13,7 +13,17 @@ struct NotificationsView: View {
     
     var body: some View {
         List(model.notifications, id: \._id){ notification in
-            NotificationCard(notification: notification)
+            if notification.type == .comment || notification.type == .like {
+                NavigationLink(destination:LazyView(ReviewDetailView().environmentObject(ReviewDetailViewModel(reviewId:notification.content, app:model.app)))) {
+                    NotificationCard(notification: notification)
+                }
+            }
+            else {
+                NotificationCard(notification: notification)
+            }
+            /*else if notification.type == .follow {
+                
+            }*/
         }.navigationBarTitle("Notifications").pullToRefresh(isShowing: $model.isLoading, onRefresh: model.refresh)
     }
 }
