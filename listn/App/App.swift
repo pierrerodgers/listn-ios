@@ -13,7 +13,7 @@ import Combine
 
 class ListnApp : ObservableObject {
     
-    var realmApp : RealmApp
+    var realmApp : App
     var loginService : MongoLoginService!
     var user : User?
     var listnUser : ListnUser?
@@ -303,7 +303,7 @@ class ListnApp : ObservableObject {
         
         // Initialise Realm App
         let config = AppConfiguration(baseURL: "https://realm.mongodb.com", transport: nil, localAppName: nil, localAppVersion: nil)
-        realmApp = RealmApp(id:"listn-bsliv", configuration: config)
+        realmApp = App(id:"listn-bsliv", configuration: config)
         
         // Initialise login service and fill variables if logged in
         loginService = MongoLoginService(app: realmApp, listnApp: self)
@@ -359,27 +359,28 @@ class ListnApp : ObservableObject {
     }
     
     func initialiseRealm( completion : @escaping (_ isAuthenticated: Bool, _ isLoggedIn: Bool, _ error: Error?) -> () = {_,_,_ in }) {
-        guard self.realmApp.currentUser() != nil else {
+        guard self.realmApp.currentUser != nil else {
             completion(false, false, nil)
             return
         }
         
-        self.realmApp.currentUser()?.refreshCustomData { error in
-            guard error == nil else {
-                // Probably is not authenticated
-                
+        self.realmApp.currentUser!.refreshCustomData { result in
+            switch result {
+            case .failure(let error):
                 completion(false, false, error)
                 return
+            case .success(_):
+                print("success")
             }
-            guard self.realmApp.currentUser()?.customData?["username"] ?? "" != "" else {
-                completion(true, false, error)
+            guard self.realmApp.currentUser?.customData["username"] ?? "" != "" else {
+                completion(true, false, nil)
                 
                 return
             }
             
             DispatchQueue.main.async {
                 Network.shared.tokenManger = GraphQLTokenManager()
-                self.realm = try! Realm(configuration: self.realmApp.currentUser()!.configuration(partitionValue:(self.realmApp.currentUser()?.identity)!))
+                self.realm = try! Realm(configuration: self.realmApp.currentUser!.configuration(partitionValue:(self.realmApp.currentUser?.id)!))
                 
                 let user = self.realm?.objects(User.self).first
                 let feed = self.realm?.objects(UserFeed.self).first
@@ -387,31 +388,31 @@ class ListnApp : ObservableObject {
                 guard user?.username ?? ""  != "" && user?.name ?? "" != ""  && feed != nil else {
                     // Might be first login, try asyncopen
                     
-                    Realm.asyncOpen(configuration: self.realmApp.currentUser()!.configuration(partitionValue:(self.realmApp.currentUser()?.identity)!), callbackQueue: DispatchQueue.main) { realm, error in
-                        guard realm != nil else {
-                            // No realm exists -- error
-                            
+                    Realm.asyncOpen(configuration: self.realmApp.currentUser!.configuration(partitionValue:(self.realmApp.currentUser?.id)!), callbackQueue: DispatchQueue.main) { result in
+                        switch result {
+                        case .failure(let error):
                             completion(false, false, error)
                             return
-                        }
-                        
-                        // Realm exists, get user and feed objects
-                        self.realm = realm!
-                        let user = realm!.objects(User.self).first
-                        let feed = realm!.objects(UserFeed.self).first
-                        
-                        guard user?.username ?? ""  != "" && user?.name ?? "" != ""  && feed != nil else {
-                            // User does not have username --> is not finished signing up
+                        case .success(let realm):
+                            // Realm exists, get user and feed objects
+                            self.realm = realm
+                            let user = realm.objects(User.self).first
+                            let feed = realm.objects(UserFeed.self).first
                             
-                            completion(true, false, nil)
-                            return
+                            guard user?.username ?? ""  != "" && user?.name ?? "" != ""  && feed != nil else {
+                                // User does not have username --> is not finished signing up
+                                
+                                completion(true, false, nil)
+                                return
+                            }
+                            
+                            
+                            self.user = user!
+                            self.listnUser = ListnUser(user: user!)
+                            
+                            completion(true, true, nil)
                         }
                         
-                        
-                        self.user = user!
-                        self.listnUser = ListnUser(user: user!)
-                        
-                        completion(true, true, nil)
                     }
                     return
                 }
@@ -430,7 +431,8 @@ class ListnApp : ObservableObject {
     // MARK: Realm functions (posting reviews, etc.)
     
     func refreshUserFeed(completion: @escaping(Array<String>) -> Void) {
-        realmApp.functions.updateUserFeed([AnyBSON(user!._id!)!]) { result, error in
+        let realmUser = realmApp.currentUser!
+        realmUser.functions.updateUserFeed([AnyBSON(user!._id!)]) { result, error in
             print("feed updated")
             DispatchQueue.main.async {
                 self.realm!.refresh()
@@ -440,9 +442,10 @@ class ListnApp : ObservableObject {
     }
     
     func usernameExists(username:String, completion: @escaping(Bool, Error?) -> ()) {
-        realmApp.functions.checkUsername([AnyBSON(username)!]) { result, error in
+        let user = realmApp.currentUser!
+        user.functions.checkUsername([AnyBSON(username)]) { result, error in
             guard error == nil else {
-                completion(true, error!)
+                completion(true, error)
                 return
             }
             completion(result!.boolValue!, nil)
@@ -484,7 +487,7 @@ class ListnApp : ObservableObject {
         completion(reviewIds)
     }
     func postReview(review:ListnReview) {
-        let userReview = Review(listnReview: review, partitionKey: realmApp.currentUser()!.identity!)
+        let userReview = Review(listnReview: review, partitionKey: realmApp.currentUser!.id)
         
         do {
             try realm!.write {
@@ -500,7 +503,7 @@ class ListnApp : ObservableObject {
         let follow = findFollow(userId: userId)
         guard follow != nil else {
             let follow = UserFollow()
-            follow._partitionKey = realmApp.currentUser()!.identity!
+            follow._partitionKey = realmApp.currentUser!.id
             follow.userFollowed = try! ObjectId(string: userId)
             print(follow.userFollowed!)
             follow.user = user?._id!
@@ -542,7 +545,7 @@ class ListnApp : ObservableObject {
         let like = findLike(reviewId: reviewId)
         guard like != nil else {
             let like = ReviewLike()
-            like._partitionKey = realmApp.currentUser()!.identity!
+            like._partitionKey = realmApp.currentUser!.id
             like.reviewLiked = try! ObjectId(string: reviewId)
             like.user = user?._id!
             
@@ -557,7 +560,7 @@ class ListnApp : ObservableObject {
     }
     
     func postComment(comment:ListnComment) {
-        let comment = ReviewComment(listnComment: comment, partitionKey: realmApp.currentUser()!.identity!)
+        let comment = ReviewComment(listnComment: comment, partitionKey: realmApp.currentUser!.id)
         
         do {
             try realm!.write {
@@ -571,25 +574,25 @@ class ListnApp : ObservableObject {
         
 }
 
-
+import FacebookLogin
 class MongoLoginService {
     
     // We assume that app is intitialised
-    private var app : RealmApp
+    private var app : App
     private var listnApp : ListnApp
     
     var isAuthenticated : Bool = false
     var isLoggedIn : Bool = false
     
+    let loginManager = LoginManager()
     
-    
-    init(app:RealmApp, listnApp: ListnApp) {
+    init(app:App, listnApp: ListnApp) {
         self.app = app
         self.listnApp = listnApp
     }
     
     func signUp(email: String, password: String, completion: @escaping (_ isAuthenticated:Bool, _ isLoggedIn: Bool, Error?) -> Void) {
-        app.usernamePasswordProviderClient().registerEmail(email, password:password, completion: { error in
+        app.emailPasswordAuth.registerUser(email:email, password:password, completion: { error in
             guard error == nil else {
                 print("Signup failed")
                 completion(false, false, error)
@@ -597,8 +600,79 @@ class MongoLoginService {
             }
             print("Signup successful")
             
-            let credentials = AppCredentials(username: email, password: password)
-            self.app.login(withCredential: credentials) { user, error in
+            let credentials = Credentials.emailPassword(email: email, password: password)
+            self.app.login(credentials: credentials) { result in
+                switch result {
+                case .success(_):
+                    DispatchQueue.main.async {
+                        self.listnApp.initialiseRealm() { isAuthenticated, isLoggedIn, error in
+                            self.isAuthenticated = isAuthenticated
+                            self.isLoggedIn = isLoggedIn
+                            
+                            self.listnApp.isLoggedIn = isLoggedIn
+                            completion(isAuthenticated, isLoggedIn, error)
+                        }
+                    }
+                case .failure(let error):
+                    print(error)
+                    return
+                }
+                
+                
+                
+            }
+            
+        })
+    }
+    
+    func completeSignUp(username: String, name: String, completion: @escaping (_ isAuthenticated:Bool, _ isLoggedIn: Bool, Error?) -> Void) {
+        let client = app.currentUser!.mongoClient("mongodb-atlas")
+        let database = client.database(named: "music")
+        let collection = database.collection(withName: "users")
+        
+        
+        
+        collection.updateOneDocument(
+            filter: ["user_id": AnyBSON(app.currentUser!.id)],
+            update: ["$set": ["name": AnyBSON(name), "username":AnyBSON(username)]]
+        ) { (result) in
+            
+            switch(result) {
+            case .success(let document):
+                DispatchQueue.main.async {
+                    self.listnApp.initialiseRealm()  { isAuthenticated, isLoggedIn, error in
+                        guard error == nil else {
+                            completion(isAuthenticated, isLoggedIn, error)
+                            return
+                        }
+                        
+                        self.isAuthenticated = isAuthenticated
+                        self.isLoggedIn = isLoggedIn
+                        
+                        self.listnApp.isLoggedIn = isLoggedIn
+                        
+                        completion(isAuthenticated, isLoggedIn, error)
+                    }
+                }
+            case .failure(let error):
+                print("Failed to update: \(error.localizedDescription)")
+                completion(false, false, error)
+                return
+            }
+            
+        }
+    }
+    
+    func logIn(email: String, password: String, completion: @escaping (_ isLoggedIn:Bool, _ isSigingUp: Bool, Error?) -> Void) {
+        let credentials = Credentials.emailPassword(email: email, password: password)
+        print(credentials)
+        app.login(credentials:credentials) { result in
+            
+            switch(result) {
+            case .failure(let error):
+                completion(false, false, error)
+                return
+            case .success(_):
                 DispatchQueue.main.async {
                     self.listnApp.initialiseRealm() { isAuthenticated, isLoggedIn, error in
                         self.isAuthenticated = isAuthenticated
@@ -608,59 +682,42 @@ class MongoLoginService {
                         completion(isAuthenticated, isLoggedIn, error)
                     }
                 }
-                
             }
             
-        })
-    }
-    
-    func completeSignUp(username: String, name: String, completion: @escaping (_ isAuthenticated:Bool, _ isLoggedIn: Bool, Error?) -> Void) {
-        let client = app.mongoClient("mongodb-atlas")
-        let database = client.database(withName: "music")
-        let collection = database.collection(withName: "users")
-        collection.updateOneDocument(
-            filter: ["user_id": AnyBSON(app.currentUser()!.identity!)],
-            update: ["$set": ["name": AnyBSON(name), "username":AnyBSON(username)]]
-        ) { (updateResult, error) in
-              guard error == nil else {
-                  print("Failed to update: \(error!.localizedDescription)")
-                completion(false, false, error)
-                  return
-              }
-            DispatchQueue.main.async {
-                self.listnApp.initialiseRealm()  { isAuthenticated, isLoggedIn, error in
-                    guard error == nil else {
-                        completion(isAuthenticated, isLoggedIn, error)
-                        return
-                    }
-                    
-                    self.isAuthenticated = isAuthenticated
-                    self.isLoggedIn = isLoggedIn
-                    
-                    self.listnApp.isLoggedIn = isLoggedIn
-                    
-                    completion(isAuthenticated, isLoggedIn, error)
-                }
-            }
             
         }
     }
     
-    func logIn(email: String, password: String, completion: @escaping (_ isLoggedIn:Bool, _ isSigingUp: Bool, Error?) -> Void) {
-        let credentials = AppCredentials(username: email, password: password)
-        print(credentials)
-        app.login(withCredential:credentials) {user, error in
-            guard error == nil else {
-                completion(false, false, error)
-                return
-            }
-            DispatchQueue.main.async {
-                self.listnApp.initialiseRealm() { isAuthenticated, isLoggedIn, error in
-                    self.isAuthenticated = isAuthenticated
-                    self.isLoggedIn = isLoggedIn
+    func loginWithFacebook(completion: @escaping (_ isLoggedIn:Bool, _ isSigingUp: Bool, Error?) -> Void) {
+        loginManager.logIn(permissions: [.publicProfile, .email], viewController: nil) { loginResult in
+            switch loginResult {
+            case .failed(let error):
+                print(error)
+            case .cancelled:
+                print("cancelled")
+            case .success(_,  _, let accessToken):
+                print(accessToken.tokenString)
+                let credentials = Credentials.facebook(accessToken:accessToken.tokenString)
+                print(credentials)
+                self.app.login(credentials: credentials) { result in
+                    switch result {
+                    case .failure(let error):
+                        print(error
+                                .localizedDescription)
+                        completion(false, false, error)
+                        return
+                    case .success(_):
+                        DispatchQueue.main.async {
+                            self.listnApp.initialiseRealm() { isAuthenticated, isLoggedIn, error in
+                                self.isAuthenticated = isAuthenticated
+                                self.isLoggedIn = isLoggedIn
+                                
+                                self.listnApp.isLoggedIn = isLoggedIn
+                                completion(isAuthenticated, isLoggedIn, error)
+                            }
+                        }
+                    }
                     
-                    self.listnApp.isLoggedIn = isLoggedIn
-                    completion(isAuthenticated, isLoggedIn, error)
                 }
             }
             
@@ -668,7 +725,7 @@ class MongoLoginService {
     }
     
     func logOut(completion: @escaping (Error?) -> Void) {
-        app.logOut() { error in
+        app.currentUser!.logOut(){ error in
             DispatchQueue.main.async{
                 self.isLoggedIn = false
                 self.isAuthenticated = false

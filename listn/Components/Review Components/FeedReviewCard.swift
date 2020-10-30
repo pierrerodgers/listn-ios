@@ -34,7 +34,7 @@ struct FeedReviewCard: View {
             if review.text != nil && review.text != "" {
                 Text(review.text!).padding(5).lineLimit(2)
             }
-        }.frame(maxHeight:180)
+        }.frame(minHeight:130)
     }
 }
 

@@ -21,7 +21,8 @@ class Review: Object {
         self._partitionKey = partitionKey
         self.text = listnReview.text
     }
-    required init() {
+    
+    override required init() {
         
     }
     
@@ -85,8 +86,7 @@ class ReviewComment: Object {
         self._partitionKey = partitionKey
         self.reviewCommented = try! ObjectId(string:listnComment.reviewCommented)
     }
-    
-    required init() {
+    override required init() {
         
     }
     

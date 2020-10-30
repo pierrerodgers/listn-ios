@@ -6,7 +6,7 @@ target 'listn' do
   use_frameworks!
 
   # Pods for listn
-  pod 'RealmSwift', '=10.0.0-beta.2'
+  pod 'RealmSwift', '=10.1.0'
   pod 'Apollo'
 
   target 'listnUITests' do

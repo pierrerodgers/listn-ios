@@ -9,6 +9,7 @@
 import UIKit
 import RealmSwift
 import Combine
+import FacebookLogin
 
 class LoginViewModel: ObservableObject {
     @Published var error : String?
@@ -70,6 +71,28 @@ class LoginViewModel: ObservableObject {
             
             
         })
+    }
+    
+    func logInWithFacebook() {
+        self.error = nil
+        self.isLoading = true
+        loginService.loginWithFacebook() {isAuthenticated, isLoggedIn, error in
+            self.isLoading = false
+            guard error == nil else {
+                DispatchQueue.main.async {
+                    self.error = error!.localizedDescription
+                }
+                return
+            }
+            DispatchQueue.main.async {
+                self.isLoggedIn = isLoggedIn
+                self.isAuthenticated = isAuthenticated
+                self.app.isLoggedIn = isLoggedIn
+
+            }
+            
+            
+        }
     }
     
     func checkUsername(_ username:String) {

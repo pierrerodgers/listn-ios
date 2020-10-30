@@ -138,6 +138,10 @@ struct LoginView: View {
                 Spacer()
                 LoginButton(action: { self.viewModel.logIn(email: self.email, password: self.password) }, buttonType: .login)
                 
+                Button(action: {self.viewModel.logInWithFacebook() }) {
+                    Text("Log in with Facebook")
+                }
+                
                 LoginButton(action:{
                     self.signingUp = true
                     self.viewModel.error = nil
